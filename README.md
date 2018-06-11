@@ -4,7 +4,7 @@ HTTP-server and -client library for Ponylang.
 
 ## Status
 
-[![Build Status](https://travis-ci.org/ponylang/http.svg?branch=master)](https://travis-ci.org/ponylang/http)
+[![CircleCI](https://circleci.com/gh/ponylang/http/tree/master.svg?style=svg)](https://circleci.com/gh/ponylang/http/tree/master)
 
 ## Installation
 
