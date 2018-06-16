@@ -1,10 +1,8 @@
 # http
 
-HTTP-server and -client library for Ponylang.
+Ponylang package to build client and server applications for the HTTP protocol.
 
-## Build Status
-
-[![CircleCI](https://circleci.com/gh/ponylang/http/tree/master.svg?style=svg)](https://circleci.com/gh/ponylang/http/tree/master)
+[![CircleCI](https://circleci.com/gh/ponylang/http/tree/master.svg?style=svg)](https://circleci.com/gh/ponylang/http/tree/master) [API Docs](https://ponylang.github.io/http/http--index/)
 
 ## Status
 
