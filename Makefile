@@ -1,26 +1,55 @@
 
 PONYC ?= ponyc
+PONYC_FLAGS ?=
+config ?= release
 
-bin/test: bin http/*.pony http/test/*.pony
-	stable env $(PONYC) http/test -o bin --debug
+BUILD_DIR ?= build/$(config)
+SRC_DIR ?= http
+EXAMPLES_DIR ?= examples
+binary := $(BUILD_DIR)/test
 
-bin:
-	mkdir -p bin
+SOURCE_FILES := $(shell find $(SRC_DIR) -name \*.pony)
+EXAMPLES_SOURCE_FILES := $(shell find $(EXAMPLES_DIR) -name \*.pony)
 
-test: bin/test
-	bin/test
+ifdef config
+  ifeq (,$(filter $(config),debug release))
+    $(error Unknown configuration "$(config)")
+  endif
+endif
 
-examples:
-	stable env $(PONYC) examples/httpget -o bin -d -s --checktree --verify
-	stable env $(PONYC) examples/httpserver -o bin -d -s --checktree --verify
+ifeq ($(config),debug)
+    PONYC_FLAGS += --debug
+endif
+
+test: $(binary)
+	$(binary)
+
+$(binary): $(SOURCE_FILES) | $(BUILD_DIR)
+	stable env $(PONYC) $(PONYC_FLAGS) $(SRC_DIR)/test -o $(BUILD_DIR)
+
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
+
+examples: $(SOURCE_FILES) $(EXAMPLES_SOURCE_FILES) | $(BUILD_DIR)
+	stable env $(PONYC) $(EXAMPLES_DIR)/httpget -o $(BUILD_DIR) -d -s --checktree --verify
+	stable env $(PONYC) $(EXAMPLES_DIR)/httpserver -o $(BUILD_DIR) -d -s --checktree --verify
 
 .coverage:
 	mkdir -p .coverage
 
-coverage: .coverage bin/test
-	kcov --include-pattern="${PWD}/http" --exclude-pattern="*/test/*.pony,*/_test.pony" .coverage bin/test
+coverage: .coverage $(binary)
+	kcov --include-pattern="$(SRC_DIR)" --exclude-pattern="*/test/*.pony,*/_test.pony" .coverage $(binary)
 
 clean:
-	rm -rf bin .coverage
+	rm -rf $(BUILD_DIR) .coverage
 
-.PHONY: clean test coverage examples
+docs: PONYC_FLAGS += --pass=docs --docs-public --output=docs-tmp
+docs:
+	rm -rf docs-tmp
+	stable env $(PONYC) $(PONYC_FLAGS) $(SRC_DIR)
+	cd docs-tmp/http-docs && mkdocs build
+	rm -rf docs
+	cp -R docs-tmp/http-docs/site docs
+	rm -rf docs-tmp
+
+.PHONY: clean test coverage examples docs
