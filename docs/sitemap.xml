@@ -1,0 +1,2610 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    
+    <url>
+     <loc>/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+        
+    <url>
+     <loc>/http--index/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-URLPartUser/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-URLPartPassword/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-URLPartHost/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-URLPartPath/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-URLPartQuery/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-URLPartFragment/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-URLPart/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-URLEncode/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-URL/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-Status/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusContinue/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusSwitchingProtocols/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusOK/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusCreated/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusAccepted/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusNonAuthoritativeInfo/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusNoContent/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusResetContent/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusPartialContent/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusMultipleChoices/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusMovedPermanently/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusFound/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusSeeOther/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusNotModified/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusUseProxy/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusTemporaryRedirect/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusBadRequest/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusUnauthorized/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusPaymentRequired/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusForbidden/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusNotFound/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusMethodNotAllowed/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusNotAcceptable/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusProxyAuthRequired/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusRequestTimeout/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusConflict/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusGone/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusLengthRequired/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusPreconditionFailed/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusRequestEntityTooLarge/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusRequestURITooLong/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusUnsupportedMediaType/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusRequestedRangeNotSatisfiable/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusExpectationFailed/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusTeapot/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusPreconditionRequired/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusTooManyRequests/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusRequestHeaderFieldsTooLarge/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusUnavailableForLegalReasons/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusInternalServerError/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusNotImplemented/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusBadGateway/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusServiceUnavailable/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusGatewayTimeout/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusHTTPVersionNotSupported/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StatusNetworkAuthenticationRequired/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-Logger/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-ServerNotify/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-HTTPServer/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-ChunkedTransfer/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-StreamTransfer/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-OneshotTransfer/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-TransferMode/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-Payload/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-MimeTypes/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-HTTPSession/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-HTTPHandler/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-HandlerFactory/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-DiscardLog/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-ContentsLog/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-CommonLog/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/http-HTTPClient/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>/assert--index/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/assert-Assert/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/assert-Fact/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>/buffered--index/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/buffered-Writer/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/buffered-Reader/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>/builtin--index/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-U8/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-U16/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-U32/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-U64/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-ULong/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-USize/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-U128/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-Unsigned/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-Stringable/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-String/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-StringBytes/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-StringRunes/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-InputNotify/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-DisposableActor/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-InputStream/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-Stdin/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-ByteSeq/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-ByteSeqIter/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-OutStream/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-StdStream/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-SourceLoc/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-I8/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-I16/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-I32/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-I64/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-ILong/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-ISize/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-I128/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-Signed/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-Seq/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-Real/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-Integer/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-FloatingPoint/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-Number/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-Int/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-ReadSeq/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-ReadElement/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-Pointer/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-Platform/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-None/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-MaybePointer/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-Iterator/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-F32/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-F64/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-Float/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-Env/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-DoNotOptimise/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-Less/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-Equal/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-Greater/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-Compare/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-HasEq/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-Equatable/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-Comparable/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-Bool/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-AsioEventID/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-AsioEventNotify/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-AsioEvent/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-Array/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-ArrayKeys/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-ArrayValues/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-ArrayPairs/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-Any/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/builtin-AmbientAuth/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>/capsicum--index/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/capsicum-CapRights/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/capsicum-CapRights0/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/capsicum-Cap/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>/collections--index/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-Sort/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-Set/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-SetIs/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-HashSet/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-SetValues/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-RingBuffer/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-Reverse/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-Range/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-Map/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-MapIs/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-HashMap/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-MapKeys/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-MapValues/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-MapPairs/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-ListNode/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-List/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-ListNodes/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-ListValues/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-Hashable/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-Hashable64/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-HashFunction/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-HashFunction64/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-HashEq/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-HashEq64/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-HashIs/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-HashByteSeq/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-Flag/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/collections-Flags/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>/encode-base64--index/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/encode-base64-Base64/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>/files--index/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-Path/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileStream/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-WalkHandler/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FilePath/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileMode/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileInfo/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileCreate/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileChmod/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileChown/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileLink/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileLookup/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileMkdir/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileRead/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileRemove/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileRename/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileSeek/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileStat/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileSync/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileTime/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileTruncate/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileWrite/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileExec/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileCaps/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileOK/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileError/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileEOF/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileBadFileNumber/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileExists/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FilePermissionDenied/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileErrNo/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-CreateFile/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-OpenFile/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-File/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-FileLines/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/files-Directory/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>/format--index/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-PrefixSpec/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-PrefixDefault/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-PrefixSpace/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-PrefixSign/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-PrefixNumber/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-FormatSpec/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-FormatDefault/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-FormatUTF32/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-FormatBinary/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-FormatBinaryBare/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-FormatOctal/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-FormatOctalBare/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-FormatHex/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-FormatHexBare/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-FormatHexSmall/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-FormatHexSmallBare/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-FormatInt/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-FormatExp/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-FormatExpLarge/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-FormatFix/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-FormatFixLarge/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-FormatGeneral/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-FormatGeneralLarge/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-FormatFloat/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-Format/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-AlignLeft/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-AlignRight/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-AlignCenter/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/format-Align/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>/net--index/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-UDPSocketAuth/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-UDPSocket/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-UDPNotify/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-TCPListenerAuth/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-TCPListener/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-TCPListenNotify/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-TCPConnectionNotify/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-TCPConnectionAuth/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-TCPConnection/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-OSSockOpt/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-NetAddress/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-DNSLookupAuth/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-DNS/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-NetAuth/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-DNSAuth/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-UDPAuth/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-TCPAuth/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-TCPListenAuth/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-TCPConnectAuth/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>/net-ssl--index/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-ssl-X509/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-ssl-SslAutoVersion/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-ssl-Ssl3Version/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-ssl-Tls1Version/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-ssl-Tls1u1Version/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-ssl-Tls1u2Version/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-ssl-Tls1u3Version/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-ssl-Dtls1Version/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-ssl-Dtls1u2Version/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-ssl-TlsMinVersion/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-ssl-TlsMaxVersion/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-ssl-DtlsMinVersion/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-ssl-DtlsMaxVersion/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-ssl-SSLContext/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-ssl-SSLConnection/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-ssl-SSLHandshake/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-ssl-SSLAuthFail/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-ssl-SSLReady/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-ssl-SSLError/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-ssl-SSLState/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/net-ssl-SSL/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>/ponytest--index/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/ponytest-UnitTest/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/ponytest-TestList/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/ponytest-ITest/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/ponytest-TestHelper/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/ponytest-PonyTest/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>/promises--index/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/promises-Promise/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/promises-Promises/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/promises-Fulfill/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/promises-Reject/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/promises-FulfillIdentity/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/promises-RejectAlways/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>/signals--index/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/signals-SignalNotify/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/signals-SignalRaise/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/signals-SignalHandler/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/signals-Sig/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>/strings--index/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/strings-CommonPrefix/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>/term--index/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/term-ReadlineNotify/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/term-Readline/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/term-ANSITerm/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/term-ANSINotify/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/term-ANSI/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>/time--index/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/time-Timers/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/time-TimerNotify/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/time-Timer/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/time-Time/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/time-PosixDate/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/time-Nanos/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>/src/http/url_encode/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/http/url/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/http/status/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/http/server_notify/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/http/server/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/http/payload/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/http/mimetypes/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/http/http_session/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/http/http_handler/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/http/discard_log/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/http/contents_log/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/http/common_log/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/http/client/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/assert/assert/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/buffered/writer/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/buffered/reader/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/unsigned/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/stringable/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/string/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/stdin/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/std_stream/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/source_loc/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/signed/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/seq/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/real/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/read_seq/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/pointer/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/platform/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/none/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/maybe_pointer/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/iterator/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/float/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/env/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/do_not_optimise/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/compare/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/bool/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/asio_event/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/array/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/any/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/builtin/ambient_auth/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/capsicum/cap_rights/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/capsicum/cap/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/collections/sort/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/collections/set/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/collections/ring_buffer/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/collections/reverse/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/collections/range/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/collections/map/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/collections/list_node/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/collections/list/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/collections/hashable/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/collections/flag/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/encode-base64/base64/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/files/path/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/files/file_stream/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/files/file_path/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/files/file_mode/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/files/file_info/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/files/file_caps/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/files/file/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/files/directory/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/format/prefix_spec/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/format/format_spec/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/format/format/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/format/align/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/net/udp_socket/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/net/udp_notify/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/net/tcp_listener/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/net/tcp_listen_notify/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/net/tcp_connection_notify/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/net/tcp_connection/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/net/ossockopt/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/net/net_address/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/net/dns/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/net/auth/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/net-ssl/x509/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/net-ssl/ssl_versions/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/net-ssl/ssl_context/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/net-ssl/ssl_connection/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/net-ssl/ssl/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/ponytest/unit_test/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/ponytest/test_list/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/ponytest/test_helper/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/ponytest/pony_test/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/promises/promise/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/promises/fulfill/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/signals/signal_notify/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/signals/signal_handler/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/signals/sig/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/strings/common_prefix/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/term/readline_notify/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/term/readline/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/term/ansi_term/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/term/ansi_notify/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/term/ansi/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/time/timers/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/time/timer_notify/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/time/timer/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/time/time/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/time/posix_date/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>/src/time/nanos/</loc>
+     <lastmod>2018-06-16</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+</urlset>
