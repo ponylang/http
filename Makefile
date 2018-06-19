@@ -31,8 +31,8 @@ $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
 examples: $(SOURCE_FILES) $(EXAMPLES_SOURCE_FILES) | $(BUILD_DIR)
-	stable env $(PONYC) $(EXAMPLES_DIR)/httpget -o $(BUILD_DIR) -d -s --checktree --verify
-	stable env $(PONYC) $(EXAMPLES_DIR)/httpserver -o $(BUILD_DIR) -d -s --checktree --verify
+	stable env $(PONYC) --path=. $(EXAMPLES_DIR)/httpget -o $(BUILD_DIR) -d -s --checktree --verify
+	stable env $(PONYC) --path=. $(EXAMPLES_DIR)/httpserver -o $(BUILD_DIR) -d -s --checktree --verify
 
 .coverage:
 	mkdir -p .coverage

@@ -3,7 +3,7 @@ use "cli"
 use "collections"
 use "encode/base64"
 use "files"
-use "net/http"
+use "http"
 use "net/ssl"
 
 class val Config

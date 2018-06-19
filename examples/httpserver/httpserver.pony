@@ -1,4 +1,4 @@
-use "net/http"
+use "http"
 
 actor Main
   """
@@ -61,7 +61,7 @@ class BackendMaker is HandlerFactory
 class BackendHandler is HTTPHandler
   """
   Notification class for a single HTTP session.  A session can process
-  several requests, one at a time.  Data recieved using OneshotTransfer 
+  several requests, one at a time.  Data recieved using OneshotTransfer
   transfer mode is echoed in the response.
   """
   let _env: Env
