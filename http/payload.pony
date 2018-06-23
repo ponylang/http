@@ -44,7 +44,7 @@ class trn Payload
 
     The type of transfer being used by an incoming message can be determined
     from its `transfer_mode` field, which will be one of the
-    [TransferMode](net-http-TransferMode) types.
+    [TransferMode](http-TransferMode) types.
 
   ### Sequence
 
@@ -69,15 +69,15 @@ class trn Payload
   3. Add any additional headers that may be required, such as `Content-type`.
   4. Call `add_chunk` one or more times to add body data.
   4. Submit the message for transmission by calling the either the
-  [HTTPSession](net-http-HTTPSession)`.apply` method (in servers) or the
-  [HTTPClient](net-http-HTTPClient)`.apply` method in clients.
+  [HTTPSession](http-HTTPSession)`.apply` method (in servers) or the
+  [HTTPClient](http-HTTPClient)`.apply` method in clients.
   """
   var proto: String = "HTTP/1.1"
     """The HTTP protocol string"""
 
   var status: U16
     """
-    Internal representation of the response [Status](net-http-Status).
+    Internal representation of the response [Status](http-Status).
 
     Will be `0` for HTTP requests.
     """
@@ -94,11 +94,11 @@ class trn Payload
 
   var url: URL
     """
-    The HTTP request [URL](net-http-URL).
+    The HTTP request [URL](http-URL).
     It will be used for the HTTP path and the `Host` header.
     The `user` and `password` fields are ignored.
 
-    For HTTP responses this will be an empty [URL](net-http-URL).
+    For HTTP responses this will be an empty [URL](http-URL).
     """
   var _body_length: USize = 0
   var transfer_mode: TransferMode = OneshotTransfer
@@ -119,17 +119,17 @@ class trn Payload
   var username: String = ""
     """
     The username extracted from an `Authentication` header of an HTTP request
-    received via [HTTPServer](net-http-HTTPServer).
+    received via [HTTPServer](http-HTTPServer).
 
-    This is not used and not sent using [HTTPClient](net-http-HTTPClient),
+    This is not used and not sent using [HTTPClient](http-HTTPClient),
     use `update` to set an `Authentication` header instead.
     """
   var password: String = ""
     """
     The password extracted from an `Authentication` header of an HTTP request
-    received via [HTTPServer](net-http-HTTPServer).
+    received via [HTTPServer](http-HTTPServer).
 
-    This is not used and not sent using [HTTPClient](net-http-HTTPClient),
+    This is not used and not sent using [HTTPClient](http-HTTPClient),
     use `update` to set an `Authentication` header instead.
     """
 

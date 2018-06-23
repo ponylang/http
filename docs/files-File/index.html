@@ -32,7 +32,7 @@
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
       <link rel="shortcut icon" href="../assets/images/logo.png">
-      <meta name="generator" content="mkdocs-0.17.3, mkdocs-ponylang-material-0.1.0">
+      <meta name="generator" content="mkdocs-0.17.4, mkdocs-ponylang-material-0.1.0">
     
     
       
@@ -6660,7 +6660,7 @@ requested data</p>
 </ul>
 <hr />
 <h3 id="position">position<a class="headerlink" href="#position" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/files/file/#L514">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/files/file/#L515">[Source]</a></span></p>
 <p>Return the current cursor position in the file.</p>
 <pre><code class="pony">fun ref position()
 : USize val
@@ -6672,7 +6672,7 @@ requested data</p>
 </ul>
 <hr />
 <h3 id="size">size<a class="headerlink" href="#size" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/files/file/#L539">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/files/file/#L540">[Source]</a></span></p>
 <p>Return the total length of the file.</p>
 <pre><code class="pony">fun ref size()
 : USize val
@@ -6684,7 +6684,7 @@ requested data</p>
 </ul>
 <hr />
 <h3 id="seek_start">seek_start<a class="headerlink" href="#seek_start" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/files/file/#L549">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/files/file/#L550">[Source]</a></span></p>
 <p>Set the cursor position relative to the start of the file.</p>
 <pre><code class="pony">fun ref seek_start(
   offset: USize val)
@@ -6701,7 +6701,7 @@ requested data</p>
 </ul>
 <hr />
 <h3 id="seek_end">seek_end<a class="headerlink" href="#seek_end" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/files/file/#L557">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/files/file/#L558">[Source]</a></span></p>
 <p>Set the cursor position relative to the end of the file.</p>
 <pre><code class="pony">fun ref seek_end(
   offset: USize val)
@@ -6718,7 +6718,7 @@ requested data</p>
 </ul>
 <hr />
 <h3 id="seek">seek<a class="headerlink" href="#seek" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/files/file/#L565">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/files/file/#L566">[Source]</a></span></p>
 <p>Move the cursor position.</p>
 <pre><code class="pony">fun ref seek(
   offset: ISize val)
@@ -6735,7 +6735,7 @@ requested data</p>
 </ul>
 <hr />
 <h3 id="sync">sync<a class="headerlink" href="#sync" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/files/file/#L573">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/files/file/#L574">[Source]</a></span></p>
 <p>Sync the file contents to physical storage.</p>
 <pre><code class="pony">fun ref sync()
 : None val
@@ -6747,7 +6747,7 @@ requested data</p>
 </ul>
 <hr />
 <h3 id="datasync">datasync<a class="headerlink" href="#datasync" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/files/file/#L593">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/files/file/#L594">[Source]</a></span></p>
 <p>Sync the file contents to physical storage.</p>
 <pre><code class="pony">fun ref datasync()
 : None val
@@ -6759,7 +6759,7 @@ requested data</p>
 </ul>
 <hr />
 <h3 id="set_length">set_length<a class="headerlink" href="#set_length" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/files/file/#L612">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/files/file/#L613">[Source]</a></span></p>
 <p>Change the file size. If it is made larger, the new contents are undefined.</p>
 <pre><code class="pony">fun ref set_length(
   len: USize val)
@@ -6776,7 +6776,7 @@ requested data</p>
 </ul>
 <hr />
 <h3 id="info">info<a class="headerlink" href="#info" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/files/file/#L642">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/files/file/#L643">[Source]</a></span></p>
 <p>Return a FileInfo for this directory. Raise an error if the fd is invalid
 or if we don't have FileStat permission.</p>
 <pre><code class="pony">fun box info()
@@ -6789,7 +6789,7 @@ or if we don't have FileStat permission.</p>
 </ul>
 <hr />
 <h3 id="chmod">chmod<a class="headerlink" href="#chmod" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/files/file/#L649">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/files/file/#L650">[Source]</a></span></p>
 <p>Set the FileMode for this directory.</p>
 <pre><code class="pony">fun box chmod(
   mode: FileMode box)
@@ -6806,7 +6806,7 @@ or if we don't have FileStat permission.</p>
 </ul>
 <hr />
 <h3 id="chown">chown<a class="headerlink" href="#chown" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/files/file/#L655">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/files/file/#L656">[Source]</a></span></p>
 <p>Set the owner and group for this directory. Does nothing on Windows.</p>
 <pre><code class="pony">fun box chown(
   uid: U32 val,
@@ -6825,7 +6825,7 @@ or if we don't have FileStat permission.</p>
 </ul>
 <hr />
 <h3 id="touch">touch<a class="headerlink" href="#touch" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/files/file/#L661">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/files/file/#L662">[Source]</a></span></p>
 <p>Set the last access and modification times of the directory to now.</p>
 <pre><code class="pony">fun box touch()
 : Bool val
@@ -6837,7 +6837,7 @@ or if we don't have FileStat permission.</p>
 </ul>
 <hr />
 <h3 id="set_time">set_time<a class="headerlink" href="#set_time" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/files/file/#L667">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/files/file/#L668">[Source]</a></span></p>
 <p>Set the last access and modification times of the directory to the given
 values.</p>
 <pre><code class="pony">fun box set_time(
@@ -6857,7 +6857,7 @@ values.</p>
 </ul>
 <hr />
 <h3 id="lines">lines<a class="headerlink" href="#lines" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/files/file/#L674">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/files/file/#L675">[Source]</a></span></p>
 <p>Returns an iterator for reading lines from the file.</p>
 <pre><code class="pony">fun ref lines()
 : FileLines ref
@@ -6869,7 +6869,7 @@ values.</p>
 </ul>
 <hr />
 <h3 id="dispose">dispose<a class="headerlink" href="#dispose" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/files/file/#L680">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/files/file/#L681">[Source]</a></span></p>
 <p>Close the file. Future operations will do nothing.</p>
 <pre><code class="pony">fun ref dispose()
 : None val
@@ -6953,7 +6953,7 @@ values.</p>
     
       <script src="../assets/javascripts/application.044f2a1a.js"></script>
       
-      <script>app.initialize({version:"0.17.3",url:{base:".."}})</script>
+      <script>app.initialize({version:"0.17.4",url:{base:".."}})</script>
       
     
     
