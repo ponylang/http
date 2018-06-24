@@ -32,7 +32,7 @@ actor PrivateTests is TestList
     test(_HTTPConnTest)
 
 class iso _Encode is UnitTest
-  fun name(): String => "net/http/URLEncode.encode"
+  fun name(): String => "http/URLEncode.encode"
 
   fun apply(h: TestHelper) ? =>
     // Unreserved chars, decoded.
@@ -78,7 +78,7 @@ class iso _Encode is UnitTest
     h.assert_eq[String](":@/?", URLEncode.encode(":@/?", URLPartFragment)?)
 
 class iso _EncodeBad is UnitTest
-  fun name(): String => "net/http/URLEncode.encode_bad"
+  fun name(): String => "http/URLEncode.encode_bad"
 
   fun apply(h: TestHelper) =>
     h.assert_error({() ? => URLEncode.encode("%2G", URLPartUser)? })
@@ -86,7 +86,7 @@ class iso _EncodeBad is UnitTest
     h.assert_error({() ? => URLEncode.encode("%2", URLPartUser)? })
 
 class iso _EncodeIPv6 is UnitTest
-  fun name(): String => "net/http/URLEncode.encode_ipv6"
+  fun name(): String => "http/URLEncode.encode_ipv6"
 
   fun apply(h: TestHelper) ? =>
     // Allowed hex digits, '.' and ':' only, between '[' and ']'.
@@ -99,7 +99,7 @@ class iso _EncodeIPv6 is UnitTest
     h.assert_eq[String]("1%5D", URLEncode.encode("1]", URLPartHost)?)
 
 class iso _EncodeClean is UnitTest
-  fun name(): String => "net/http/URLEncode.encode_clean"
+  fun name(): String => "http/URLEncode.encode_clean"
 
   fun apply(h: TestHelper) ? =>
     // No percent encoding in source string.
@@ -108,7 +108,7 @@ class iso _EncodeClean is UnitTest
     h.assert_eq[String]("%25", URLEncode.encode("%", URLPartQuery, false)?)
 
 class iso _Check is UnitTest
-  fun name(): String => "net/http/URLEncode.check"
+  fun name(): String => "http/URLEncode.check"
 
   fun apply(h: TestHelper) =>
     // Unreserved chars, legal encoded or not.
@@ -172,7 +172,7 @@ class iso _Check is UnitTest
     h.assert_eq[Bool](true, URLEncode.check(":@/?", URLPartFragment))
 
 class iso _CheckBad is UnitTest
-  fun name(): String => "net/http/URLEncode.check_bad"
+  fun name(): String => "http/URLEncode.check_bad"
 
   fun apply(h: TestHelper) =>
     h.assert_eq[Bool](false, URLEncode.check("%2G", URLPartUser))
@@ -180,7 +180,7 @@ class iso _CheckBad is UnitTest
     h.assert_eq[Bool](false, URLEncode.check("%2", URLPartUser))
 
 class iso _CheckScheme is UnitTest
-  fun name(): String => "net/http/URLEncode.check_scheme"
+  fun name(): String => "http/URLEncode.check_scheme"
 
   fun apply(h: TestHelper) =>
     h.assert_eq[Bool](true, URLEncode.check_scheme("Aa4-+."))
@@ -189,7 +189,7 @@ class iso _CheckScheme is UnitTest
     h.assert_eq[Bool](false, URLEncode.check_scheme("%41"))
 
 class iso _CheckIPv6 is UnitTest
-  fun name(): String => "net/http/URLEncode.check_ipv6"
+  fun name(): String => "http/URLEncode.check_ipv6"
 
   fun apply(h: TestHelper) =>
     // Allowed hex digits, '.' and ':' only, between '[' and ']'.
@@ -202,7 +202,7 @@ class iso _CheckIPv6 is UnitTest
     h.assert_eq[Bool](false, URLEncode.check("1]", URLPartHost))
 
 class iso _Decode is UnitTest
-  fun name(): String => "net/http/URLEncode.decode"
+  fun name(): String => "http/URLEncode.decode"
 
   fun apply(h: TestHelper) ? =>
     h.assert_eq[String]("Aa4-._~Aa4-._~",
@@ -217,7 +217,7 @@ class iso _Decode is UnitTest
       URLEncode.decode("#<>[]{}|^ %23%3C%3E%5B%5D%7B%7D%7C%5E%20%25")?)
 
 class iso _DecodeBad is UnitTest
-  fun name(): String => "net/http/URLEncode.decode_bad"
+  fun name(): String => "http/URLEncode.decode_bad"
 
   fun apply(h: TestHelper) =>
     h.assert_error({() ? => URLEncode.decode("%2G")? })
@@ -225,7 +225,7 @@ class iso _DecodeBad is UnitTest
     h.assert_error({() ? => URLEncode.decode("%2")? })
 
 class iso _BuildBasic is UnitTest
-  fun name(): String => "net/http/URL.build_basic"
+  fun name(): String => "http/URL.build_basic"
 
   fun apply(h: TestHelper) ? =>
     _Test(h,
@@ -248,7 +248,7 @@ class iso _BuildBasic is UnitTest
       "http", "user", "", "host", 80, "/", "", "")
 
 class iso _BuildMissingParts is UnitTest
-  fun name(): String => "net/http/URL.build_missing_parts"
+  fun name(): String => "http/URL.build_missing_parts"
 
   fun apply(h: TestHelper) ? =>
     _Test(h, URL.build("https://user@host.name/path#fragment")?,
@@ -276,7 +276,7 @@ class iso _BuildMissingParts is UnitTest
       "https", "user", "", "host.name", 443, "/", "quer/y", "fragment")
 
 class iso _BuildBad is UnitTest
-  fun name(): String => "net/http/URL.build_bad"
+  fun name(): String => "http/URL.build_bad"
 
   fun apply(h: TestHelper) =>
     h.assert_error({() ? =>
@@ -300,14 +300,14 @@ class iso _BuildBad is UnitTest
     })
 
 class iso _BuildNoEncoding is UnitTest
-  fun name(): String => "net/http/URL.build_no_encoding"
+  fun name(): String => "http/URL.build_no_encoding"
 
   fun apply(h: TestHelper) ? =>
     _Test(h, URL.build("https://host.name/path%32path", false)?,
       "https", "", "", "host.name", 443, "/path%2532path", "", "")
 
 class iso _Valid is UnitTest
-  fun name(): String => "net/http/URL.valid"
+  fun name(): String => "http/URL.valid"
 
   fun apply(h: TestHelper) ? =>
     _Test(h,
@@ -328,7 +328,7 @@ class iso _Valid is UnitTest
       "http", "user", "", "host", 80, "/", "", "")
 
 class iso _ToStringFun is UnitTest
-  fun name(): String => "net/http/URL.to_string"
+  fun name(): String => "http/URL.to_string"
 
   fun apply(h: TestHelper) ? =>
     h.assert_eq[String](
@@ -396,7 +396,7 @@ class val _HTTPConnTestHandlerFactory is HandlerFactory
     _HTTPConnTestHandler(h)
 
 class iso _HTTPConnTest is UnitTest
-  fun name(): String => "net/http/_HTTPConnection._new_conn"
+  fun name(): String => "http/_HTTPConnection._new_conn"
   fun label(): String => "conn-fix"
 
   fun ref apply(h: TestHelper) ? =>

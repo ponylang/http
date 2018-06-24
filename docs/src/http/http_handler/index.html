@@ -5772,7 +5772,7 @@ interface HTTPHandler
 interface HandlerFactory
   &quot;&quot;&quot;
   The TCP connections that underlie HTTP sessions get created within
-  the `net/http` package at times that the application code can not
+  the `http` package at times that the application code can not
   predict. Yet, the application code has to provide custom hooks into
   these connections as they are created. To accomplish this, the
   application code provides an instance of a `class` that implements
