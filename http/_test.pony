@@ -482,7 +482,7 @@ primitive _FixedResponseHTTPServerNotify
     : TCPListenNotify iso^
   =>
     recover
-      object is TCPListenNotify iso^
+      object iso is TCPListenNotify
         let h: TestHelper = h'
         let listen_cb: {(String val)} iso = consume f
         let response: Array[String val] val = r
@@ -507,7 +507,7 @@ primitive _FixedResponseHTTPServerNotify
         fun ref connected(listen: TCPListener ref): TCPConnectionNotify iso^ =>
           h.complete_action("server listen connected")
           recover
-            object is TCPConnectionNotify iso^
+            object iso is TCPConnectionNotify
             // let response': Array[String val] val = response
             let reader: Reader iso = Reader
             var nr: USize = 0
