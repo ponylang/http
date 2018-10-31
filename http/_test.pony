@@ -30,6 +30,7 @@ actor PrivateTests is TestList
     test(_ToStringFun)
 
     test(_HTTPConnTest)
+    test(_HTTPParserNoBodyTest)
 
 class iso _Encode is UnitTest
   fun name(): String => "net/http/URLEncode.encode"
@@ -568,3 +569,36 @@ primitive _FixedResponseHTTPServerNotify
 
       end // object
     end // recover
+
+class iso _HTTPParserNoBodyTest is UnitTest
+  fun name(): String => "/net/http/_HttpParser.NoBody"
+  fun ref apply(h: TestHelper) =>
+    let test_session =
+      object is HTTPSession
+        be apply(payload: Payload val) => None
+        be finish() => None
+        be dispose() => None
+        be write(byteseq: ByteSeq val) => None
+        be _mute() => None
+        be _unmute() => None
+        be cancel(msg: Payload val) => None
+        be _deliver(payload: Payload val) =>
+          h.complete_action("_deliver")
+        be _chunk(data: ByteSeq val) =>
+          h.fail("HTTPSession._chunk called")
+        be _finish() =>
+          h.complete_action("_finish")
+      end
+    let parser = _HTTPParser.request(test_session)
+    let payload = "GET /get HTTP/1.1\r\nHost: httpbin.org\r\nUser-Agent: curl/7.58.0\r\nAccept: */*\r\n\r\n"
+
+    h.long_test(2_000_000_000)
+    h.expect_action("_deliver")
+    h.expect_action("_finish")
+    let reader: Reader = Reader
+    reader.append(payload)
+    try
+      parser.parse(reader)?
+    else
+      h.fail("parser failed to parse request")
+    end

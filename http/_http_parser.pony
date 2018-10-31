@@ -106,6 +106,7 @@ class _HTTPParser
     let payload = _payload = Payload._empty(_client)
     _session._deliver(consume payload)
     if not body_follows then
+      _session._finish()
       _restart()
     end
 
