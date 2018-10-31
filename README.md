@@ -2,7 +2,7 @@
 
 Ponylang package to build client and server applications for the HTTP protocol.
 
-[![CircleCI](https://circleci.com/gh/ponylang/http/tree/master.svg?style=svg)](https://circleci.com/gh/ponylang/http/tree/master) [![API Docs](https://img.shields.io/badge/api-docs-yellow.svg)](https://ponylang.github.io/http/http--index/)
+[![CircleCI](https://circleci.com/gh/ponylang/http/tree/master.svg?style=svg)](https://circleci.com/gh/ponylang/http/tree/master)
 
 ## Status
 
