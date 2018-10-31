@@ -32,7 +32,7 @@
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
       <link rel="shortcut icon" href="../assets/images/logo.png">
-      <meta name="generator" content="mkdocs-0.17.3, mkdocs-ponylang-material-0.1.0">
+      <meta name="generator" content="mkdocs-0.17.4, mkdocs-ponylang-material-0.1.0">
     
     
       
@@ -6289,7 +6289,7 @@ of any size. This package supports both of them:</p>
   transit at once.</p>
 <p>The type of transfer being used by an incoming message can be determined
   from its <code>transfer_mode</code> field, which will be one of the
-  <a href="../net-http-TransferMode">TransferMode</a> types.</p>
+  <a href="../http-TransferMode">TransferMode</a> types.</p>
 <h3 id="sequence">Sequence<a class="headerlink" href="#sequence" title="Permanent link">&para;</a></h3>
 <p>For example, to send a message of possibly large size:</p>
 <ol>
@@ -6312,8 +6312,8 @@ simplified method can be used instead:</p>
 <li>Add any additional headers that may be required, such as <code>Content-type</code>.</li>
 <li>Call <code>add_chunk</code> one or more times to add body data.</li>
 <li>Submit the message for transmission by calling the either the
-<a href="../net-http-HTTPSession">HTTPSession</a><code>.apply</code> method (in servers) or the
-<a href="../net-http-HTTPClient">HTTPClient</a><code>.apply</code> method in clients.</li>
+<a href="../http-HTTPSession">HTTPSession</a><code>.apply</code> method (in servers) or the
+<a href="../http-HTTPClient">HTTPClient</a><code>.apply</code> method in clients.</li>
 </ol>
 <pre><code class="pony">class trn Payload
 </code></pre>
@@ -6362,7 +6362,7 @@ simplified method can be used instead:</p>
 <hr />
 <h3 id="var-status-u16-val">var status: <a href="../builtin-U16">U16</a> val<a class="headerlink" href="#var-status-u16-val" title="Permanent link">&para;</a></h3>
 <p><span class="source-link"><a href="../src/http/payload/#L78">[Source]</a></span></p>
-<p>Internal representation of the response <a href="../net-http-Status">Status</a>.</p>
+<p>Internal representation of the response <a href="../http-Status">Status</a>.</p>
 <p>Will be <code>0</code> for HTTP requests.</p>
 <hr />
 <h3 id="var-method-string-val">var method: <a href="../builtin-String">String</a> val<a class="headerlink" href="#var-method-string-val" title="Permanent link">&para;</a></h3>
@@ -6374,10 +6374,10 @@ for a <code>200</code> status this will be <code>200 OK</code>, for <code>404</c
 <hr />
 <h3 id="var-url-url-val">var url: <a href="../http-URL">URL</a> val<a class="headerlink" href="#var-url-url-val" title="Permanent link">&para;</a></h3>
 <p><span class="source-link"><a href="../src/http/payload/#L95">[Source]</a></span></p>
-<p>The HTTP request <a href="../net-http-URL">URL</a>.
+<p>The HTTP request <a href="../http-URL">URL</a>.
 It will be used for the HTTP path and the <code>Host</code> header.
 The <code>user</code> and <code>password</code> fields are ignored.</p>
-<p>For HTTP responses this will be an empty <a href="../net-http-URL">URL</a>.</p>
+<p>For HTTP responses this will be an empty <a href="../http-URL">URL</a>.</p>
 <hr />
 <h3 id="var-transfer_mode-chunkedtransfer-val-streamtransfer-val-oneshottransfer-val">var transfer_mode: (<a href="../http-ChunkedTransfer">ChunkedTransfer</a> val | <a href="../http-StreamTransfer">StreamTransfer</a> val | <a href="../http-OneshotTransfer">OneshotTransfer</a> val)<a class="headerlink" href="#var-transfer_mode-chunkedtransfer-val-streamtransfer-val-oneshottransfer-val" title="Permanent link">&para;</a></h3>
 <p><span class="source-link"><a href="../src/http/payload/#L104">[Source]</a></span></p>
@@ -6393,15 +6393,15 @@ how the request is transferred.</p>
 <h3 id="var-username-string-val">var username: <a href="../builtin-String">String</a> val<a class="headerlink" href="#var-username-string-val" title="Permanent link">&para;</a></h3>
 <p><span class="source-link"><a href="../src/http/payload/#L119">[Source]</a></span></p>
 <p>The username extracted from an <code>Authentication</code> header of an HTTP request
-received via <a href="../net-http-HTTPServer">HTTPServer</a>.</p>
-<p>This is not used and not sent using <a href="../net-http-HTTPClient">HTTPClient</a>,
+received via <a href="../http-HTTPServer">HTTPServer</a>.</p>
+<p>This is not used and not sent using <a href="../http-HTTPClient">HTTPClient</a>,
 use <code>update</code> to set an <code>Authentication</code> header instead.</p>
 <hr />
 <h3 id="var-password-string-val">var password: <a href="../builtin-String">String</a> val<a class="headerlink" href="#var-password-string-val" title="Permanent link">&para;</a></h3>
 <p><span class="source-link"><a href="../src/http/payload/#L127">[Source]</a></span></p>
 <p>The password extracted from an <code>Authentication</code> header of an HTTP request
-received via <a href="../net-http-HTTPServer">HTTPServer</a>.</p>
-<p>This is not used and not sent using <a href="../net-http-HTTPClient">HTTPClient</a>,
+received via <a href="../http-HTTPServer">HTTPServer</a>.</p>
+<p>This is not used and not sent using <a href="../http-HTTPClient">HTTPClient</a>,
 use <code>update</code> to set an <code>Authentication</code> header instead.</p>
 <hr />
 <h2 id="public-functions">Public Functions<a class="headerlink" href="#public-functions" title="Permanent link">&para;</a></h2>
@@ -6668,7 +6668,7 @@ and is unnecessary, in Oneshot mode.</p>
     
       <script src="../assets/javascripts/application.044f2a1a.js"></script>
       
-      <script>app.initialize({version:"0.17.3",url:{base:".."}})</script>
+      <script>app.initialize({version:"0.17.4",url:{base:".."}})</script>
       
     
     

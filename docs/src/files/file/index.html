@@ -32,7 +32,7 @@
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
       <link rel="shortcut icon" href="../../../assets/images/logo.png">
-      <meta name="generator" content="mkdocs-0.17.3, mkdocs-ponylang-material-0.1.0">
+      <meta name="generator" content="mkdocs-0.17.4, mkdocs-ponylang-material-0.1.0">
     
     
       
@@ -5775,7 +5775,7 @@ class File
   var _fd: I32
   var _last_line_length: USize = 256
   var _errno: FileErrNo = FileOK
-  embed _pending_writev: Array[(Pointer[U8] tag, USize)] = _pending_writev.create()
+  embed _pending_writev: Array[USize] = _pending_writev.create()
   var _pending_writev_total: USize = 0
 
   new create(from: FilePath) =&gt;
@@ -6080,7 +6080,7 @@ class File
     NOTE: Queue'd data will always be written before normal print/write
     requested data
     &quot;&quot;&quot;
-    _pending_writev .&gt; push((data.cpointer(), data.size()))
+    _pending_writev .&gt; push(data.cpointer().usize()) .&gt; push(data.size())
     _pending_writev_total = _pending_writev_total + data.size()
 
   fun ref queuev(data: ByteSeqIter box) =&gt;
@@ -6122,6 +6122,7 @@ class File
         end
         for d in Range[USize](0, num_written, 1) do
           _pending_writev.shift()?
+          _pending_writev.shift()?
         end
       end
       return result
@@ -6156,7 +6157,7 @@ class File
     let writev_batch_size = @pony_os_writev_max()
     while pending_total &gt; 0 do
       // Determine the number of bytes and buffers to send.
-      num_to_send = _pending_writev.size().i32() - num_sent.i32()
+      num_to_send = (_pending_writev.size().i32() / 2) - num_sent.i32()
       if num_to_send &lt;= writev_batch_size then
         bytes_to_send = pending_total
       else
@@ -6164,20 +6165,20 @@ class File
         // We must iterate over the buffers being sent to add up to the total.
         num_to_send = writev_batch_size
         bytes_to_send = 0
-        var counter: I32 = num_sent.i32()
+        var counter: I32 = (num_sent.i32() * 2) + 1
         repeat
-          bytes_to_send = bytes_to_send + _pending_writev(counter.usize())?._2
-          counter = counter + 1
-        until counter &gt;= num_to_send end
+          bytes_to_send = bytes_to_send + _pending_writev(counter.usize())?
+          counter = counter + 2
+        until counter &gt;= (num_to_send * 2) end
       end
 
       // Write as much data as possible (vectored i/o).
       // On Windows only write 1 buffer at a time.
       var len = ifdef windows then
-        @_write(_fd, _pending_writev(num_sent)?._1,
+        @_write(_fd, _pending_writev(num_sent * 2)?,
           bytes_to_send.i32()).isize()
       else
-        @writev(_fd, _pending_writev.cpointer(num_sent),
+        @writev(_fd, _pending_writev.cpointer(num_sent * 2),
           num_to_send).isize()
       end
 
@@ -6533,7 +6534,7 @@ class FileLines is Iterator[String]
     
       <script src="../../../assets/javascripts/application.044f2a1a.js"></script>
       
-      <script>app.initialize({version:"0.17.3",url:{base:"../../.."}})</script>
+      <script>app.initialize({version:"0.17.4",url:{base:"../../.."}})</script>
       
     
     

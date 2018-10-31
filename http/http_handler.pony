@@ -4,22 +4,22 @@ and server applications for the HTTP protocol.
 
 The important interfaces an application needs to deal with are:
 
-* [HTTPSession](net-http-HTTPSession), the API to an HTTP connection.
+* [HTTPSession](http-HTTPSession), the API to an HTTP connection.
 
-* [HTTPHandler](net-http-HTTPHandler), the interface to a handler you
+* [HTTPHandler](http-HTTPHandler), the interface to a handler you
 need to write that will receive notifications from the `HTTPSession`.
 
-* [HandlerFactory](net-http-HandlerFactory), the interface to a class you
+* [HandlerFactory](http-HandlerFactory), the interface to a class you
 need to write that creates instances of your `HTTPHandler`.
 
-* [Payload](net-http-Payload), the class that represents a single HTTP
+* [Payload](http-Payload), the class that represents a single HTTP
 message, with its headers.
 
 If you are writing a client, you will need to deal with the
-[HTTPClient](net-http-HTTPClient) class.
+[HTTPClient](http-HTTPClient) class.
 
 If you are writing a server, you will need to deal with the
-[HTTPServer](net-http-HTTPServer) class.
+[HTTPServer](http-HTTPServer) class.
 
 """
 
@@ -93,7 +93,7 @@ interface HTTPHandler
 interface HandlerFactory
   """
   The TCP connections that underlie HTTP sessions get created within
-  the `net/http` package at times that the application code can not
+  the `http` package at times that the application code can not
   predict. Yet, the application code has to provide custom hooks into
   these connections as they are created. To accomplish this, the
   application code provides an instance of a `class` that implements

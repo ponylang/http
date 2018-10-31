@@ -5,7 +5,7 @@ interface tag HTTPSession
   at a time in each direction. The client and server each have their
   own ways of implementing this interface, but to application code (either
   in the client or in the server 'back end') this interface provides a
-  common view of how information is passed *into* the `net/http` package.
+  common view of how information is passed *into* the `http` package.
   """
   be apply(payload: Payload val)
     """
