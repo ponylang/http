@@ -30,6 +30,8 @@ actor PrivateTests is TestList
     test(_ToStringFun)
 
     test(_HTTPConnTest)
+    test(_HTTPParserNoBodyTest)
+    test(_HTTPParserOneshotBodyTest)
 
 class iso _Encode is UnitTest
   fun name(): String => "http/URLEncode.encode"
@@ -568,3 +570,66 @@ primitive _FixedResponseHTTPServerNotify
 
       end // object
     end // recover
+
+class iso _HTTPParserNoBodyTest is UnitTest
+  fun name(): String => "http/_HttpParser.NoBody"
+  fun ref apply(h: TestHelper) =>
+    let test_session =
+      object is HTTPSession
+        be apply(payload: Payload val) => None
+        be finish() => None
+        be dispose() => None
+        be write(byteseq: ByteSeq val) => None
+        be _mute() => None
+        be _unmute() => None
+        be cancel(msg: Payload val) => None
+        be _deliver(payload: Payload val) =>
+          h.complete_action("_deliver")
+        be _chunk(data: ByteSeq val) =>
+          h.fail("HTTPSession._chunk called.")
+        be _finish() =>
+          h.fail("HTTPSession._finish called.")
+      end
+    let parser = _HTTPParser.request(test_session)
+    let payload = "GET /get HTTP/1.1\r\nHost: httpbin.org\r\nUser-Agent: curl/7.58.0\r\nAccept: */*\r\n\r\n"
+
+    h.long_test(2_000_000_000)
+    h.expect_action("_deliver")
+    let reader: Reader = Reader
+    reader.append(payload)
+    try
+      parser.parse(reader)?
+    else
+      h.fail("parser failed to parse request")
+    end
+
+class iso _HTTPParserOneshotBodyTest is UnitTest
+  fun name(): String => "http/_HttpParser.OneshotBody"
+  fun ref apply(h: TestHelper) =>
+    let test_session =
+      object is HTTPSession
+        be apply(payload: Payload val) => None
+        be finish() => None
+        be dispose() => None
+        be write(byteseq: ByteSeq val) => None
+        be _mute() => None
+        be _unmute() => None
+        be cancel(msg: Payload val) => None
+        be _deliver(payload: Payload val) =>
+          h.complete_action("_deliver")
+        be _chunk(data: ByteSeq val) =>
+          h.fail("HTTPSession._chunk called.")
+        be _finish() =>
+          h.fail("HTTPSession._finish called.")
+      end
+    let parser = _HTTPParser.request(test_session)
+    let payload = "POST /post HTTP/1.1\r\nHost: httpbin.org\r\nUser-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nAccept-Language: en-GB,en;q=0.5\r\nAccept-Encoding: gzip, deflate\r\nReferer: http://httpbin.org/forms/post\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 174\r\nCookie: _gauges_unique_hour=1; _gauges_unique_day=1; _gauges_unique_month=1; _gauges_unique_year=1; _gauges_unique=1\r\nConnection: keep-alive\r\nUpgrade-Insecure-Requests: 1\r\n\r\ncustname=Pony+Mc+Ponyface&custtel=%2B490123456789&custemail=pony%40ponylang.org&size=large&topping=bacon&topping=cheese&topping=onion&delivery=&comments=This+is+a+stupid+test"
+    h.long_test(2_000_000_000)
+    h.expect_action("_deliver")
+    let reader: Reader = Reader
+    reader.append(payload)
+    try
+      parser.parse(reader)?
+    else
+      h.fail("parser failed to parse request")
+    end

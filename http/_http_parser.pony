@@ -209,7 +209,11 @@ class _HTTPParser
           // An empty line marks the end of the headers. Set state
           // appropriately.
           _set_header_end()
-          _deliver()
+          if _state isnt _ExpectBody then
+            // deliver for chunked or streamed transfer
+            // accumulate the body in the Payload for OneshotTransfer
+            _deliver()
+          end
           parse(buffer)?
         else
           // A non-empty line *must* be a header. Error if not.
@@ -330,11 +334,24 @@ class _HTTPParser
       let bytes = buffer.block(usable)?
       let body = recover val consume bytes end
       _expected_length = _expected_length - usable
-      _session._chunk(body)
+      match _payload.transfer_mode
+      | OneshotTransfer =>
+        // in oneshot transfer we actually fill the body of the payload
+        _payload.add_chunk(body)
+      else
+        _session._chunk(body)
+      end
 
       // All done with this message if we have processed the entire body.
       if _expected_length == 0 then
-        _session._finish()
+        match _payload.transfer_mode
+        | OneshotTransfer =>
+          // we have all the body, finally deliver it
+          _deliver()
+        else
+          // explicitly finish the session in chunked and stream mode
+          _session._finish()
+        end
         _restart()
       end
     end
