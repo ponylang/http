@@ -591,7 +591,14 @@ class iso _HTTPParserNoBodyTest is UnitTest
           h.fail("HTTPSession._finish called.")
       end
     let parser = _HTTPParser.request(test_session)
-    let payload = "GET /get HTTP/1.1\r\nHost: httpbin.org\r\nUser-Agent: curl/7.58.0\r\nAccept: */*\r\n\r\n"
+    let payload: String = "\r\n".join([
+      "GET /get HTTP/1.1"
+      "Host: httpbin.org"
+      "User-Agent: curl/7.58.0"
+      "Accept: */*"
+      ""
+      ""
+      ].values())
 
     h.long_test(2_000_000_000)
     h.expect_action("_deliver")
@@ -623,7 +630,22 @@ class iso _HTTPParserOneshotBodyTest is UnitTest
           h.fail("HTTPSession._finish called.")
       end
     let parser = _HTTPParser.request(test_session)
-    let payload = "POST /post HTTP/1.1\r\nHost: httpbin.org\r\nUser-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nAccept-Language: en-GB,en;q=0.5\r\nAccept-Encoding: gzip, deflate\r\nReferer: http://httpbin.org/forms/post\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: 174\r\nCookie: _gauges_unique_hour=1; _gauges_unique_day=1; _gauges_unique_month=1; _gauges_unique_year=1; _gauges_unique=1\r\nConnection: keep-alive\r\nUpgrade-Insecure-Requests: 1\r\n\r\ncustname=Pony+Mc+Ponyface&custtel=%2B490123456789&custemail=pony%40ponylang.org&size=large&topping=bacon&topping=cheese&topping=onion&delivery=&comments=This+is+a+stupid+test"
+    let payload: String = "\r\n".join([
+        "POST /post HTTP/1.1"
+        "Host: httpbin.org"
+        "User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0"
+        "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+        "Accept-Language: en-GB,en;q=0.5"
+        "Accept-Encoding: gzip, deflate"
+        "Referer: http://httpbin.org/forms/post"
+        "Content-Type: application/x-www-form-urlencoded"
+        "Content-Length: 174"
+        "Cookie: _gauges_unique_hour=1; _gauges_unique_day=1; _gauges_unique_month=1; _gauges_unique_year=1; _gauges_unique=1"
+        "Connection: keep-alive"
+        "Upgrade-Insecure-Requests: 1"
+        ""
+        "custname=Pony+Mc+Ponyface&custtel=%2B490123456789&custemail=pony%40ponylang.org&size=large&topping=bacon&topping=cheese&topping=onion&delivery=&comments=This+is+a+stupid+test"
+      ].values())
     h.long_test(2_000_000_000)
     h.expect_action("_deliver")
     let reader: Reader = Reader
