@@ -106,10 +106,10 @@ class _HTTPParser
     let payload = _payload = Payload._empty(_client)
     _session._deliver(consume payload)
     if not body_follows then
-      _restart()
+      restart()
     end
 
-  fun ref _restart() =>
+  fun ref restart() =>
     """
     Restart parser state for the next message. It will be of the same
     kind as the last one.
@@ -352,7 +352,7 @@ class _HTTPParser
           // explicitly finish the session in chunked and stream mode
           _session._finish()
         end
-        _restart()
+        restart()
       end
     end
 
@@ -374,7 +374,7 @@ class _HTTPParser
       else
         // We already have the CRLF after the zero, so we are all done.
         _session._finish()
-        _restart()
+        restart()
       end
 
       parse(buffer)?
@@ -417,7 +417,7 @@ class _HTTPParser
       if _chunk_end
       then
         _session._finish()
-        _restart()
+        restart()
       else
         _state = _ExpectChunkStart
         parse(buffer)?
