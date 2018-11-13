@@ -12,7 +12,7 @@ class _ServerConnHandler is TCPConnectionNotify
   let _logger: Logger
   let _reversedns: (DNSLookupAuth | None)
   let _buffer: Reader = Reader
-  var _parser: (_HTTPParser | None) = None
+  var _parser: (HTTPParser | None) = None
   var _session: (_ServerConnection | None) = None
   let _registry: HTTPServer tag
 
@@ -44,7 +44,7 @@ class _ServerConnHandler is TCPConnectionNotify
     _registry.register_session(conn)
     _session = _ServerConnection(_handlermaker, _logger, conn, host)
     try
-      _parser = _HTTPParser.request(_session as _ServerConnection)
+      _parser = HTTPParser.request(_session as _ServerConnection)
     end
 
   fun ref received(
@@ -62,7 +62,7 @@ class _ServerConnHandler is TCPConnectionNotify
     _buffer.append(consume data)
 
     match _parser
-    | let b: _HTTPParser =>
+    | let b: HTTPParser =>
       try
         // Let the parser take a look at what has been received.
         b.parse(_buffer)?

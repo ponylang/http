@@ -29,7 +29,7 @@ type _PayloadState is
   | _ExpectError         // Not valid HTTP format
   )
 
-class _HTTPParser
+class HTTPParser
   """
   This is the HTTP parser that builds a message `Payload` object
   representing either a Request or a Response from received chunks of data.
