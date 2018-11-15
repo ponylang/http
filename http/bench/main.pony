@@ -2,18 +2,18 @@ use ".."
 use "buffered"
 use "ponybench"
 use "debug"
+use "format"
 
 actor Main is BenchmarkList
   new create(env: Env) =>
     PonyBench(env, this)
 
   fun tag benchmarks(bench: PonyBench) =>
-    Debug("benching private benchmarks")
     bench(_SimpleGetRequestBenchmark)
     bench(_FormSubmissionRequestBenchmark)
     bench(_SplitFormSubmissionRequestBenchmark)
-//    bench(_MultipartFileUploadBenchmark)
-//    bench(_ChunkedRequestBenchmark)
+    bench(_MultipartFileUploadBenchmark)
+    bench(_ChunkedRequestBenchmark)
 
 actor _TestHTTPSession is HTTPSession
   var _c: (AsyncBenchContinue | None) = None
@@ -105,6 +105,9 @@ class iso _SimpleGetRequestBenchmark is AsyncMicroBenchmark
 
   let _bench: _ParseRequestBenchmark = _ParseRequestBenchmark(data)
 
+  fun config(): BenchConfig => BenchConfig(
+    where max_iterations' = 100)
+
   fun name(): String => "request/simple"
 
   fun ref apply(c: AsyncBenchContinue)? =>
@@ -132,6 +135,9 @@ class iso _FormSubmissionRequestBenchmark is AsyncMicroBenchmark
         ].values())
   ]
   let _bench: _ParseRequestBenchmark = _ParseRequestBenchmark(data)
+
+  fun config(): BenchConfig => BenchConfig(
+    where max_iterations' = 100)
 
   fun name(): String => "request/form-submission"
 
@@ -162,14 +168,38 @@ class iso _SplitFormSubmissionRequestBenchmark is AsyncMicroBenchmark
   ]
   let _bench: _ParseRequestBenchmark = _ParseRequestBenchmark(data)
 
+  fun config(): BenchConfig => BenchConfig(
+    where max_iterations' = 100)
+
   fun name(): String => "request/form-submission/split"
 
   fun ref apply(c: AsyncBenchContinue)? =>
     _bench.apply(c)?
 
 class iso _MultipartFileUploadBenchmark is AsyncMicroBenchmark
-  let data: Array[String] = []
+  let data: Array[String] = [
+    "\r\n".join([
+      "POST /cgi-bin/request HTTP/1.1"
+      "Host: localhost"
+      "User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0"
+      "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+      "Accept-Language: en-GB,en;q=0.5"
+      "Accept-Encoding: gzip, deflate"
+      "Connection: keep-alive"
+      "Content-Type: multipart/form-data; boundary=abcdef123456"
+      "Content-Length: 10001" // forcing streaming
+      ""
+      "--abcdef123456"
+      "Content-Disposition: form-data; name=\"random_stuff1\""
+      String.from_array(recover val Array[U8].init('a', 5000) end)
+      "Content-Disposition: form-data; name=\"random_stuff2\""
+      String.from_array(recover val Array[U8].init('b', 4867) end)
+      "--abcdef123456--"
+      ].values())]
   let _bench: _ParseRequestBenchmark = _ParseRequestBenchmark(data)
+
+  fun config(): BenchConfig => BenchConfig(
+    where max_iterations' = 100)
 
   fun name(): String => "request/multipart-file-upload"
 
@@ -177,8 +207,28 @@ class iso _MultipartFileUploadBenchmark is AsyncMicroBenchmark
     _bench.apply(c)?
 
 class iso _ChunkedRequestBenchmark is AsyncMicroBenchmark
-  let data: Array[String] = []
+  let data: Array[String] = [
+    "\r\n".join([
+      "GET /get HTTP/1.1"
+      "Host: localhost:8888"
+      "User-Agent: curl/7.58.0"
+      "Accept: */*"
+      "Transfer-Encoding: chunked"
+      "Content-Type: application/x-www-form-urlencoded"
+      ""
+      Format.int[U64](100 where fmt=FormatHexBare)
+      String.from_array(recover val Array[U8].init('a', 100) end)
+      Format.int[U64](500 where fmt=FormatHexBare)
+      String.from_array(recover val Array[U8].init('b', 500) end)
+      "0"
+      ""
+      ""
+      ].values())
+    ]
   let _bench: _ParseRequestBenchmark = _ParseRequestBenchmark(data)
+
+  fun config(): BenchConfig => BenchConfig(
+    where max_iterations' = 100)
 
   fun name(): String => "request/chunked"
 
