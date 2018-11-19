@@ -8,7 +8,7 @@ class _ClientConnHandler is TCPConnectionNotify
   """
   let _session: _ClientConnection
   let _buffer: Reader = Reader
-  let _parser: _HTTPParser
+  let _parser: HTTPParser
   var _delivered: Bool = false
 
   new iso create(client: _ClientConnection) =>
@@ -17,7 +17,7 @@ class _ClientConnHandler is TCPConnectionNotify
     parsed information to.
     """
     _session = client
-    _parser = _HTTPParser.response(_session)
+    _parser = HTTPParser.response(_session)
 
   fun ref connected(conn: TCPConnection ref) =>
     """
@@ -41,7 +41,7 @@ class _ClientConnHandler is TCPConnectionNotify
     times: USize): Bool
   =>
    """
-   Pass a received chunk of data to the `_HTTPParser`.
+   Pass a received chunk of data to the `HTTPParser`.
    """
    // TODO: inactivity timer
     _buffer.append(consume data)

@@ -590,7 +590,7 @@ class iso _HTTPParserNoBodyTest is UnitTest
         be _finish() =>
           h.fail("HTTPSession._finish called.")
       end
-    let parser = _HTTPParser.request(test_session)
+    let parser = HTTPParser.request(test_session)
     let payload: String = "\r\n".join([
       "GET /get HTTP/1.1"
       "Host: httpbin.org"
@@ -629,7 +629,7 @@ class iso _HTTPParserOneshotBodyTest is UnitTest
         be _finish() =>
           h.fail("HTTPSession._finish called.")
       end
-    let parser = _HTTPParser.request(test_session)
+    let parser = HTTPParser.request(test_session)
     let payload: String = "\r\n".join([
         "POST /post HTTP/1.1"
         "Host: httpbin.org"
