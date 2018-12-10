@@ -604,10 +604,8 @@ class iso _HTTPParserNoBodyTest is UnitTest
     h.expect_action("_deliver")
     let reader: Reader = Reader
     reader.append(payload)
-    try
-      parser.parse(reader)?
-    else
-      h.fail("parser failed to parse request")
+    match parser.parse(reader)
+    | ParseError => h.fail("parser failed to parse request")
     end
 
 class iso _HTTPParserOneshotBodyTest is UnitTest
@@ -650,8 +648,6 @@ class iso _HTTPParserOneshotBodyTest is UnitTest
     h.expect_action("_deliver")
     let reader: Reader = Reader
     reader.append(payload)
-    try
-      parser.parse(reader)?
-    else
-      h.fail("parser failed to parse request")
+    match parser.parse(reader)
+    | ParseError => h.fail("parser failed to parse request")
     end

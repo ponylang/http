@@ -29,6 +29,8 @@ type _PayloadState is
   | _ExpectError         // Not valid HTTP format
   )
 
+primitive ParseError
+
 class HTTPParser
   """
   This is the HTTP parser that builds a message `Payload` object
@@ -67,25 +69,25 @@ class HTTPParser
     _chunk_end = false
     _state = _ExpectResponse
 
-  fun ref parse(buffer: Reader) ? =>
+  fun ref parse(buffer: Reader): (Error | None) =>
     """
     Analyze new data based on the parser's current internal state.
     """
     match _state
-    | _ExpectRequest => _parse_request(buffer)?
-    | _ExpectResponse => _parse_response(buffer)?
-    | _ExpectHeaders => _parse_headers(buffer)?
+    | _ExpectRequest => _parse_request(buffer)
+    | _ExpectResponse => _parse_response(buffer)
+    | _ExpectHeaders => _parse_headers(buffer)
     | _ExpectBody =>
         // We are expecting a message body. Now we decide exactly
         // which encoding to look for.
         if _chunked then
           _state = _ExpectChunkStart
-          _parse_chunk_start(buffer)?
+          _parse_chunk_start(buffer)
         else
           _state = _ExpectContentLength
           _parse_content_length(buffer)
         end
-    | _ExpectChunkStart => _parse_chunk_start(buffer)?
+    | _ExpectChunkStart => _parse_chunk_start(buffer)
     | _ExpectChunk => _parse_chunk(buffer)
     | _ExpectChunkEnd => _parse_chunk_end(buffer)
     | _ExpectContentLength => _parse_content_length(buffer)
@@ -144,7 +146,7 @@ class HTTPParser
       end
     end
 
-  fun ref _parse_request(buffer: Reader) ? =>
+  fun ref _parse_request(buffer: Reader): (Error | None) =>
     """
     Look for "<Method> <URL> <Proto>", the first line of an HTTP
     'request' message.
@@ -164,12 +166,12 @@ class HTTPParser
       _payload.proto = line.substring(url_end + 1)
 
       _state = _ExpectHeaders
-      parse(buffer)?
+      parse(buffer)
     else
-      error
+      ParseError
     end
 
-  fun ref _parse_response(buffer: Reader) ? =>
+  fun ref _parse_response(buffer: Reader): (Error | None) =>
     """
     Look for "<Proto> <Code> <Description>", the first line of an
     HTTP 'response' message.
@@ -190,12 +192,12 @@ class HTTPParser
       _payload.method = line.substring(status_end + 1)
 
       _state = _ExpectHeaders
-      parse(buffer)?
+      parse(buffer)
     else
-      error
+      ParseError
     end
 
-  fun ref _parse_headers(buffer: Reader) ? =>
+  fun ref _parse_headers(buffer: Reader): (Error | None) =>
     """
     Look for: "<Key>:<Value>" or the empty line that marks the end of
     all the headers.
@@ -214,7 +216,7 @@ class HTTPParser
             // accumulate the body in the Payload for OneshotTransfer
             _deliver()
           end
-          parse(buffer)?
+          parse(buffer)
         else
           // A non-empty line *must* be a header. Error if not.
           try
@@ -231,7 +233,7 @@ class HTTPParser
     end // looping over all headers in this buffer
 
     // Breaking out of that loop means an error.
-    if _state is _ExpectError then error end
+    if _state is _ExpectError then ParseError end
 
   fun ref _process_header(line: String) ? =>
     """
@@ -356,18 +358,26 @@ class HTTPParser
       end
     end
 
-  fun ref _parse_chunk_start(buffer: Reader) ? =>
+  fun ref _parse_chunk_start(buffer: Reader): (Error | None) =>
     """
     Look for the beginning of a chunk, which is a length in hex on a line
     terminated by CRLF. An explicit length of zero marks the end of
     the entire chunked message body.
     """
-    let line = buffer.line()?
+    let line = try
+      buffer.line()?
+    else
+      return ParseError
+    end
 
     if line.size() > 0
     then
       // This should be the length of the next chunk.
-      _expected_length = line.read_int[USize](0, 16)?._1
+      _expected_length = try
+        line.read_int[USize](0, 16)?._1
+      else
+        return ParseError
+      end
       // A chunk explicitly of length zero marks the end of the body.
       if _expected_length > 0 then
         _state = _ExpectChunk
@@ -377,12 +387,12 @@ class HTTPParser
         restart()
       end
 
-      parse(buffer)?
+      parse(buffer)
     else
       // Anything other than a length is an error.
       _expected_length = 0
       _state = _ExpectError
-      error
+      ParseError
     end
 
   fun ref _parse_chunk(buffer: Reader) =>
@@ -403,7 +413,7 @@ class HTTPParser
       // Otherwise we will keep working on this chunk.
       if _expected_length == 0 then
         _state = _ExpectChunkEnd
-        parse(buffer)?
+        parse(buffer)
         end
     end
 
@@ -420,7 +430,7 @@ class HTTPParser
         restart()
       else
         _state = _ExpectChunkStart
-        parse(buffer)?
+        parse(buffer)
       end
     end
 

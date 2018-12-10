@@ -63,12 +63,10 @@ class _ServerConnHandler is TCPConnectionNotify
 
     match _parser
     | let b: HTTPParser =>
-      try
-        // Let the parser take a look at what has been received.
-        b.parse(_buffer)?
-      else
-        // Any syntax errors will terminate the connection.
-        conn.close()
+      // Let the parser take a look at what has been received.
+      match b.parse(_buffer)
+      // Any syntax errors will terminate the connection.
+      | ParseError => conn.close()
       end
     end
     true
