@@ -69,7 +69,7 @@ class HTTPParser
     _chunk_end = false
     _state = _ExpectResponse
 
-  fun ref parse(buffer: Reader): (Error | None) =>
+  fun ref parse(buffer: Reader): (ParseError | None) =>
     """
     Analyze new data based on the parser's current internal state.
     """
@@ -146,7 +146,7 @@ class HTTPParser
       end
     end
 
-  fun ref _parse_request(buffer: Reader): (Error | None) =>
+  fun ref _parse_request(buffer: Reader): (ParseError | None) =>
     """
     Look for "<Method> <URL> <Proto>", the first line of an HTTP
     'request' message.
@@ -171,7 +171,7 @@ class HTTPParser
       ParseError
     end
 
-  fun ref _parse_response(buffer: Reader): (Error | None) =>
+  fun ref _parse_response(buffer: Reader): (ParseError | None) =>
     """
     Look for "<Proto> <Code> <Description>", the first line of an
     HTTP 'response' message.
@@ -197,7 +197,7 @@ class HTTPParser
       ParseError
     end
 
-  fun ref _parse_headers(buffer: Reader): (Error | None) =>
+  fun ref _parse_headers(buffer: Reader): (ParseError | None) =>
     """
     Look for: "<Key>:<Value>" or the empty line that marks the end of
     all the headers.
@@ -218,7 +218,7 @@ class HTTPParser
           end
           parse(buffer)
         else
-          // A non-empty line *must* be a header. Error if not.
+          // A non-empty line *must* be a header. error if not.
           try
             _process_header(consume line)?
           else
@@ -358,7 +358,7 @@ class HTTPParser
       end
     end
 
-  fun ref _parse_chunk_start(buffer: Reader): (Error | None) =>
+  fun ref _parse_chunk_start(buffer: Reader): (ParseError | None) =>
     """
     Look for the beginning of a chunk, which is a length in hex on a line
     terminated by CRLF. An explicit length of zero marks the end of
