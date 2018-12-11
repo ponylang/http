@@ -10,7 +10,7 @@ This is the Pony HTTP/1 library from the standard library, formerly known as `ne
 It contains both an HTTP client to issue HTTP requests against HTTP servers, and
 an HTTP server. It also contains a library for handling and parsing URLs.
 
-It will be removed from the stdlib with one of the next minor releases as a result of
+It was removed from the stdlib with [0.24.0](https://github.com/ponylang/ponyc/releases/tag/0.24.0) as a result of
 [RFC 55](https://github.com/ponylang/rfcs/blob/master/text/0055-remove-http-server-from-stdlib.md).
 The Pony Team decided to remove it from the stdlib as is did not meet their quality standards.
 Given the familiarity of most people with HTTP and thus the attention this library gets,
