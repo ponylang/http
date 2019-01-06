@@ -22,10 +22,12 @@ class CommonLog is Logger
     list.push(" - ")
     list.push(_entry(request.url.user))
 
-    let time = PosixDate(Time.seconds()).format("%d/%b/%Y:%H:%M:%S +0000")
-    list.push(" [")
-    list.push(time)
-    list.push("] \"")
+    try // this one should never fail
+      let time = PosixDate(Time.seconds()).format("%d/%b/%Y:%H:%M:%S +0000")?
+      list.push(" [")
+      list.push(time)
+      list.push("] \"")
+    end
 
     list.push(request.method)
     list.push(" ")
