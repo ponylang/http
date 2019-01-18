@@ -23,7 +23,7 @@ class CommonLog is Logger
     list.push(_entry(request.url.user))
 
     try // this one should never fail
-      let time = PosixDate(Time.seconds()).format("%d/%b/%Y:%H:%M:%S +0000")?
+      let time =_log_time()?
       list.push(" [")
       list.push(time)
       list.push("] \"")
@@ -60,3 +60,6 @@ class CommonLog is Logger
 
   fun _entry(s: String): String =>
     if s.size() > 0 then s else "-" end
+
+  fun _log_time(): String ? =>
+    PosixDate(Time.seconds()).format("%d/%b/%Y:%H:%M:%S +0000")?
