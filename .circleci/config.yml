@@ -17,8 +17,8 @@ workflows:
   version: 2
   commit:
     jobs:
-      - vs-ponyc-release
-  nightly:
+      - vs-ponyc-master
+  nightly-master:
     triggers:
       - schedule:
           cron: "0 0 * * *"
@@ -27,3 +27,12 @@ workflows:
               only: master
     jobs:
       - vs-ponyc-master
+  nightly-release:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only: release
+    jobs:
+      - vs-ponyc-release
