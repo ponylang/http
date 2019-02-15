@@ -22,17 +22,12 @@ workflows:
     triggers:
       - schedule:
           cron: "0 0 * * *"
+    jobs:
+      - vs-ponyc-master
           filters:
             branches:
               only: master
-    jobs:
-      - vs-ponyc-master
-  nightly-release:
-    triggers:
-      - schedule:
-          cron: "0 0 * * *"
+      - vs-ponyc-release
           filters:
             branches:
               only: release
-    jobs:
-      - vs-ponyc-release
