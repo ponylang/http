@@ -343,7 +343,11 @@ class trn Payload
       conn.write("Connection: close\r\n")
     end
 
-    conn.write("Host: " + url.host + ":" + url.port.string() + "\r\n")
+    if url.port == url.default_port() then
+      conn.write("Host: " + url.host + "\r\n")
+    else
+      conn.write("Host: " + url.host + ":"  + url.port.string() + "\r\n")
+    end
 
   fun val _write_common(conn: TCPConnection tag) =>
     """
