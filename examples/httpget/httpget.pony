@@ -52,6 +52,7 @@ actor Main
       URL.valid(c.url)?
     else
       env.out.print("Invalid URL: " + c.url)
+      env.exitcode(1)
       return
     end
 
@@ -115,9 +116,11 @@ actor _GetWork
         // Could send body data via `sentreq`, if it was a POST
       else
         try env.out.print("Malformed URL: " + env.args(1)?) end
+        env.exitcode(1)
       end
     else
       env.out.print("unable to use network")
+      env.exitcode(1)
     end
 
   be cancelled() =>
@@ -126,12 +129,24 @@ actor _GetWork
     """
     _env.out.print("-- response cancelled --")
 
+  be failed(reason: HTTPFailureReason) =>
+    match reason
+    | AuthFailed =>
+      _env.err.print("-- auth failed --")
+    | ConnectFailed =>
+      _env.err.print("-- connect failed --")
+    | ConnectionClosed =>
+      _env.err.print("-- connection closed --")
+    end
+    _env.exitcode(1)
+
   be have_response(response: Payload val) =>
     """
     Process return the the response message.
     """
     if response.status == 0 then
       _env.out.print("Failed")
+      _env.exitcode(1)
       return
     end
 
@@ -217,3 +232,7 @@ class HttpNotify is HTTPHandler
 
   fun ref cancelled() =>
     _main.cancelled()
+
+  fun ref failed(reason: HTTPFailureReason) =>
+    _main.failed(reason)
+

@@ -65,14 +65,14 @@ actor _ServerConnection is HTTPSession
         // requests in the case of a runaway client.
         if _pending.size() > 2 then _conn.mute() end
     end
- 
+
   be _chunk(data: ByteSeq val) =>
     """
     Receive some `request` body data, which we pass on to the handler.
     """
     _body_bytes_sent = _body_bytes_sent + data.size()
     _backend.chunk(consume data)
-      
+
   be _finish() =>
     """
     Inidcates that the last *inbound* body chunk has been sent to
@@ -88,16 +88,18 @@ actor _ServerConnection is HTTPSession
 
   be cancel(msg: Payload val) =>
     """
-    Cancel the current response. The connection has closed.
+    Cancel the current response.
     """
+    _cancel()
+
+  fun ref _cancel() =>
     match _active_response
     | let p: Payload val =>
-      finish()
       _backend.cancelled()
     end
 
-  be _closed() =>
-    _backend.finished()
+  be closed() =>
+    _backend.failed(ConnectionClosed)
     _conn.unmute()
 
   be apply(response: Payload val) =>
@@ -165,7 +167,7 @@ actor _ServerConnection is HTTPSession
 
     _active_request = None
     _active_response = None
-    
+
     if not _keepalive then
       _conn.dispose()
       _pending.clear()
@@ -188,4 +190,4 @@ actor _ServerConnection is HTTPSession
 
   be _unmute() =>
     _conn.unmute()
-    
+

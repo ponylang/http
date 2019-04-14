@@ -94,7 +94,7 @@ class _ServerConnHandler is TCPConnectionNotify
     """
     _registry.unregister_session(conn)
     try
-      (_session as _ServerConnection).cancel(Payload.request())
+      (_session as _ServerConnection).closed()
     end
 
   fun ref connect_failed(conn: TCPConnection ref) =>
