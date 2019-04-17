@@ -11,6 +11,7 @@ class val Config
   let pass: String
   let output: String
   let url: String
+  let timeout: U64
 
   new val create(env: Env) ? =>
     let cs = CommandSpec.leaf("httpget", "", [
@@ -20,6 +21,8 @@ class val Config
         where short' = 'p', default' = "")
       OptionSpec.string("output", "Name of file to write response body."
         where short' = 'o', default' = "")
+      OptionSpec.u64("timeout", "TCP Keepalive timeout to detect broken communications link."
+        where short' = 't', default' = U64(0))
     ],[
       ArgSpec.string("url", "Url to query." where default' = None)
     ])?.>add_help()?
@@ -39,6 +42,7 @@ class val Config
     pass = cmd.option("pass").string()
     output = cmd.option("output").string()
     url = cmd.arg("url").string()
+    timeout = cmd.option("timeout").u64()
 
 actor Main
   """
@@ -57,7 +61,7 @@ actor Main
     end
 
     // Start the actor that does the real work.
-    _GetWork.create(env, url, c.user, c.pass, c.output)
+    _GetWork.create(env, url, c.user, c.pass, c.output, c.timeout)
 
 actor _GetWork
   """
@@ -65,7 +69,7 @@ actor _GetWork
   """
   let _env: Env
 
-  new create(env: Env, url: URL, user: String, pass: String, output: String)
+  new create(env: Env, url: URL, user: String, pass: String, output: String, timeout: U64)
     =>
     """
     Create the worker actor.
@@ -83,7 +87,7 @@ actor _GetWork
 
     try
       // The Client manages all links.
-      let client = HTTPClient(env.root as AmbientAuth, consume sslctx)
+      let client = HTTPClient(env.root as AmbientAuth, consume sslctx where keepalive_timeout_secs = timeout.u32())
       // The Notify Factory will create HTTPHandlers as required.  It is
       // done this way because we do not know exactly when an HTTPSession
       // is created - they can be re-used.
