@@ -44,6 +44,7 @@ actor _ClientConnection is HTTPSession
   let _service: String
   let _sslctx: (SSLContext | None)
   let _pipeline: Bool
+  let _keepalive_timeout_secs: U32
   let _app_handler: HTTPHandler
   let _unsent: List[Payload val] = _unsent.create()
   let _sent: List[Payload val] = _sent.create()
@@ -57,6 +58,7 @@ actor _ClientConnection is HTTPSession
     service: String,
     sslctx: (SSLContext | None) = None,
     pipeline: Bool = true,
+    keepalive_timeout_secs: U32 = 0,
     handlermaker: HandlerFactory val)
   =>
     """
@@ -68,6 +70,7 @@ actor _ClientConnection is HTTPSession
     _service = service
     _sslctx = sslctx
     _pipeline = pipeline
+    _keepalive_timeout_secs = keepalive_timeout_secs
     _app_handler = handlermaker(this)
 
   be apply(request: Payload val) =>
@@ -297,12 +300,12 @@ actor _ClientConnection is HTTPSession
         let ssl = ctx.client(_host)?
         TCPConnection(
           _auth,
-          SSLConnection(_ClientConnHandler(this), consume ssl),
+          SSLConnection(_ClientConnHandler(this, _keepalive_timeout_secs), consume ssl),
           _host, _service)
       else
         TCPConnection(
           _auth,
-          _ClientConnHandler(this),
+          _ClientConnHandler(this, _keepalive_timeout_secs),
           _host, _service)
       end
       _conn = _ConnConnecting
