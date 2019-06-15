@@ -41,6 +41,8 @@ actor _TestStream is OutStream
       _collector.push(to_string(elem))
     end
 
+  be flush() => None
+
   be validate(h: TestHelper) =>
     let collected: String = "".join(_collector.values())
     h.assert_true(
