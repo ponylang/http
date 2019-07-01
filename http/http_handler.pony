@@ -24,13 +24,29 @@ If you are writing a server, you will need to deal with the
 """
 
 primitive AuthFailed
+  """
+  HTTP failure reason for when e.g. SSL Authentication failed.
+  """
+
 primitive ConnectionClosed
+  """
+  HTTP failure reason for when the connection was closed
+  either from the other side (detectable when using TCP keepalive)
+  or locally (e.g. due to an error).
+  """
 primitive ConnectFailed
+  """
+  HTTP failure reason for when a connection could not be established.
+  """
+
 type HTTPFailureReason is (
   AuthFailed |
   ConnectionClosed |
   ConnectFailed
   )
+  """
+  HTTP failure reason reported to `HTTPHandler.failed()`.
+  """
 
 interface HTTPHandler
   """
@@ -79,13 +95,13 @@ interface HTTPHandler
   fun ref cancelled() =>
     """
     Notification that transferring the payload has been cancelled locally,
-    e.g. by disposing the client, closing the server or manually cancelling a single request..
+    e.g. by disposing the client, closing the server or manually cancelling a single request.
     """
 
   fun ref failed(reason: HTTPFailureReason) =>
     """
     Notification about failure to transfer the payload
-    (e.g. connection could not be established, authentication failes, connection was closed prematurely, ...)
+    (e.g. connection could not be established, authentication failed, connection was closed prematurely, ...)
     """
 
   fun ref throttled() =>

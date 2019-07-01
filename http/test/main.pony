@@ -7,7 +7,8 @@ actor Main is TestList
   new make() => None
 
   fun tag tests(test: PonyTest) =>
-    PrivateTests.make().tests(test)
+    PrivateTests.tests(test)
+    ClientErrorHandlingTests.tests(test)
     test(CommonLogTest)
 
 actor _TestStream is OutStream
