@@ -46,17 +46,17 @@ class _ServerListener is TCPListenNotify
     """
     _server._closed()
 
-  fun ref connected(listen: TCPListener ref): TCPConnectionNotify iso^ =>
+  fun ref connected(listen: TCPListener ref): TCPConnectionNotify iso^ ? =>
     """
     Create a notifier for a specific HTTP socket. A new instance of the
     back-end Handler is passed along so it can be used on each `Payload`.
     """
-    try
-      let ctx = _sslctx as SSLContext
+    match _sslctx
+    | None =>
+      _ServerConnHandler(_handlermaker, _logger, _reversedns, _server)
+    | let ctx: SSLContext =>
       let ssl = ctx.server()?
       SSLConnection(
         _ServerConnHandler(_handlermaker, _logger, _reversedns, _server),
         consume ssl)
-    else
-      _ServerConnHandler(_handlermaker, _logger, _reversedns, _server)
     end
