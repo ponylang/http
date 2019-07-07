@@ -7,22 +7,29 @@ class _ClientConnHandler is TCPConnectionNotify
   received data to the `HTTPParser` to assemble response `Payload` objects.
   """
   let _session: _ClientConnection
+  let _keepalive_timeout_secs: U32
   let _buffer: Reader = Reader
   let _parser: HTTPParser
   var _delivered: Bool = false
 
-  new iso create(client: _ClientConnection) =>
+  new iso create(
+    client: _ClientConnection,
+    keepalive_timeout_secs: U32 = 0) =>
     """
     The response builder needs to know which Session to forward
     parsed information to.
     """
     _session = client
+    _keepalive_timeout_secs = keepalive_timeout_secs
     _parser = HTTPParser.response(_session)
 
   fun ref connected(conn: TCPConnection ref) =>
     """
     Tell the client we have connected.
+
+    And set the desired keepalive timeout (or disable it, which is the default).
     """
+    conn.set_keepalive(_keepalive_timeout_secs)
     _session._connected(conn)
 
   fun ref connect_failed(conn: TCPConnection ref) =>

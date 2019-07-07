@@ -10,15 +10,21 @@ class HTTPClient
   let _auth: TCPConnectionAuth
   let _sslctx: SSLContext
   let _pipeline: Bool
+  let _keepalive_timeout_secs: U32
   let _sessions: Map[_HostService, _ClientConnection] = _sessions.create()
 
   new create(
     auth: TCPConnectionAuth,
     sslctx: (SSLContext | None) = None,
-    pipeline: Bool = true)
+    pipeline: Bool = true,
+    keepalive_timeout_secs: U32 = 0)
   =>
     """
     Create the context in which all HTTP sessions will originate.
+
+    Parameters:
+    - keepalive_timeout_secs: Use TCP Keepalive and check if the other side is down
+                              every `keepalive_timeout_secs` seconds.
     """
     _auth = auth
 
@@ -33,6 +39,7 @@ class HTTPClient
     end
 
     _pipeline = pipeline
+    _keepalive_timeout_secs = keepalive_timeout_secs
 
   fun ref apply(
     request: Payload trn,
@@ -93,10 +100,10 @@ class HTTPClient
         match url.scheme
         | "http" =>
           _ClientConnection(_auth, hs.host, hs.service,
-            None, _pipeline, handlermaker)
+            None, _pipeline, _keepalive_timeout_secs, handlermaker)
         | "https" =>
           _ClientConnection(_auth, hs.host, hs.service,
-            _sslctx, _pipeline, handlermaker)
+            _sslctx, _pipeline, _keepalive_timeout_secs, handlermaker)
         else
           error
         end

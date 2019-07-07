@@ -23,6 +23,35 @@ If you are writing a server, you will need to deal with the
 
 """
 
+primitive AuthFailed
+  """
+  HTTP failure reason for when SSL Authentication failed.
+
+  This failure reason is only reported to HTTP client HTTPHandler instances.
+  """
+
+primitive ConnectionClosed
+  """
+  HTTP failure reason for when the connection was closed
+  either from the other side (detectable when using TCP keepalive)
+  or locally (e.g. due to an error).
+  """
+primitive ConnectFailed
+  """
+  HTTP failure reason for when a connection could not be established.
+
+  This failure reason is only valid for HTTP client HTTPHandlers.
+  """
+
+type HTTPFailureReason is (
+  AuthFailed |
+  ConnectionClosed |
+  ConnectFailed
+  )
+  """
+  HTTP failure reason reported to `HTTPHandler.failed()`.
+  """
+
 interface HTTPHandler
   """
   This is the interface through which HTTP messages are delivered *to*
@@ -42,7 +71,7 @@ interface HTTPHandler
   so the application must provide an instance of `HandlerFactory` that
   will be called at the appropriate time.
   """
-  fun ref apply(payload: Payload val): Any => None
+  fun ref apply(payload: Payload val): Any =>
     """
     Notification of an incoming message. On the client, these will
     be responses coming from the server. On the server these will be requests
@@ -55,36 +84,41 @@ interface HTTPHandler
     message.
     """
 
-  fun ref chunk(data: ByteSeq val) => None
+  fun ref chunk(data: ByteSeq val) =>
     """
     Notification of incoming body data. The body belongs to the most
     recent `Payload` delivered by an `apply` notification.
     """
 
-  fun ref finished() => None
+  fun ref finished() =>
     """
     Notification that no more body chunks are coming. Delivery of this HTTP
     message is complete.
     """
 
-  fun ref cancelled() => None
+  fun ref cancelled() =>
     """
-    Notification that the communication link has broken in the middle of
-    transferring the payload. Everything received so far should
-    be discarded. Any transmissions should be terminated.
+    Notification that transferring the payload has been cancelled locally,
+    e.g. by disposing the client, closing the server or manually cancelling a single request.
     """
 
-  fun ref throttled() => None
+  fun ref failed(reason: HTTPFailureReason) =>
+    """
+    Notification about failure to transfer the payload
+    (e.g. connection could not be established, authentication failed, connection was closed prematurely, ...)
+    """
+
+  fun ref throttled() =>
     """
     Notification that the session temporarily can not accept more data.
     """
 
-  fun ref unthrottled() => None
+  fun ref unthrottled() =>
     """
     Notification that the session can resume accepting data.
     """
 
-  fun ref need_body() => None
+  fun ref need_body() =>
     """
     Notification that the HTTPSession is ready for Stream or Chunked
     body data.

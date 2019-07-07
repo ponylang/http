@@ -35,7 +35,7 @@ actor _ClientConnection is HTTPSession
   a new session, based on the request URL, it will do that, and then it
   will need a new instance of the caller's `HTTPHandler` class.
   Since the client application code does not know in advance when this
-   will be necessary, it passes in a `HandlerFactory` that creates the
+  will be necessary, it passes in a `HandlerFactory` that creates the
   actual `HTTPHandler`, customized
   for the client application's needs.
   """
@@ -44,6 +44,7 @@ actor _ClientConnection is HTTPSession
   let _service: String
   let _sslctx: (SSLContext | None)
   let _pipeline: Bool
+  let _keepalive_timeout_secs: U32
   let _app_handler: HTTPHandler
   let _unsent: List[Payload val] = _unsent.create()
   let _sent: List[Payload val] = _sent.create()
@@ -57,6 +58,7 @@ actor _ClientConnection is HTTPSession
     service: String,
     sslctx: (SSLContext | None) = None,
     pipeline: Bool = true,
+    keepalive_timeout_secs: U32 = 0,
     handlermaker: HandlerFactory val)
   =>
     """
@@ -68,6 +70,7 @@ actor _ClientConnection is HTTPSession
     _service = service
     _sslctx = sslctx
     _pipeline = pipeline
+    _keepalive_timeout_secs = keepalive_timeout_secs
     _app_handler = handlermaker(this)
 
   be apply(request: Payload val) =>
@@ -88,6 +91,7 @@ actor _ClientConnection is HTTPSession
       for node in _unsent.nodes() do
         if node()? is request then
           node .> remove().pop()?
+          _app_handler.cancelled()
           return
         end
       end
@@ -100,6 +104,7 @@ actor _ClientConnection is HTTPSession
           try (_conn as TCPConnection).dispose() end
           _conn = None
           node .> remove().pop()?
+          _app_handler.cancelled()
           break
         end
       end
@@ -140,6 +145,7 @@ actor _ClientConnection is HTTPSession
     """
     _cancel_all()
     _conn = None
+    _app_handler.failed(ConnectFailed)
 
   be _auth_failed(conn: TCPConnection) =>
     """
@@ -147,6 +153,7 @@ actor _ClientConnection is HTTPSession
     """
     _cancel_all()
     _conn = None
+    _app_handler.failed(AuthFailed)
 
   be _closed(conn: TCPConnection) =>
     """
@@ -155,6 +162,7 @@ actor _ClientConnection is HTTPSession
     if conn is _conn then
       _cancel_all()
       _conn = None
+      _app_handler.failed(ConnectionClosed)
     end
 
   be write(data: ByteSeq val) =>
@@ -195,7 +203,9 @@ actor _ClientConnection is HTTPSession
     """
     Cancels all requests and disposes the tcp connection.
     """
-    _cancel_all()
+    if _cancel_all() then
+      _app_handler.cancelled()
+    end
     match _conn
     | let c: TCPConnection => c.dispose()
     end
@@ -281,8 +291,7 @@ actor _ClientConnection is HTTPSession
 
   fun ref _new_conn() =>
     """
-    Creates a new connection. `ResponseBuilder` is the notification class
-    that will send back a `_connected` call when the connection has been made.
+    Creates a new connection.
     """
     match _conn
     | let _: None =>
@@ -291,31 +300,39 @@ actor _ClientConnection is HTTPSession
         let ssl = ctx.client(_host)?
         TCPConnection(
           _auth,
-          SSLConnection(_ClientConnHandler(this), consume ssl),
+          SSLConnection(_ClientConnHandler(this, _keepalive_timeout_secs), consume ssl),
           _host, _service)
       else
         TCPConnection(
           _auth,
-          _ClientConnHandler(this),
+          _ClientConnHandler(this, _keepalive_timeout_secs),
           _host, _service)
       end
       _conn = _ConnConnecting
     end
 
-  fun ref _cancel_all() =>
+  fun ref _cancel_all(): Bool =>
     """
     Cancel all pending requests.
+
+    Returns true if any requests have been cancelled.
     """
+    var cancelled = false
     try
       while true do
-        _unsent.pop()? //TODO send fail response
+        _unsent.pop()?
+        cancelled = true
       end
     end
 
     for node in _sent.nodes() do
       node.remove()
-      try node.pop()? end //TODO send fail response
+      try
+        node.pop()?
+      end
+      cancelled = true
     end
+    cancelled
 
   be _mute() =>
     """

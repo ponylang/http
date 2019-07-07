@@ -4,10 +4,7 @@ use "collections"
 use "buffered"
 use "time"
 
-actor PrivateTests is TestList
-  new create(env: Env) => PonyTest(env, this)
-  new make() => None
-
+primitive PrivateTests is TestList
   fun tag tests(test: PonyTest) =>
     test(_Encode)
     test(_EncodeBad)
