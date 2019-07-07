@@ -25,7 +25,9 @@ If you are writing a server, you will need to deal with the
 
 primitive AuthFailed
   """
-  HTTP failure reason for when e.g. SSL Authentication failed.
+  HTTP failure reason for when SSL Authentication failed.
+
+  This failure reason is only reported to HTTP client HTTPHandler instances.
   """
 
 primitive ConnectionClosed
@@ -37,6 +39,8 @@ primitive ConnectionClosed
 primitive ConnectFailed
   """
   HTTP failure reason for when a connection could not be established.
+
+  This failure reason is only valid for HTTP client HTTPHandlers.
   """
 
 type HTTPFailureReason is (

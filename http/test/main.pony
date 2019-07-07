@@ -9,6 +9,7 @@ actor Main is TestList
   fun tag tests(test: PonyTest) =>
     PrivateTests.tests(test)
     ClientErrorHandlingTests.tests(test)
+    ServerErrorHandlingTests.tests(test)
     test(CommonLogTest)
 
 actor _TestStream is OutStream

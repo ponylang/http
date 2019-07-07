@@ -98,7 +98,5 @@ class _ServerConnHandler is TCPConnectionNotify
     end
 
   fun ref connect_failed(conn: TCPConnection ref) =>
-    """
-    The connect has failed. TODO: is it a case for server-side?
-    """
     None
+
