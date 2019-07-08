@@ -12,7 +12,7 @@ actor _ClientConnection is HTTPSession
   Only "safe" requests (GET, HEAD, OPTIONS) are sent to the server if
   *any* responses are still pending.
 
-  The `HTTPHandler.send_body` notification function will be called if/when
+  The `HTTPHandler.need_body` notification function will be called if/when
   the `HTTPSession` is ready to receive body data for `POST` operations in
   transfer modes other than `Oneshot`.
 
