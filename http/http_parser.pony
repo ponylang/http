@@ -41,7 +41,7 @@ class HTTPParser
   var _state: _PayloadState  // Parser state
   var _payload: Payload iso  // The Payload under construction
   var _expected_length: USize = 0
-  var _chunked: Bool = false
+  var _transfer_mode: TransferMode = OneshotTransfer
   var _chunk_end: Bool = false
   var _delivered: Bool = false
 
@@ -53,7 +53,7 @@ class HTTPParser
     _session = session'
     _payload = Payload.request()
     _expected_length = 0
-    _chunked = false
+    _transfer_mode = OneshotTransfer
     _chunk_end = false
     _state = _ExpectRequest
 
@@ -65,7 +65,7 @@ class HTTPParser
     _session = session'
     _payload = Payload.response()
     _expected_length = 0
-    _chunked = false
+    _transfer_mode = OneshotTransfer
     _chunk_end = false
     _state = _ExpectResponse
 
@@ -80,7 +80,8 @@ class HTTPParser
     | _ExpectBody =>
         // We are expecting a message body. Now we decide exactly
         // which encoding to look for.
-        if _chunked then
+        match _transfer_mode
+        | ChunkedTransfer =>
           _state = _ExpectChunkStart
           _parse_chunk_start(buffer)
         else
@@ -117,7 +118,7 @@ class HTTPParser
     kind as the last one.
     """
     _expected_length = 0
-    _chunked = false
+    _transfer_mode = OneshotTransfer
     _chunk_end = false
 
     _state = if _client then
@@ -153,7 +154,7 @@ class HTTPParser
     """
     // Reset expectations
     _expected_length = 0
-    _chunked = false
+    _transfer_mode = OneshotTransfer
     _payload.session = _session
 
     try
@@ -178,7 +179,7 @@ class HTTPParser
     """
     // Reset expectations
     _expected_length = 0
-    _chunked = false
+    _transfer_mode = OneshotTransfer
     _payload.session = _session
 
     try
@@ -211,10 +212,13 @@ class HTTPParser
           // An empty line marks the end of the headers. Set state
           // appropriately.
           _set_header_end()
-          if _state isnt _ExpectBody then
-            // deliver for chunked or streamed transfer
-            // accumulate the body in the Payload for OneshotTransfer
-            _deliver()
+
+          // deliver for empty responses, chunked or streamed transfer
+          // accumulate the body in the Payload for OneshotTransfer
+          match _payload.transfer_mode
+          | OneshotTransfer if _state isnt _ExpectBody => _deliver()
+          | StreamTransfer =>                             _deliver()
+          | ChunkedTransfer =>                            _deliver()
           end
           parse(buffer)
         else
@@ -255,18 +259,19 @@ class HTTPParser
       // On the receiving end, there is no difference
       // between Oneshot and Stream transfers except how
       // we store it. TODO eliminate this?
-      _payload.transfer_mode =
-      if _expected_length > 10_000 then
-        StreamTransfer
-      else
-        OneshotTransfer
-      end
+      _transfer_mode =
+        if _expected_length > 10_000 then
+          StreamTransfer
+        else
+          OneshotTransfer
+        end
+      _payload.transfer_mode = _transfer_mode
 
     | "transfer-encoding" => // Incremental body lengths.
       try
         value2.find("chunked")?
-        _payload.transfer_mode = ChunkedTransfer
-        _chunked = true
+        _transfer_mode = ChunkedTransfer
+        _payload.transfer_mode = _transfer_mode
       else
         _state = _ExpectError
       end
@@ -314,7 +319,8 @@ class HTTPParser
       // In any case we can pass the completed `Payload` on to the
       // session for processing.
       _state = match _payload.transfer_mode
-      | ChunkedTransfer => _ExpectChunkStart
+      | ChunkedTransfer =>
+        _ExpectChunkStart
       else
         if _expected_length == 0 then
           _ExpectReady
@@ -332,11 +338,14 @@ class HTTPParser
     """
     let available = buffer.size()
     let usable = available.min(_expected_length)
+
     try
       let bytes = buffer.block(usable)?
       let body = recover val consume bytes end
       _expected_length = _expected_length - usable
-      match _payload.transfer_mode
+      // in streaming mode we already have a new unrelated payload in _payload
+      // so we need to keep track of the current transfer-mode via _transfer_mode
+      match _transfer_mode
       | OneshotTransfer =>
         // in oneshot transfer we actually fill the body of the payload
         _payload.add_chunk(body)
@@ -346,7 +355,7 @@ class HTTPParser
 
       // All done with this message if we have processed the entire body.
       if _expected_length == 0 then
-        match _payload.transfer_mode
+        match _transfer_mode
         | OneshotTransfer =>
           // we have all the body, finally deliver it
           _deliver()

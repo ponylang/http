@@ -29,6 +29,7 @@ primitive PrivateTests is TestList
     test(_HTTPConnTest)
     test(_HTTPParserNoBodyTest)
     test(_HTTPParserOneshotBodyTest)
+    test(_HTTPParserStreamedBodyTest)
 
 class iso _Encode is UnitTest
   fun name(): String => "http/URLEncode.encode"
@@ -569,7 +570,7 @@ primitive _FixedResponseHTTPServerNotify
     end // recover
 
 class iso _HTTPParserNoBodyTest is UnitTest
-  fun name(): String => "http/_HttpParser.NoBody"
+  fun name(): String => "http/HTTPParser.NoBody"
   fun ref apply(h: TestHelper) =>
     let test_session =
       object is HTTPSession
@@ -582,6 +583,12 @@ class iso _HTTPParserNoBodyTest is UnitTest
         be cancel(msg: Payload val) => None
         be _deliver(payload: Payload val) =>
           h.complete_action("_deliver")
+          try
+            h.assert_eq[USize](payload.body()?.size(), 0)
+          else
+            h.fail("failed to get empty oneshot body.")
+          end
+
         be _chunk(data: ByteSeq val) =>
           h.fail("HTTPSession._chunk called.")
         be _finish() =>
@@ -606,8 +613,9 @@ class iso _HTTPParserNoBodyTest is UnitTest
     end
 
 class iso _HTTPParserOneshotBodyTest is UnitTest
-  fun name(): String => "http/_HttpParser.OneshotBody"
+  fun name(): String => "http/HTTPParser.OneshotBody"
   fun ref apply(h: TestHelper) =>
+    let body = "custname=Pony+Mc+Ponyface&custtel=%2B490123456789&custemail=pony%40ponylang.org&size=large&topping=bacon&topping=cheese&topping=onion&delivery=&comments=This+is+a+stupid+test"
     let test_session =
       object is HTTPSession
         be apply(payload: Payload val) => None
@@ -619,6 +627,20 @@ class iso _HTTPParserOneshotBodyTest is UnitTest
         be cancel(msg: Payload val) => None
         be _deliver(payload: Payload val) =>
           h.complete_action("_deliver")
+          try
+            let received_body: String =
+              recover val
+                let tmp = payload.body()?
+                let buf = String(body.size())
+                for chunk in tmp.values() do
+                  buf.append(chunk)
+                end
+                buf
+              end
+            h.assert_eq[String](received_body, body)
+          else
+            h.fail("failed to get oneshot body.")
+          end
         be _chunk(data: ByteSeq val) =>
           h.fail("HTTPSession._chunk called.")
         be _finish() =>
@@ -639,12 +661,49 @@ class iso _HTTPParserOneshotBodyTest is UnitTest
         "Connection: keep-alive"
         "Upgrade-Insecure-Requests: 1"
         ""
-        "custname=Pony+Mc+Ponyface&custtel=%2B490123456789&custemail=pony%40ponylang.org&size=large&topping=bacon&topping=cheese&topping=onion&delivery=&comments=This+is+a+stupid+test"
+        body
       ].values())
     h.long_test(2_000_000_000)
     h.expect_action("_deliver")
     let reader: Reader = Reader
     reader.append(payload)
     match parser.parse(reader)
-    | ParseError => h.fail("parser failed to parse request")
+    | ParseError => h.fail("parser failed to parse request.")
+    end
+
+class iso _HTTPParserStreamedBodyTest is UnitTest
+  fun name(): String => "http/HTTPParser.StreamedBody"
+  fun apply(h: TestHelper) =>
+    let test_session =
+      object is HTTPSession
+        be apply(payload: Payload val) => None
+        be finish() => None
+        be dispose() => None
+        be write(byteseq: ByteSeq val) => None
+        be _mute() => None
+        be _unmute() => None
+        be cancel(msg: Payload val) => None
+        be _deliver(payload: Payload val) =>
+          h.complete_action("_deliver")
+        be _chunk(data: ByteSeq val) =>
+          h.complete_action("session._chunk")
+        be _finish() =>
+          h.complete_action("session._finish")
+      end
+    let parser = HTTPParser.response(test_session)
+    let payload: String = "\r\n".join([
+      "HTTP/1.1 200 OK"
+      "Content-Length: 10001"
+      "Content-Type: application/octet-stream"
+      ""
+      String.from_array(recover val Array[U8].init('a', 10001) end)
+    ].values())
+    h.long_test(2_000_000_000)
+    h.expect_action("_deliver")
+    h.expect_action("session._chunk")
+    h.expect_action("session._finish")
+    let reader: Reader = Reader
+    reader.append(payload)
+    match parser.parse(reader)
+    | ParseError => h.fail("parser failed to parse request.")
     end
