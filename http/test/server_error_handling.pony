@@ -1,7 +1,7 @@
 use ".."
 use "ponytest"
 use "net"
-use "net/ssl"
+use "net_ssl"
 use "files"
 
 primitive ServerErrorHandlingTests is TestList
@@ -78,4 +78,3 @@ class iso ServerConnectionClosedTest is UnitTest
       where host = "127.0.0.1"
     )
     h.dispose_when_done(server)
-

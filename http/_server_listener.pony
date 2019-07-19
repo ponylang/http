@@ -1,5 +1,5 @@
 use "net"
-use "net/ssl"
+use "net_ssl"
 
 class _ServerListener is TCPListenNotify
   """

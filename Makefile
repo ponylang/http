@@ -4,6 +4,7 @@ PONYC_FLAGS ?=
 config ?= release
 
 BUILD_DIR ?= build/$(config)
+DEPS_DIR ?= .deps
 SRC_DIR ?= http
 EXAMPLES_DIR ?= examples
 binary := $(BUILD_DIR)/test
@@ -22,22 +23,25 @@ ifeq ($(config),debug)
     PONYC_FLAGS += --debug
 endif
 
+$(DEPS_DIR):
+	stable fetch
+
 test: $(binary)
 	$(binary)
 
 bench: $(bench_binary)
 	$(bench_binary)
 
-$(binary): $(SOURCE_FILES) | $(BUILD_DIR)
+$(binary): $(SOURCE_FILES) | $(BUILD_DIR) $(DEPS_DIR)
 	stable env $(PONYC) $(PONYC_FLAGS) $(SRC_DIR)/test -o $(BUILD_DIR)
 
-$(bench_binary): $(SOURCE_FILES) | $(BUILD_DIR)
+$(bench_binary): $(SOURCE_FILES) | $(BUILD_DIR) $(DEPS_DIR)
 	stable env $(PONYC) $(PONYC_FLAGS) $(SRC_DIR)/bench -o $(BUILD_DIR)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-examples: $(SOURCE_FILES) $(EXAMPLES_SOURCE_FILES) | $(BUILD_DIR)
+examples: $(SOURCE_FILES) $(EXAMPLES_SOURCE_FILES) | $(BUILD_DIR) $(DEPS_DIR)
 	stable env $(PONYC) --path=. $(EXAMPLES_DIR)/httpget -o $(BUILD_DIR) -d -s --checktree --verify
 	stable env $(PONYC) --path=. $(EXAMPLES_DIR)/httpserver -o $(BUILD_DIR) -d -s --checktree --verify
 
@@ -51,7 +55,7 @@ clean:
 	rm -rf $(BUILD_DIR) .coverage
 
 docs: PONYC_FLAGS += --pass=docs --docs-public --output=docs-tmp
-docs:
+docs: | $(DEPS_DIR)
 	rm -rf docs-tmp
 	stable env $(PONYC) $(PONYC_FLAGS) $(SRC_DIR)
 	cd docs-tmp/http-docs && mkdocs build

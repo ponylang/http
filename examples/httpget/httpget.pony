@@ -3,8 +3,8 @@ use "cli"
 use "collections"
 use "encode/base64"
 use "files"
-use "http"
-use "net/ssl"
+use "../../http"
+use "net_ssl"
 
 class val Config
   let user: String
@@ -239,4 +239,3 @@ class HttpNotify is HTTPHandler
 
   fun ref failed(reason: HTTPFailureReason) =>
     _main.failed(reason)
-

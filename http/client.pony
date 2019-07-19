@@ -1,6 +1,6 @@
 use "collections"
 use "net"
-use "net/ssl"
+use "net_ssl"
 
 class HTTPClient
   """
@@ -154,4 +154,3 @@ class _SessionGuard
 
     // Channel can not accept another request now.
     error
-
