@@ -1,7 +1,7 @@
 use "ponytest"
 use ".."
 use "net"
-use "net/ssl"
+use "net_ssl"
 use "files"
 
 primitive ClientErrorHandlingTests is TestList
