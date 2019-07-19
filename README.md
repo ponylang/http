@@ -27,10 +27,16 @@ for representing the power of Ponylang, drop us a note on any of the issues mark
 
 ## Installation
 
-* Add `http` to your build dependencies using [pony-stable](https://github.com/ponylang/pony-stable):
+* Add `http` (and its transitive dependencies) to your build dependencies using [pony-stable](https://github.com/ponylang/pony-stable):
 
 ```bash
 stable add github ponylang/http
+
+# transitive dependencies
+stable add github ponylang/net-ssl
+
+# for testing only
+stable add github ponylang/regex
 ```
 
 * Execute `stable fetch` to fetch your dependencies.
