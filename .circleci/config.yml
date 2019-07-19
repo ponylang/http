@@ -11,7 +11,7 @@ jobs:
       - image: ponylang/ponyc:latest
     steps:
       - checkout
-      - run: make fetch test examples
+      - run: make test examples
 
 workflows:
   version: 2
