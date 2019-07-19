@@ -190,8 +190,11 @@ actor _ClientConnection is HTTPSession
     _send_pending is called to detect that _unsent and _sent are emptye
     and that _conn can be disposed.
     """
-    _app_handler.finished()
-    _send_pending()
+    try
+      _sent.shift()?
+      _app_handler.finished()
+      _send_pending()
+    end
 
   be finish() =>
     """
