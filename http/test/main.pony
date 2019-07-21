@@ -12,8 +12,6 @@ actor Main is TestList
     ServerErrorHandlingTests.tests(test)
     test(CommonLogTest)
     ClientTests.tests(test)
-    // TODO: client test that a StreamingTransfer request is
-    //       triggering session.apply, session.chunk and session.finished
 
 actor _TestStream is OutStream
   let _collector: Array[String] ref = Array[String]
