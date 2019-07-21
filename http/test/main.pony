@@ -11,6 +11,7 @@ actor Main is TestList
     ClientErrorHandlingTests.tests(test)
     ServerErrorHandlingTests.tests(test)
     test(CommonLogTest)
+    ClientTests.tests(test)
     // TODO: client test that a StreamingTransfer request is
     //       triggering session.apply, session.chunk and session.finished
 
