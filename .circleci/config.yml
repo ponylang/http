@@ -1,4 +1,7 @@
-version: 2
+version: 2.1
+orbs:
+    zulip: ponylang/zulip@1.0.0
+
 jobs:
   vs-ponyc-release:
     docker:
@@ -6,6 +9,8 @@ jobs:
     steps:
       - checkout
       - run: make test examples
+      - zulip/status:
+          fail_only: true
   vs-ponyc-master:
     docker:
       - image: ponylang/ponyc:latest
@@ -14,6 +19,9 @@ jobs:
       - run: apt-get install -y libpcre2-dev libssl-dev
       - checkout
       - run: make test examples
+      - zulip/status:
+          fail_only: true
+
 
 workflows:
   version: 2
@@ -31,10 +39,12 @@ workflows:
                 - release
     jobs:
     - vs-ponyc-master:
+        context: org-global
         filters:
           branches:
             only: master
     - vs-ponyc-release:
+        context: org-global
         filters:
           branches:
             only: release
