@@ -1,6 +1,6 @@
 
 PONYC ?= ponyc
-PONYC_FLAGS ?=
+PONYC_FLAGS ?= -Dopenssl_0.9.0
 config ?= release
 
 BUILD_DIR ?= build/$(config)
@@ -42,8 +42,8 @@ $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
 examples: $(SOURCE_FILES) $(EXAMPLES_SOURCE_FILES) | $(BUILD_DIR) $(DEPS_DIR)
-	stable env $(PONYC) --path=. $(EXAMPLES_DIR)/httpget -o $(BUILD_DIR) -d -s --checktree --verify
-	stable env $(PONYC) --path=. $(EXAMPLES_DIR)/httpserver -o $(BUILD_DIR) -d -s --checktree --verify
+	stable env $(PONYC) $(PONYC_FLAGS) --path=. $(EXAMPLES_DIR)/httpget -o $(BUILD_DIR) -d -s --checktree --verify
+	stable env $(PONYC) $(PONYC_FLAGS) --path=. $(EXAMPLES_DIR)/httpserver -o $(BUILD_DIR) -d -s --checktree --verify
 
 .coverage:
 	mkdir -p .coverage
