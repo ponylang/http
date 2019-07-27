@@ -27,8 +27,8 @@ workflows:
   version: 2
   commit:
     jobs:
-      - vs-ponyc-master
-          context: org-global
+    - vs-ponyc-master:
+        context: org-global
   nightly-master:
     triggers:
       - schedule:
