@@ -23,6 +23,16 @@ ifeq ($(config),debug)
     PONYC_FLAGS += --debug
 endif
 
+
+ifeq ($(ssl), 1.1.x)
+  SSL = -Dopenssl_1.1.x
+else ifeq ($(ssl), 0.9.0)
+  SSL = -Dopenssl_0.9.0
+else
+  $(error Unknown SSL version "$(ssl)". Must set using 'ssl=FOO')
+endif
+PONYC_FLAGS := $(SSL)
+
 $(DEPS_DIR):
 	stable fetch
 

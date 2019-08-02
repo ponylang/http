@@ -8,9 +8,10 @@ jobs:
       - image: ponylang/ponyc:release
     steps:
       - checkout
-      - run: make test examples
+      - run: make test examples ssl=0.9.0
       - zulip/status:
           fail_only: true
+
   vs-ponyc-master:
     docker:
       - image: ponylang/ponyc:latest
@@ -18,10 +19,9 @@ jobs:
       - run: apt-get update
       - run: apt-get install -y libpcre2-dev libssl-dev
       - checkout
-      - run: make test examples
+      - run: make test examples ssl=0.9.0
       - zulip/status:
           fail_only: true
-
 
 workflows:
   version: 2
