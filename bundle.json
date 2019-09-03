@@ -2,11 +2,13 @@
   "deps": [
     {
       "type": "github",
-      "repo": "ponylang/net-ssl"
+      "repo": "ponylang/net-ssl",
+      "tag": "1.0.0"
     },
     {
       "type": "github",
-      "repo": "ponylang/regex"
+      "repo": "ponylang/regex",
+      "tag": "1.0.0"
     }
   ]
 }
