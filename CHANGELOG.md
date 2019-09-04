@@ -9,7 +9,8 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Added
 
-- Initial release
+- Changelog
+- Automated release process
 
 ### Changed
 
