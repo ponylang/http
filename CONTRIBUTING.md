@@ -12,7 +12,7 @@ Additional notes regarding formatting:
 
 * [Documentation formatting](#documentation-formatting)
 * [Code formatting](#code-formatting)
-* [File Naming](#standard-library-file-naming)
+* [File naming](#file-naming)
 
 ## Bug report
 
@@ -28,7 +28,7 @@ Provide the following details:
 
 If possible, try to isolate the problem and provide just enough code to demonstrate it. Add any related information which might help to fix the issue.
 
-## How to Contribute
+## How to contribute
 
 This project uses a fairly standard GitHub pull request workflow. If you have already contributed to a project via GitHub pull request, you can skip this section and proceed to the [specific details of what we ask for in a pull request](#pull-request). If this is your first time contributing to a project via GitHub, read on.
 
@@ -47,9 +47,7 @@ Some things to note that aren't immediately obvious to folks just starting out:
 2. Any changes you make on your branch that you used for one PR will automatically appear in another PR so if you have more than 1 PR, be sure to always create different branches for them.
 3. Weird things happen with commit history if you don't create your PR branches off of `master` so always make sure you have the `master` branch checked out before creating a branch for a PR
 
-If you feel overwhelmed at any point, don't worry, it can be a lot to learn when you get started. You can usually find me on the [Pony IRC](https://webchat.freenode.net/?channels=%ponylang) if you need help.
-
-You can get help using GitHub via [the official documentation](https://help.github.com/). Some hightlights include:
+You can get help using GitHub via [the official documentation](https://help.github.com/). Some highlights include:
 
 - [Fork A Repo](https://help.github.com/articles/fork-a-repo/)
 - [Creating a pull request](https://help.github.com/articles/creating-a-pull-request/)
@@ -66,7 +64,7 @@ If you aren't sure how to squash multiple commits into one, Steve Klabnik wrote 
 
 Once those conditions are met, the PR can be merged.
 
-Please note, if your changes are purely to things like README, CHANGELOG etc, you can add [skip ci] as the last line of your commit message and your PR won't be run through our continuous integration systems. We ask that you use [skip ci] where appropriate as it helps to get changes through CI faster and doesn't waste resources that TravisCI is kindly donating to the Open Source community.
+Please note, if your changes are purely to things like README, CHANGELOG etc, you can add [skip ci] as the last line of your commit message and your PR won't be run through our continuous integration systems. We ask that you use [skip ci] where appropriate as it helps to get changes through CI faster and doesn't waste resources that CircleCI is kindly donating to the Open Source community.
 
 ## Documentation formatting
 
@@ -78,19 +76,19 @@ Documentation is not "source code." As such, it should not be wrapped at 80 colu
 
 All code examples in documentation should be formatted in a fashion appropriate to the language in question.
 
-All command line examples in documentation should be presented in a copy and paste friendly fashion. Assume the user is using the `bash` shell. GitHub formatting on long command lines can be unfriendly to copy-and-paste. Long command lines should be broken up using `\` so that each line is no more than 80 columns. Wrapping at 80 columns should result in a good display experience in GitHub. Additionally, continuation lines should be indented two spaces. 
+All command line examples in documentation should be presented in a copy and paste friendly fashion. Assume the user is using the `bash` shell. GitHub formatting on long command lines can be unfriendly to copy-and-paste. Long command lines should be broken up using `\` so that each line is no more than 80 columns. Wrapping at 80 columns should result in a good display experience in GitHub. Additionally, continuation lines should be indented two spaces.
 
 OK:
 
 ```bash
-my_command --some-option foo --path-to-file ../../wallaroo/long/line/foo \
+my_command --some-option foo --path-to-file ../../project/long/line/foo \
   --some-other-option bar
 ```
 
 Not OK:
 
 ```bash
-my_command --some-option foo --path-to-file ../../wallaroo/long/line/foo --some-other-option bar
+my_command --some-option foo --path-to-file ../../project/long/line/foo --some-other-option bar
 ```
 
 Wherever possible when writing documentation, favor full command options rather than short versions. Full flags are usually much easier to modify because the meaning is clearer.
@@ -131,6 +129,6 @@ The details:
 
 All Pony sources should follow the [Pony standard library style guide](https://github.com/ponylang/ponyc/blob/master/STYLE_GUIDE.md).
 
-##  File naming
+## File naming
 
 Pony code follows the [Pony standard library file naming guidelines](https://github.com/ponylang/ponyc/blob/master/STYLE_GUIDE.md#naming).

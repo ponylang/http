@@ -1,4 +1,4 @@
-use ".."
+use "../http"
 use "buffered"
 use "ponybench"
 use "debug"

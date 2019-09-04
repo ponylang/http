@@ -1,53 +1,113 @@
 version: 2.1
+
 orbs:
   zulip: ponylang/zulip@1
 
 jobs:
-  vs-ponyc-release:
+  verify-changelog:
+    docker:
+      - image: ponylang/changelog-tool:release
+    steps:
+      - checkout
+      - run: changelog-tool verify
+
+  release-vs-ponyc-release:
     docker:
       - image: ponylang/ponyc:release
     steps:
       - run: apt-get update
       - run: apt-get install -y libpcre2-dev libssl-dev
       - checkout
-      - run: make test examples ssl=0.9.0
+      - run: make test ssl=0.9.0 config=release
       - zulip/status:
           fail_only: true
 
-  vs-ponyc-master:
+  release-vs-ponyc-master:
     docker:
       - image: ponylang/ponyc:latest
     steps:
       - run: apt-get update
       - run: apt-get install -y libpcre2-dev libssl-dev
       - checkout
-      - run: make test examples ssl=0.9.0
+      - run: make test ssl=0.9.0 config=release
       - zulip/status:
           fail_only: true
 
+  debug-vs-ponyc-release:
+    docker:
+      - image: ponylang/ponyc:release
+    steps:
+      - run: apt-get update
+      - run: apt-get install -y libpcre2-dev libssl-dev
+      - checkout
+      - run: make test ssl=0.9.0 config=debug
+      - zulip/status:
+          fail_only: true
+
+  debug-vs-ponyc-master:
+    docker:
+      - image: ponylang/ponyc:latest
+    steps:
+      - run: apt-get update
+      - run: apt-get install -y libpcre2-dev libssl-dev
+      - checkout
+      - run: make test ssl=0.9.0 config=debug
+      - zulip/status:
+          fail_only: true
+
+  cut-release:
+    docker:
+      - image: ponylang/shared-docker-ci-release-a-library:release
+    steps:
+      - checkout
+      - run: bash .ci-scripts/release.bash "$CIRCLE_TAG" "$GITHUB_TOKEN" "$ZULIP_RELEASE_ANNOUNCEMENT_TOKEN"
+
+  generate-documentation-pr-for-main-dot-actor:
+    docker:
+      - image: ponylang/shared-docker-ci-release-a-library:release
+    steps:
+      - checkout
+      - run: bash .ci-scripts/documentation.bash "$CIRCLE_TAG" "$GITHUB_TOKEN"
+
 workflows:
-  version: 2
-  commit:
+  version: 2.1
+
+  on-every-commit:
     jobs:
-    - vs-ponyc-master:
-        context: org-global
-  nightly-master:
+      - verify-changelog:
+          context: org-global
+      - release-vs-ponyc-release:
+          context: org-global
+      - debug-vs-ponyc-release:
+          context: org-global
+
+  create-release:
+    jobs:
+      - cut-release:
+          filters:
+            tags:
+              only: /^release-\d+\.\d+\.\d+$/
+            branches:
+              ignore: /.*/
+
+  on-release-being-tagged:
+    jobs:
+      - generate-documentation-pr-for-main-dot-actor:
+          filters:
+            tags:
+              only: /^\d+\.\d+\.\d+$/
+            branches:
+              ignore: /.*/
+
+  daily-check-for-breakage:
     triggers:
       - schedule:
           cron: "0 0 * * *"
           filters:
             branches:
-              only:
-                - master
-                - release
+              only: master
     jobs:
-    - vs-ponyc-master:
-        context: org-global
-        filters:
-          branches:
-            only: master
-    - vs-ponyc-release:
-        context: org-global
-        filters:
-          branches:
-            only: release
+      - release-vs-ponyc-master:
+          context: org-global
+      - debug-vs-ponyc-master:
+          context: org-global
