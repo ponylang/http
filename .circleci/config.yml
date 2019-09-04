@@ -84,6 +84,7 @@ workflows:
   create-release:
     jobs:
       - cut-release:
+          context: org-global
           filters:
             tags:
               only: /^release-\d+\.\d+\.\d+$/
@@ -93,6 +94,7 @@ workflows:
   on-release-being-tagged:
     jobs:
       - generate-documentation-pr-for-main-dot-actor:
+          context: org-global
           filters:
             tags:
               only: /^\d+\.\d+\.\d+$/
