@@ -29,23 +29,3 @@ workflows:
     jobs:
     - vs-ponyc-master:
         context: org-global
-  nightly-master:
-    triggers:
-      - schedule:
-          cron: "0 0 * * *"
-          filters:
-            branches:
-              only:
-                - master
-                - release
-    jobs:
-    - vs-ponyc-master:
-        context: org-global
-        filters:
-          branches:
-            only: master
-    - vs-ponyc-release:
-        context: org-global
-        filters:
-          branches:
-            only: release
