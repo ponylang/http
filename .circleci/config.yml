@@ -13,10 +13,8 @@ jobs:
 
   release-vs-ponyc-release:
     docker:
-      - image: ponylang/ponyc:release
+      - image: ponylang/http-ci-x86-64-unknown-linux-builder:release
     steps:
-      - run: apt-get update
-      - run: apt-get install -y libpcre2-dev libssl-dev
       - checkout
       - run: make test ssl=0.9.0 config=release
       - zulip/status:
@@ -24,10 +22,8 @@ jobs:
 
   release-vs-ponyc-master:
     docker:
-      - image: ponylang/ponyc:latest
+      - image: ponylang/http-ci-x86-64-unknown-linux-builder:latest
     steps:
-      - run: apt-get update
-      - run: apt-get install -y libpcre2-dev libssl-dev
       - checkout
       - run: make test ssl=0.9.0 config=release
       - zulip/status:
@@ -35,10 +31,8 @@ jobs:
 
   debug-vs-ponyc-release:
     docker:
-      - image: ponylang/ponyc:release
+      - image: ponylang/http-ci-x86-64-unknown-linux-builder:release
     steps:
-      - run: apt-get update
-      - run: apt-get install -y libpcre2-dev libssl-dev
       - checkout
       - run: make test ssl=0.9.0 config=debug
       - zulip/status:
@@ -46,10 +40,8 @@ jobs:
 
   debug-vs-ponyc-master:
     docker:
-      - image: ponylang/ponyc:latest
+      - image: ponylang/http-ci-x86-64-unknown-linux-builder:latest
     steps:
-      - run: apt-get update
-      - run: apt-get install -y libpcre2-dev libssl-dev
       - checkout
       - run: make test ssl=0.9.0 config=debug
       - zulip/status:
