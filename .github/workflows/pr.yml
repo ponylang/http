@@ -1,0 +1,24 @@
+name: PR
+
+on: pull_request
+
+jobs:
+  verify-changelog:
+    name: Verify CHANGELOG is valid
+    runs-on: ubuntu-latest
+    container:
+      image: ponylang/changelog-tool:release
+    steps:
+      - uses: actions/checkout@v1
+      - name: Verify CHANGELOG
+        run: changelog-tool verify
+
+  vs-ponyc-release:
+    name: Test against recent ponyc release
+    runs-on: ubuntu-latest
+    container:
+      image: ponylang/http-ci-x86-64-unknown-linux-builder:release
+    steps:
+      - uses: actions/checkout@v1
+      - name: Test
+        run: make test ssl=0.9.0 config=debug
