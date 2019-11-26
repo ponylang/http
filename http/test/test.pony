@@ -12,6 +12,7 @@ actor Main is TestList
     ServerErrorHandlingTests.tests(test)
     test(CommonLogTest)
     ClientTests.tests(test)
+    RequestParserTests.tests(test)
 
 actor _TestStream is OutStream
   let _collector: Array[String] ref = Array[String]

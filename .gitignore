@@ -1,5 +1,5 @@
-build/*
+/build/*
 TAGS
 tags
-.deps/*
-.coverage/
+/.deps/*
+/.coverage/
