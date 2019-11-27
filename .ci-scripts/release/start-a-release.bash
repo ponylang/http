@@ -78,17 +78,13 @@ VERSION="${GITHUB_REF/refs\/tags\/release-/}"
 git checkout master
 git pull
 
-# update VERSION
-echo -e "\e[34mUpdating VERSION to ${VERSION}\e[0m"
-echo "${VERSION}" > VERSION
-
 # version the changelog
 echo -e "\e[34mUpdating CHANGELOG.md for release\e[0m"
 changelog-tool release "${VERSION}" -e
 
-# commit CHANGELOG and VERSION updates
-echo -e "\e[34mCommiting VERSION and CHANGELOG.md changes\e[0m"
-git add CHANGELOG.md VERSION
+# commit CHANGELOG update
+echo -e "\e[34mCommiting CHANGELOG.md changes\e[0m"
+git add CHANGELOG.md
 git commit -m "${VERSION} release"
 
 # tag release
