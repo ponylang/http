@@ -94,9 +94,10 @@ class Headers
   // insensitive.
   // handle insensitivity during add and get
   //  - TODO: find a way to do this with hashmap
-  var _hl: List[Header] = _hl.create()
+  var _hl: Array[Header] = _hl.create(4)
 
   fun ref add(name: String, value: String) =>
+    // TODO
     match _find(name)
     | (Less, let ln: ListNode[Header]) =>
       let node = ListNode[Header]((name, value))
@@ -124,10 +125,24 @@ class Headers
     end
 
   fun get(name: String): (String | None) =>
-    match _find(name)
-    | (Equal, let ln: ListNode[(String, String)]) =>
-      try
-        ln.apply()?._2
+    // binary search
+    let s = _hl.size()
+    if s == 0 then return None end
+
+    var i = s / 2
+    try
+      while (i >= 0) and (i < s) do
+        val header = _hl(i)?
+        match _compare(name, header._1)
+        | Less =>
+          if i == 0 then return None end
+          i = i / 2
+        | Equal => return header._2
+        | Greater =>
+          if i == s then return None end
+          let num_right = s - i
+          i = i + (num_right / 2)
+        end
       end
     end
 
@@ -136,7 +151,7 @@ class Headers
 
   fun values(): Iterator[Header] => _hl.values()
 
-  fun _find(name: String): ((Compare, this->ListNode[Header]) | None) =>
+  fun _find(name: String): (USize | None) =>
     // binary search
     let s = _hl.size()
     if s == 0 then return None end
@@ -145,8 +160,8 @@ class Headers
     var last: (Compare, USize) = (Equal, 0)
     try
       while (i >= 0) and (i < s) do
-        let node = _hl.index(i)?
-        match _compare(name, node()?._1)
+        let header = _hl(i)?
+        match _compare(name, header._1)
         | Less =>
           if (i == 0) or
             match last
@@ -155,11 +170,11 @@ class Headers
               false
             end
           then
-            return (Less, node)
+            return i
           end
           last = (Less, i)
           i = i / 2
-        | Equal   => return (Equal, node)
+        | Equal   => return i
         | Greater =>
           let num_right = s - i
           if (num_right == 0) or
@@ -169,7 +184,7 @@ class Headers
               false
             end
           then
-            return (Greater, node)
+            return i + 1
           end
           last = (Greater, i)
           let right_half = if num_right == 1 then 1 else num_right / 2 end
