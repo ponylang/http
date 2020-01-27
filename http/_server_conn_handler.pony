@@ -1,5 +1,5 @@
-use "buffered"
 use "net"
+use "debug"
 
 class _ServerConnHandler is TCPConnectionNotify
   """
@@ -9,24 +9,17 @@ class _ServerConnHandler is TCPConnectionNotify
   `TCPConnection` actor.
   """
   let _handlermaker: HandlerFactory val
-  let _logger: Logger
-  let _reversedns: (DNSLookupAuth | None)
-  let _buffer: Reader = Reader
-  var _parser: (HTTPParser | None) = None
+  var _parser: (HTTP11RequestParser | None) = None
   var _session: (_ServerConnection | None) = None
   let _registry: HTTPServer tag
 
   new iso create(
     handlermaker: HandlerFactory val,
-    logger: Logger,
-    reversedns: (DNSLookupAuth | None),
     registry: HTTPServer)
     =>
     """
     Initialize the context for parsing incoming HTTP requests.
     """
-    _logger = logger
-    _reversedns = reversedns
     _handlermaker = handlermaker
     _registry = registry
 
@@ -35,17 +28,12 @@ class _ServerConnHandler is TCPConnectionNotify
     Accept the incoming TCP connection and create the actor that will
     manage further communication, and the message parser that feeds it.
     """
-    (let host, let port) = try
-      conn.remote_address().name(_reversedns)?
-    else
-      ("-", "-")
-    end
 
+    let ip_string = recover val String.from_cstring(@pony_os_netaddr_string[Pointer[U8] ref](conn.remote_address())) end
     _registry.register_session(conn)
-    _session = _ServerConnection(_handlermaker, _logger, conn, host)
-    try
-      _parser = HTTPParser.request(_session as _ServerConnection)
-    end
+    let sconn = _ServerConnection(_handlermaker, conn, ip_string)
+    _session = sconn
+    _parser = HTTP11RequestParser.create(sconn)
 
   fun ref received(
     conn: TCPConnection ref,
@@ -59,14 +47,20 @@ class _ServerConnHandler is TCPConnectionNotify
     """
     // TODO: inactivity timer
     // add a "reset" API to Timers
-    _buffer.append(consume data)
 
     match _parser
-    | let b: HTTPParser =>
+    | let b: HTTP11RequestParser =>
       // Let the parser take a look at what has been received.
-      match b.parse(_buffer)
+      let res = b.parse(consume data)
+      match res
       // Any syntax errors will terminate the connection.
-      | ParseError => conn.close()
+      | let rpe: RequestParseError =>
+        Debug("RPE")
+        conn.close()
+      | NeedMore =>
+        Debug("NeedMore")
+      | None =>
+        Debug("None")
       end
     end
     true

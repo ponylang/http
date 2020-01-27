@@ -1,3 +1,4 @@
+/*
 use ".."
 use "ponytest"
 use "net"
@@ -117,3 +118,4 @@ class iso ClientStreamTransferTest is UnitTest
     h.dispose_when_done(listener)
 
 
+*/

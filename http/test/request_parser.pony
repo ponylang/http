@@ -7,49 +7,34 @@ primitive RequestParserTests is TestList
     test(NoDataTest)
     test(UnknownMethodTest)
 
-actor _MockHTTPSession is HTTPSession
-  be apply(payload: Payload val) =>
-    Debug("apply")
+actor _MockRequestHandler is HTTP11RequestHandler
+  be _receive_start(request: HTTPRequest val, request_id: RequestId) =>
+    Debug("_receive_start: " + request_id.string())
 
-  be finish() =>
-    Debug("finish")
+  be _receive_chunk(data: Array[U8] val, request_id: RequestId) =>
+    Debug("_receive_chunk: " + request_id.string())
 
-  be dispose() =>
-    Debug("dispose")
+  be _receive_finished(request_id: RequestId) =>
+    Debug("_receive_finished: " + request_id.string())
 
-  be write(data: ByteSeq val) => None
-
-  be cancel(msg: Payload val) => None
-
-  be _mute() => None
-
-  be _unmute() => None
-
-  be _deliver(payload: Payload val) =>
-    Debug("_deliver")
-
-  be _chunk(data: ByteSeq val) =>
-    Debug("_chunk")
-
-  be _finish() => None
-    Debug("_finish")
+  be _receive_failed(parse_error: RequestParseError, request_id: RequestId) =>
+    Debug("_receive_failed: " + request_id.string())
 
 
 class iso NoDataTest is UnitTest
   fun name(): String => "request_parser/no_data"
   fun apply(h: TestHelper) =>
     let parser = HTTP11RequestParser(
-      object is HTTP11Handler
-        fun ref apply(request: HTTPRequest val, session: HTTPSession) =>
+      object is HTTP11RequestHandler
+        be _receive_start(request: HTTPRequest val, request_id: RequestId) =>
           h.fail("request delivered from no data.")
-        fun ref chunk(data: Array[U8] val, session: HTTPSession) =>
+        be _receive_chunk(data: Array[U8] val, request_id: RequestId) =>
           h.fail("chunk delivered from no data.")
-        fun ref finished(session: HTTPSession) =>
+        be _receive_finished(request_id: RequestId) =>
           h.fail("finished called from no data.")
-        fun ref failed(parse_error: RequestParseError, session: HTTPSession) =>
+        be _receive_failed(parse_error: RequestParseError, request_id: RequestId) =>
           h.fail("failed called from no data.")
-      end,
-      _MockHTTPSession
+      end
     )
     h.assert_is[ParseReturn](NeedMore, parser.parse(recover Array[U8](0) end))
 
@@ -57,17 +42,16 @@ class iso UnknownMethodTest is UnitTest
   fun name(): String => "request_parser/unknown_method"
   fun apply(h: TestHelper) =>
     let parser = HTTP11RequestParser(
-      object is HTTP11Handler
-        fun ref apply(request: HTTPRequest val, session: HTTPSession) =>
+      object is HTTP11RequestHandler
+        be _receive_start(request: HTTPRequest val, request_id: RequestId) =>
           h.fail("request delivered from no data.")
-        fun ref chunk(data: Array[U8] val, session: HTTPSession) =>
+        be _receive_chunk(data: Array[U8] val, request_id: RequestId) =>
           h.fail("chunk delivered from no data.")
-        fun ref finished(session: HTTPSession) =>
+        be _receive_finished(request_id: RequestId) =>
           h.fail("finished called from no data.")
-        fun ref failed(parse_error: RequestParseError, session: HTTPSession) =>
+        be _receive_failed(parse_error: RequestParseError, request_id: RequestId) =>
           h.assert_is[RequestParseError](UnknownMethod, parse_error)
-      end,
-      _MockHTTPSession
+      end
     )
     h.assert_is[ParseReturn](
       UnknownMethod,

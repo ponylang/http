@@ -6,20 +6,29 @@ actor _ServerConnection is HTTPSession
   Manages a stream of requests coming into a server from a single client,
   dispatches those request to a back-end, and returns the responses back
   to the client.
+
+  TODO: how to handle 101 Upgrade - set new notify for the connection
   """
   let _backend: HTTPHandler
-  let _logger: Logger
   let _conn: TCPConnection
   let _client_ip: String
-  let _pending: List[Payload val] = _pending.create()
-  var _active_request: (Payload val | None) = None
-  var _active_response: (Payload val | None) = None
   var _keepalive: Bool = true
   var _body_bytes_sent: USize = 0
 
+  var _active_request: RequestId = 0
+    """
+    keeps the request_id of the request currently active.
+    That is, that has been sent to the backend last.
+    """
+  var _sent_response: RequestId = 0
+    """
+    Keeps track of the request_id for which we sent a response already
+    in order to determine lag in request handling.
+    """
+  let _max_request_handling_lag: USize = 100 // TODO: make configurable
+
   new create(
     handlermaker: HandlerFactory val,
-    logger: Logger,
     conn: TCPConnection,
     client_ip: String)
   =>
@@ -29,11 +38,10 @@ actor _ServerConnection is HTTPSession
     handler that will process incoming requests.
     """
     _backend = handlermaker(this)
-    _logger = logger
     _conn = conn
     _client_ip = client_ip
 
-  be _deliver(request: Payload val) =>
+  be _receive_start(request: HTTPRequest val, request_id: RequestId) =>
     """
     Dispatch requests. At the time this behavior is called for StreamTransfer
     and ChunkTransfer encodings, only the headers of the request may have
@@ -45,40 +53,39 @@ actor _ServerConnection is HTTPSession
     of the response to a processed request has been sent is the next request
     processed.
     """
-    let frozen_request = recover val consume request end
-
-    if _active_request is None
-    then
-        // Backend is not busy, so pass this request on for processing.
-        _active_request = frozen_request
-        _keepalive = try
-          frozen_request("Connection")? != "close"
-        else
-          frozen_request.proto != "HTTP/1.0"
-        end
-        _body_bytes_sent = 0
-        _backend(frozen_request)
-    else
-        _pending.push(frozen_request)
-        // Backpressure incoming requests if the queue grows too much.
-        // The backpressure prevents filling up memory with queued
-        // requests in the case of a runaway client.
-        if _pending.size() > 2 then _conn.mute() end
+    _active_request = request_id
+    _keepalive =
+      match request.header("Connection")
+      | "close" => false
+      else
+        // keepalive is the default in HTTP/1.1, not supported in HTTP/1.0
+        request.version() isnt HTTP10
+      end
+    _body_bytes_sent = 0
+    _backend(request, request_id)
+    // TODO: handle wrap around
+    if (_active_request - _sent_response).abs() >= _max_request_handling_lag then
+      // Backpressure incoming requests if the queue grows too much.
+      // The backpressure prevents filling up memory with queued
+      // requests in the case of a runaway client.
+      _conn.mute()
     end
 
-  be _chunk(data: ByteSeq val) =>
+  be _receive_chunk(data: ByteSeq val, request_id: RequestId) =>
     """
     Receive some `request` body data, which we pass on to the handler.
     """
-    _body_bytes_sent = _body_bytes_sent + data.size()
-    _backend.chunk(consume data)
+    _backend.chunk(data, request_id)
 
-  be _finish() =>
+  be _receive_finished(request_id: RequestId) =>
     """
     Inidcates that the last *inbound* body chunk has been sent to
     `_chunk`. This is passed on to the back end.
     """
-    _backend.finished()
+    _backend.finished(request_id)
+
+  be _receive_failed(parse_error: RequestParseError, request_id: RequestId) =>
+    _backend.failed(parse_error, request_id)
 
   be dispose() =>
     """
@@ -86,91 +93,56 @@ actor _ServerConnection is HTTPSession
     """
     _conn.dispose()
 
-  be cancel(msg: Payload val) =>
-    """
-    Cancel the current response.
-    """
-    _cancel()
-
-  fun ref _cancel() =>
-    match _active_response
-    | let p: Payload val =>
-      _backend.cancelled()
-    end
 
   be closed() =>
-    _backend.failed(ConnectionClosed)
+    _backend.failed(ConnectionClosed, _active_request)
     _conn.unmute()
 
-  be apply(response: Payload val) =>
+  be send_start(response: HTTPResponse val, request_id: RequestId) =>
     """
     Initiate transmission of the HTTP Response message for the current
     Request.
     """
     _conn.unmute()
-    _active_response = response
+    _sent_response = request_id
     _send(response)
 
-    // Clear all pending after an error response.
-    if (response.status == 0) or (response.status >= 300)
-    then
-      _pending.clear()
-    end
-
-  fun ref _dispatch_pending() =>
-    """
-    If we have pending requests, dispatch the next one.
-    """
-    try
-      let request = _pending.pop()?
-      _active_request = request
-      _backend(consume request)
-    else
-      _active_request = None
-    end
-
-  fun ref _send(response: Payload val) =>
+  fun ref _send(response: HTTPResponse val) =>
     """
     Send a single response.
     """
-    let okstatus = (response.status < 300)
-    response._write(_keepalive and okstatus, _conn)
+    let okstatus = (response.status().apply() < 300)
+    // TODO
+    //response._write(_keepalive and okstatus, _conn)
 
-    if response.has_body()
-    then
-      match response.transfer_mode
-      | OneshotTransfer => finish() // Already sent
-      else
-        _backend.need_body()  // To be sent later
-      end
-    else
-      finish()
-    end
-
-  be write(data: ByteSeq val) =>
+  be send_chunk(data: ByteSeq val, request_id: RequestId) =>
     """
     Write low level outbound raw byte stream.
     """
     _body_bytes_sent = _body_bytes_sent + data.size()
     _conn.write(data)
 
-  be finish() =>
+  be send_finished(request_id: RequestId) =>
     """
     We are done sending a response. We can close the connection if
     `keepalive` was not requested.
     """
-    try
-      _logger(_client_ip, _body_bytes_sent,
-        (_active_request as Payload val),
-        (_active_response as Payload val))
-    end
-
-    _active_request = None
-    _active_response = None
-
     if not _keepalive then
       _conn.dispose()
-      _pending.clear()
+    end
+
+  be send_cancel(request_id: RequestId) =>
+    """
+    Cancel the current response.
+
+    TODO: keep this???
+    """
+    _cancel(request_id)
+
+  fun ref _cancel(request_id: RequestId) =>
+    if (_active_request - _sent_response) != 0 then
+      // we still have some stuff in flight at the backend
+      _backend.cancelled(request_id)
     end
 
   be throttled() =>

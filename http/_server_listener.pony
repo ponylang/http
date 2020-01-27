@@ -9,15 +9,11 @@ class _ServerListener is TCPListenNotify
   let _server: HTTPServer
   let _sslctx: (SSLContext | None)
   let _handlermaker: HandlerFactory val
-  let _logger: Logger
-  let _reversedns: (DNSLookupAuth | None)
 
   new iso create(
     server: HTTPServer,
     sslctx: (SSLContext | None),
-    handler: HandlerFactory val,  // Makes a unique session handler
-    logger: Logger,
-    reversedns: (DNSLookupAuth | None))
+    handler: HandlerFactory val)  // Makes a unique session handler
   =>
     """
     Creates a new listening socket manager.
@@ -25,8 +21,6 @@ class _ServerListener is TCPListenNotify
     _server = server
     _sslctx = sslctx
     _handlermaker = handler
-    _logger = logger
-    _reversedns = reversedns
 
   fun ref listening(listen: TCPListener ref) =>
     """
@@ -53,10 +47,10 @@ class _ServerListener is TCPListenNotify
     """
     match _sslctx
     | None =>
-      _ServerConnHandler(_handlermaker, _logger, _reversedns, _server)
+      _ServerConnHandler(_handlermaker, _server)
     | let ctx: SSLContext =>
       let ssl = ctx.server()?
       SSLConnection(
-        _ServerConnHandler(_handlermaker, _logger, _reversedns, _server),
+        _ServerConnHandler(_handlermaker, _server),
         consume ssl)
     end

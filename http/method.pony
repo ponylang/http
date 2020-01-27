@@ -7,7 +7,6 @@ primitive CONNECT is HTTPMethod
 primitive GET is HTTPMethod
   fun repr(): String val => "GET"
 
-
 primitive DELETE is HTTPMethod
   fun repr(): String => "DELETE"
 

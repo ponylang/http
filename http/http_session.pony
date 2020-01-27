@@ -7,27 +7,51 @@ interface tag HTTPSession
   in the client or in the server 'back end') this interface provides a
   common view of how information is passed *into* the `http` package.
   """
-  be apply(payload: Payload val)
+  ////////////////////////
+  // API THAT CALLS YOU //
+  ////////////////////////
+  be _receive_start(request: HTTPRequest val, request_id: RequestId)
     """
-    Start sending a request or response. The `Payload` must have all its
-    essential fields filled in at this point, because ownership is being
-    transferred to the session actor. This begins an outbound message.
+    receive a request...
+
+
+    The appropriate Payload Builder will call this from the `TCPConnection`
+    actor to start delivery of a new *inbound* message. If the `Payload`s
+    `transfer_mode` is `OneshotTransfer`, this is the only notification
+    that will happen for the message. Otherwise there will be one or more
+
     """
 
-  be finish()
+  be _receive_chunk(data: Array[U8] val, request_id: RequestId)
     """
-    Indicate that all *outbound* `add_chunk` calls have been made and
-    submission of the HTTP message is complete.
     """
+
+  be _receive_finished(request_id: RequestId)
+    """
+    Indicate that the current inbound request has been fully received.
+    """
+
+  be _receive_failed(parse_error: RequestParseError, request_id: RequestId) =>
+    """ignored by default."""
+    None
+
+  ///////////////////////
+  // API THAT YOU CALL //
+  ///////////////////////
+  be send_start(respone: HTTPResponse val, request_id: RequestId)
+    """
+    Start sending a response.
+    """
+
+  be send_chunk(data: ByteSeq val, request_id: RequestId)
+
+  be send_cancel(request_id: RequestId)
+
+  be send_finished(request_id: RequestId)
 
   be dispose()
     """
     Close the connection from this end.
-    """
-
-  be write(data: ByteSeq val)
-    """
-    Write raw byte stream to the outbound TCP connection.
     """
 
   be _mute()
@@ -41,29 +65,5 @@ interface tag HTTPSession
     Resume delivering incoming data to the handler.
     """
 
-  be cancel(msg: Payload val)
-    """
-    Tell the session to stop sending an *outbound* message.
-    """
 
-  be _deliver(payload: Payload val)
-    """
-    The appropriate Payload Builder will call this from the `TCPConnection`
-    actor to start delivery of a new *inbound* message. If the `Payload`s
-    `transfer_mode` is `OneshotTransfer`, this is the only notification 
-    that will happen for the message. Otherwise there will be one or more
-    `_chunk` calls followed by a `_finish` call.
-    """
-
-  be _chunk(data: ByteSeq val)
-    """
-    Deliver a piece of *inbound* body data to the application `HTTPHandler`
-    This is called by the PayloadBuilder.
-    """
-
-  be _finish()
-    """
-    Inidcates that the last *inbound* body chunk has been sent to
-    `_chunk`. This is called by the PayloadBuilder.
-    """
 

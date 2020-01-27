@@ -15,7 +15,9 @@ class val _ServerConnectionClosedHandlerFactory is HandlerFactory
 
   fun apply(session: HTTPSession): HTTPHandler ref^ =>
     object is HTTPHandler
-      fun ref failed(reason: HTTPFailureReason) =>
+      fun ref apply(res: HTTPRequest val, request_id: RequestId) =>
+        _h.log("received request")
+      fun ref failed(reason: HTTPFailureReason, request_id: RequestId) =>
         match reason
         | ConnectionClosed =>
           _h.complete_action("server failed with ConnectionClosed")
@@ -27,7 +29,7 @@ class val _ServerConnectionClosedHandlerFactory is HandlerFactory
 class iso ServerConnectionClosedTest is UnitTest
   fun name(): String => "server/error-handling/connection-closed"
   fun apply(h: TestHelper) ? =>
-    h.long_test(10_000_000_000)
+    h.long_test(5_000_000_000)
     h.expect_action("server listening")
     h.expect_action("client connected")
     h.expect_action("server failed with ConnectionClosed")
@@ -48,8 +50,8 @@ class iso ServerConnectionClosedTest is UnitTest
                 object iso is TCPConnectionNotify
                   fun ref connected(conn: TCPConnection ref) =>
                     _h.complete_action("client connected")
-                    conn.write("GET /abc/def HTTP/1.1\r\n")
-                    conn.close()
+                    conn.write("GET /abc/def HTTP/1.1\r\n\r\n")
+                    conn.dispose()
 
                   fun ref received(conn: TCPConnection ref, data: Array[U8] iso, times: USize): Bool =>
                     true

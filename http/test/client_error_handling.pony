@@ -1,3 +1,4 @@
+/*
 use "ponytest"
 use ".."
 use "net"
@@ -318,3 +319,4 @@ class iso SSLAuthFailedTest is UnitTest
         "127.0.0.1",
         "0")
     h.dispose_when_done(listener)
+*/

@@ -1,35 +1,15 @@
+use "valbytes"
+use "debug"
 
 primitive TooLarge
 primitive UnknownMethod
 primitive InvalidURI
 primitive InvalidVersion
 primitive InvalidContentLength
-primitive InvalidTransferEncoding
+primitive InvalidTransferCoding
+primitive InvalidChunk
 
-"""
-## How HTTP Requests need to be handled now
-
-fun received(request) =>
-  // look at method, url, headers
-  // to determine what to do with coming body data.
-  // set internal state for handling data
-
-fun chunk(data) =>
-  // determine based on internal state how to handle data.
-
-## How they should be handled
-
-
-interface RequestHandler
-  fun received(request, session) =>
-    do_sth_async(req_params, session as ResponseCallback) --> response_cb(response)
-
-  fun chunk(data: Array[U8] val, session) => ...
-  fun finished(session)
-"""
-
-
-type RequestParseError is ( TooLarge | UnknownMethod | InvalidURI | InvalidVersion | InvalidContentLength | InvalidTransferEncoding )
+type RequestParseError is ( TooLarge | UnknownMethod | InvalidURI | InvalidVersion | InvalidContentLength | InvalidTransferCoding | InvalidChunk )
 
 primitive NeedMore
 
@@ -37,47 +17,58 @@ type ParseReturn is (NeedMore | RequestParseError | None)
   """what is returned from `HTTP11RequestParser.parse(...)`"""
 
 primitive _ExpectRequestLine
-//primitive _ExpectHeaders
-//primitive _ExpectBody
+primitive _ExpectHeaders
+primitive _ExpectBody
+primitive _ExpectChunkStart
+primitive _ExpectChunk
+primitive _ExpectChunkEnd
 
 type _ParserState is (
   _ExpectRequestLine |
   _ExpectHeaders |
-  _ExpectBody) // TODO: chunked stuff
+  _ExpectBody |
+  _ExpectChunkStart |
+  _ExpectChunk |
+  _ExpectChunkEnd)
 
-interface HTTP11Handler
+type RequestId is USize
+
+primitive Chunked
+
+interface tag HTTP11RequestHandler
   """
-  Downstream class that is notified of parse results,
+  Downstream actor that is notified of parse results,
   be it a valid `HTTPRequest` containing method, URL, headers and other metadata,
   or a specific `RequestParseError`.
   """
-  fun ref apply(request: HTTPRequest val, session: HTTPSession)
+  be _receive_start(request: HTTPRequest val, request_id: RequestId)
     """
-    Received parsed HTTPRequests
+    Receive parsed HTTPRequest
     """
-  fun ref chunk(data: Array[U8] val, session: HTTPSession)
-  fun ref finished(session: HTTPSession)
 
-  fun ref failed(parse_error: RequestParseError, session: HTTPSession)
+  be _receive_chunk(data: Array[U8] val, request_id: RequestId)
+  be _receive_finished(request_id: RequestId)
+
+  be _receive_failed(parse_error: RequestParseError, request_id: RequestId)
 
 class HTTP11RequestParser
   let _max_request_line_size: USize = 8192 // TODO make configurable
   let _max_headers_size: USize      = 8192 // TODO make configurable
+  let _max_chunk_size_line_length: USize = 128 // TODO: make configurable
 
-  let _handler: HTTP11Handler
-  let _session: HTTPSession
+  let _handler: HTTP11RequestHandler
 
   var _state: _ParserState = _ExpectRequestLine
   var _buffer: ByteArrays = ByteArrays.create()
-  var _current_request: BuildableHTTPRequest trn = BuildableHTTPRequest
+  var _request_counter: RequestId = 0
+  var _current_request: BuildableHTTPRequest trn = BuildableHTTPRequest.create()
 
   var _expected_body_length: USize = 0
   var _persistent_connection: Bool = true
-  var _transfer_encoding: (Chunked | None) = None
+  var _transfer_coding: (Chunked | None) = None
 
-  new create(handler: HTTP11Handler, session: HTTPSession) =>
+  new create(handler: HTTP11RequestHandler) =>
     _handler = handler
-    _session = session
 
   fun ref parse(data: Array[U8] iso): ParseReturn =>
     _buffer = _buffer + (consume data)
@@ -89,11 +80,20 @@ class HTTP11RequestParser
         _parse_headers()
       | _ExpectBody =>
         _parse_body()
+      | _ExpectChunkStart =>
+        _parse_chunk_start()
+      | _ExpectChunk =>
+        _parse_chunk()
+      | _ExpectChunkEnd =>
+        _parse_chunk_end()
       end
     // signal errors to result receiver
     match ret
-    | let rpe: RequestParseError => _handler.failed(rpe, _session)
+    | let rpe: RequestParseError =>
+      _handler._receive_failed(rpe, _request_counter)
+      _reset(where reset_request = true) // TODO: drop data here?
     end
+    ret
 
   fun _skip_whitespace(start: USize = 0): USize =>
     _buffer.skip_while(_HTTP11Parsing~is_whitespace(), start)
@@ -104,6 +104,20 @@ class HTTP11RequestParser
   fun _request_line_exhausted(): (TooLarge | NeedMore) =>
     if _buffer.size() > _max_request_line_size then
       TooLarge
+    else
+      NeedMore
+    end
+
+  fun _chunk_size_line_exhausted(): (InvalidChunk | NeedMore) =>
+    if _buffer.size() > _max_chunk_size_line_length then
+      InvalidChunk
+    else
+      NeedMore
+    end
+
+  fun _chunk_trailers_exhausted(): (InvalidChunk | NeedMore) =>
+    if _buffer.size() > _max_headers_size then
+      InvalidChunk
     else
       NeedMore
     end
@@ -220,10 +234,18 @@ class HTTP11RequestParser
     _buffer = _buffer.drop(header_start)
 
     // send request downstream
-    _handler.apply(_current_request = BuildableHTTPRequest, _session)
+    _send_request()
 
     _state = _ExpectBody
     _parse_body()
+
+  fun ref _send_request() =>
+    // send it down to the handler
+    _handler._receive_start(
+      // resetting the request here already, to pass down a trn
+      _current_request = BuildableHTTPRequest.create(),
+      _request_counter
+    )
 
   fun ref _handle_special_headers(name: String, value: String): ParseReturn =>
     if CompareCaseInsensitive(name, "content-length") then
@@ -238,10 +260,10 @@ class HTTP11RequestParser
     elseif CompareCaseInsensitive(name, "transfer-encoding") then
       try
         value.find("chunked")?
-        _transfer_encoding = Chunked
-        _current_request.set_transfer_encoding(Chunked)
+        _transfer_coding = Chunked
+        _current_request.set_transfer_coding(Chunked)
       else
-        return InvalidTransferEncoding
+        return InvalidTransferCoding
       end
     elseif CompareCaseInsensitive(name, "connection") then
       _persistent_connection = if value == "close" then false else true end
@@ -305,27 +327,137 @@ class HTTP11RequestParser
 
 
   fun ref _parse_body(): ParseReturn =>
-    match _transfer_encoding
+    match _transfer_coding
     | Chunked =>
-      // TODO
-      NeedMore
+      _state = _ExpectChunkStart
+      _parse_chunk_start()
     else
       if _expected_body_length > 0 then
         let available = _expected_body_length.min(_buffer.size() - 1)
         let data = _buffer.trim(0, available)
         _buffer = _buffer.drop(data.size())
         _expected_body_length = _expected_body_length - data.size()
-        _handler.chunk(data, _session)
+        _handler._receive_chunk(data, _request_counter)
       end
       if _expected_body_length == 0 then
-        _handler.finished(_session)
 
-        _state = _ExpectRequestLine
+        _handler._receive_finished(_request_counter)
+        _reset()
         _parse_request_line()
+
       else
         NeedMore
       end
     end
+
+  fun ref _parse_chunk_start(): ParseReturn =>
+    match _buffer.find("\r\n", 0)
+    | (true, let chunk_start_line_end: USize) =>
+      let chunk_length_end =
+        match _buffer.find(";", 0, chunk_start_line_end)
+        | (true, let cle: USize) =>
+          // we found some chunk extensions
+          // don't care, YOLO
+          cle
+        else
+          chunk_start_line_end
+        end
+      let chunk_length_str = _buffer.string(0, chunk_length_end)
+      _buffer = _buffer.drop(chunk_start_line_end + 2)
+      try
+        match chunk_length_str.read_int[USize](0, 16)?
+        | (0, 0) =>
+          return InvalidChunk // chunk-size is not a hex number
+        | (0, _) =>
+          // last chunk
+          _state = _ExpectChunkEnd
+          _parse_chunk_end()
+        | (let chunk_length: USize, _) =>
+           // set valid chunk length
+           _expected_body_length = chunk_length
+          _state = _ExpectChunk
+          _parse_chunk()
+        end
+      else
+        return InvalidChunk // HEX chunk-size integer out of range
+      end
+    else
+      _chunk_size_line_exhausted() // no CRLF found
+    end
+
+  fun ref _parse_chunk_end(): ParseReturn =>
+    """
+    handle possible trailer headers (by skipping them) and verify the finishing CRLF.
+    """
+    // search for CRLF ending chunked request
+    match _buffer.find("\r\n", 0)
+    | (true, 0) =>
+      // immediate CRLF --> no trailers
+      _buffer = _buffer.drop(2) // skip final CRLF
+    | (true, let line_end: USize) =>
+      // data before CRLF --> trailers
+      match _buffer.find("\r\n\r\n", line_end)
+      | (true, let trailer_end: USize) =>
+        // skip trailers and final CRLF
+        _buffer = _buffer.drop(trailer_end + 4)
+      else
+        return _chunk_trailers_exhausted() // trailer line too long or we need more
+      end
+    else
+      _chunk_trailers_exhausted() // trailer line too long or we need more
+    end
+    // we got a final CRLF for this chunked request
+    _handler._receive_finished(_request_counter)
+    _reset()
+    _parse_request_line()
+
+  fun ref _parse_chunk(): ParseReturn =>
+    """
+    This will not be called for the last-chunk with length 0.
+    See _parse_chunk_start.
+    """
+    if _expected_body_length > 0 then
+      let available = _expected_body_length.min(_buffer.size() - 1)
+      let data = _buffer.trim(0, available)
+      _buffer = _buffer.drop(data.size())
+      _expected_body_length = _expected_body_length - data.size()
+      _handler._receive_chunk(data, _request_counter)
+    end
+    if _expected_body_length == 0 then
+      // end of chunk, expect CRLF, otherwise fail
+      try
+        if (_buffer(0)? == '\r') and (_buffer(1)? == '\n') then
+          _buffer = _buffer.drop(2)
+        else
+          return InvalidChunk // no CRLF after chunk
+        end
+      else
+        return NeedMore // not enough data for reading a CRLF
+      end
+      // expect next chunk
+      _state = _ExpectChunkStart
+      _parse_chunk_start()
+    else
+      NeedMore
+    end
+
+  fun ref _reset(
+    drop_data: Bool = false,
+    reset_request: Bool = false)
+  =>
+    if reset_request then
+      _current_request = BuildableHTTPRequest.create()
+    end
+    _request_counter = _request_counter + 1
+    _state = _ExpectRequestLine
+    _expected_body_length = 0
+    _persistent_connection = true
+    _transfer_coding = None
+    if drop_data then
+      _buffer = ByteArrays.create()
+    end
+
+// TODO: handle closed event
 
 
 primitive _HTTP11Parsing

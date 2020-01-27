@@ -1,3 +1,4 @@
+/*
 use "collections"
 use "net"
 use "net_ssl"
@@ -154,3 +155,4 @@ class _SessionGuard
 
     // Channel can not accept another request now.
     error
+*/

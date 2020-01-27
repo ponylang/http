@@ -1,13 +1,10 @@
 use "collections"
-
-primitive ChunkedBody
+use "debug"
 
 primitive HTTP11
 primitive HTTP10
 type HTTPVersion is (HTTP10 | HTTP11)
-type HTTPBody is (None | ValBytes | ChunkedBody )
 
-primitive Chunked
 
 type Header is (String, String)
 
@@ -17,7 +14,7 @@ interface val HTTPRequest
   fun version(): HTTPVersion
   fun header(name: String): (String | None)
   fun headers(): Iterator[Header]
-  fun transfer_encoding(): (Chunked | None)
+  fun transfer_coding(): (Chunked | None)
   fun content_length(): (USize | None)
 
 class val BuildableHTTPRequest is HTTPRequest
@@ -25,19 +22,19 @@ class val BuildableHTTPRequest is HTTPRequest
   var _uri: URL
   var _version: HTTPVersion
   embed _headers: Headers = _headers.create()
-  var _transfer_encoding: (Chunked | None)
+  var _transfer_coding: (Chunked | None)
   var _content_length: (USize | None)
 
   new trn create(
     method': HTTPMethod = GET,
     uri': URL = URL,
     version': HTTPVersion = HTTP11,
-    transfer_encoding': (Chunked | None) = None,
+    transfer_coding': (Chunked | None) = None,
     content_length': (USize | None) = None) =>
     _method = method'
     _uri = uri'
     _version = version'
-    _transfer_encoding = transfer_encoding'
+    _transfer_coding = transfer_coding'
     _content_length = content_length'
 
   fun method(): HTTPMethod => _method
@@ -68,7 +65,7 @@ class val BuildableHTTPRequest is HTTPRequest
   fun headers(): Iterator[Header] => _headers.values()
 
   fun ref add_header(name: String, value: String): BuildableHTTPRequest ref =>
-    // TODO: concat multiple values for same name with comma as separator
+    // TODO: check for special headers like Transfer-Coding
     _headers.add(name, value)
     this
 
@@ -76,10 +73,11 @@ class val BuildableHTTPRequest is HTTPRequest
     _headers.clear()
     this
 
-  fun transfer_encoding(): (Chunked | None) => _transfer_encoding
+  fun transfer_coding(): (Chunked | None) => _transfer_coding
 
-  fun ref set_transfer_encoding(te: (Chunked | None)): BuildableHTTPRequest ref =>
-    _transfer_encoding = te
+  fun ref set_transfer_coding(te: (Chunked | None)): BuildableHTTPRequest ref =>
+    // TODO: also update headers
+    _transfer_coding = te
     this
 
   fun content_length(): (USize | None) => _content_length
@@ -97,31 +95,29 @@ class Headers
   var _hl: Array[Header] = _hl.create(4)
 
   fun ref add(name: String, value: String) =>
-    // TODO
-    match _find(name)
-    | (Less, let ln: ListNode[Header]) =>
-      let node = ListNode[Header]((name, value))
-      ln.prepend(node)
-    | (Equal, let ln: ListNode[Header]) =>
-      // append comma separated
-      try
-        let old_value = ln.apply()?
-        // TODO: remove extra allocation
-        let new_value = recover iso String(old_value._2.size() + 1 + value.size()) end
-        new_value.>append(old_value._2)
-                 .>append(",")
-                 .>append(value)
-        ln.update((old_value._1, consume new_value))?
-      else
-        // shouldn't happen
-        None
+    try
+      match _find(name)
+      | let i: USize =>
+        let header = _hl(i)?
+        match _compare(name, header._1)
+        | Equal =>
+          // append with comma
+          let old_value = header._2
+          let new_value = recover iso String(old_value.size() + 1 + value.size()) end
+          new_value.>append(old_value)
+                   .>append(",")
+                   .>append(value)
+          _hl(i)? = (header._1, consume new_value)
+        else
+          // either Less or Greater - we got the right insertion point
+          _hl.insert(i, (name, value))?
+        end
+      | None =>
+        // first node or last node, just push
+        _hl.push((name, value))
       end
-    | (Greater, let ln: ListNode[Header]) =>
-      let node = ListNode[Header]((name, value))
-      ln.append(node)
-    | None =>
-      // first node, just push
-      _hl.push((name, value))
+    else
+      Debug("error Header.add")
     end
 
   fun get(name: String): (String | None) =>
@@ -132,7 +128,7 @@ class Headers
     var i = s / 2
     try
       while (i >= 0) and (i < s) do
-        val header = _hl(i)?
+        let header = _hl(i)?
         match _compare(name, header._1)
         | Less =>
           if i == 0 then return None end
@@ -145,6 +141,7 @@ class Headers
         end
       end
     end
+    None
 
   fun ref clear() =>
     _hl.clear()
@@ -194,30 +191,44 @@ class Headers
     end
 
   fun _compare(left: String, right: String): Compare =>
+    """
+    Less: left sorts lexicographically smaller than right
+    Equal: same size, same content
+    Greater: left sorts lexicographically higher than right
+
+    _compare("A", "B") ==> Less
+    _compare("AA", "A") ==> Greater
+    _compare("A", "AA") ==> Less
+    _compare("", "") ==> Equal
+    """
     let ls = left.size()
     let rs = right.size()
+    let min = ls.min(rs)
 
-    if ls < rs then
-      Less
-    elseif rs < ls then
-      Greater
-    else
-      // both equal
-      var i = 0
-      while i < ls do
-        try
-          let lc = _lower(left(i)?)
-          let rc = _lower(right(i)?)
-          if lc < rc then
-            return Less
-          elseif rc < lc then
-            return Greater
-          end
-        else
-          Less // should not happen, size checked
+    var i = USize(0)
+    while i < min do
+      try
+        let lc = _lower(left(i)?)
+        let rc = _lower(right(i)?)
+        if lc < rc then
+          return Less
+        elseif rc < lc then
+          return Greater
         end
-        i = i + 1
+      else
+        Less // should not happen, size checked
       end
+      i = i + 1
+    end
+    // all characters equal up to min size
+    if ls > min then
+      // left side is longer, so considered greater
+      Greater
+    elseif rs > min then
+      // right side is longer, so considered greater
+      Less
+    else
+      // both sides equal size and content
       Equal
     end
 

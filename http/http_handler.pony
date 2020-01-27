@@ -46,7 +46,8 @@ primitive ConnectFailed
 type HTTPFailureReason is (
   AuthFailed |
   ConnectionClosed |
-  ConnectFailed
+  ConnectFailed |
+  RequestParseError
   )
   """
   HTTP failure reason reported to `HTTPHandler.failed()`.
@@ -71,38 +72,33 @@ interface HTTPHandler
   so the application must provide an instance of `HandlerFactory` that
   will be called at the appropriate time.
   """
-  fun ref apply(payload: Payload val): Any =>
+  fun ref apply(request: HTTPRequest val, request_id: RequestId): Any =>
     """
-    Notification of an incoming message. On the client, these will
-    be responses coming from the server. On the server these will be requests
-    coming from the client. The `Payload` object carries HTTP headers
-    and the method, URL, and status codes.
+    Notification of an incoming message.
 
     Only one HTTP message will be processed at a time, and that starts
-    with a call to this method. This would be a good time to create
-    an actor to deal with subsequent information pertaining to this
-    message.
+    with a call to this method.
     """
 
-  fun ref chunk(data: ByteSeq val) =>
+  fun ref chunk(data: ByteSeq val, request_id: RequestId) =>
     """
     Notification of incoming body data. The body belongs to the most
-    recent `Payload` delivered by an `apply` notification.
+    recent `HTTPRequest` delivered by an `apply` notification.
     """
 
-  fun ref finished() =>
+  fun ref finished(request_id: RequestId) =>
     """
     Notification that no more body chunks are coming. Delivery of this HTTP
     message is complete.
     """
 
-  fun ref cancelled() =>
+  fun ref cancelled(request_id: RequestId) =>
     """
     Notification that transferring the payload has been cancelled locally,
     e.g. by disposing the client, closing the server or manually cancelling a single request.
     """
 
-  fun ref failed(reason: HTTPFailureReason) =>
+  fun ref failed(reason: HTTPFailureReason, request_id: RequestId) =>
     """
     Notification about failure to transfer the payload
     (e.g. connection could not be established, authentication failed, connection was closed prematurely, ...)
@@ -116,12 +112,6 @@ interface HTTPHandler
   fun ref unthrottled() =>
     """
     Notification that the session can resume accepting data.
-    """
-
-  fun ref need_body() =>
-    """
-    Notification that the HTTPSession is ready for Stream or Chunked
-    body data.
     """
 
 interface HandlerFactory

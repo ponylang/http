@@ -1,18 +1,3 @@
-interface val Logger
-  """
-  Handles logging request/response pairs.
-  """
-  fun val apply(
-    ip: String,
-    body_size: USize,
-    request: Payload val,
-    response: Payload val)
-    : Any
-  =>
-    """
-    Called after the server has handled a request.
-    """
-
 interface ServerNotify
   """
   Notifications about the creation and closing of `TCPConnection`s

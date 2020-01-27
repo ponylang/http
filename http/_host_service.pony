@@ -1,3 +1,4 @@
+/*
 use "collections"
 
 class val _HostService is (Hashable & Equatable[_HostService])
@@ -17,3 +18,4 @@ class val _HostService is (Hashable & Equatable[_HostService])
     (scheme == that.scheme)
       and (host == that.host)
       and (service == that.service)
+*/

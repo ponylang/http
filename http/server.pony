@@ -60,19 +60,20 @@ actor HTTPServer
   """
   let _notify: ServerNotify
   var _handler_maker: HandlerFactory val
-  var _logger: Logger
-  let _reversedns: (DNSLookupAuth | None)
   let _sslctx: (SSLContext | None)
   let _listen: TCPListener
   var _address: NetAddress
   var _dirty_routes: Bool = false
   let _sessions: SetIs[TCPConnection tag] = SetIs[TCPConnection tag]
 
-  new create(auth: TCPListenerAuth, notify: ServerNotify iso,
-    handler: HandlerFactory val, logger: Logger = DiscardLog,
-    host: String = "", service: String = "0", limit: USize = 0,
-    sslctx: (SSLContext | None) = None,
-    reversedns: (DNSLookupAuth | None) = None)
+  new create(
+    auth: TCPListenerAuth,
+    notify: ServerNotify iso,
+    handler: HandlerFactory val,
+    host: String = "",
+    service: String = "0",
+    limit: USize = 0,
+    sslctx: (SSLContext | None) = None)
   =>
     """
     Create a server bound to the given host and service. To do this we
@@ -81,12 +82,10 @@ actor HTTPServer
     """
     _notify = consume notify
     _handler_maker = handler
-    _logger = logger
-    _reversedns = reversedns
     _sslctx = sslctx
 
     _listen = TCPListener(auth,
-        _ServerListener(this, sslctx, _handler_maker, _logger, _reversedns),
+        _ServerListener(this, sslctx, _handler_maker),
         host, service, limit)
 
     _address = recover NetAddress end
@@ -103,15 +102,7 @@ actor HTTPServer
     """
     _handler_maker = handler
     _listen.set_notify(
-      _ServerListener(this, _sslctx, _handler_maker, _logger, _reversedns))
-
-  be set_logger(logger: Logger) =>
-    """
-    Replace the logger.
-    """
-    _logger = logger
-    _listen.set_notify(
-      _ServerListener(this, _sslctx, _handler_maker, _logger, _reversedns))
+      _ServerListener(this, _sslctx, _handler_maker))
 
   be dispose() =>
     """
