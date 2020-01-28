@@ -1,17 +1,32 @@
 use "valbytes"
 use "debug"
 
-primitive TooLarge
-primitive UnknownMethod
-primitive InvalidURI
-primitive InvalidVersion
-primitive InvalidContentLength
-primitive InvalidTransferCoding
-primitive InvalidChunk
+primitive TooLarge is Stringable
+  fun string(): String iso^ => "TooLarge".clone()
+
+primitive UnknownMethod is Stringable
+  fun string(): String iso^ => "UnknownMethod".clone()
+
+primitive InvalidURI is Stringable
+  fun string(): String iso^ =>
+    "InvalidURI".clone()
+primitive InvalidVersion is Stringable
+  fun string(): String iso^ =>
+    "InvalidVersion".clone()
+primitive InvalidContentLength is Stringable
+  fun string(): String iso^ =>
+    "InvalidContentLength".clone()
+primitive InvalidTransferCoding is Stringable
+  fun string(): String iso^ =>
+    "InvalidTransferCoding".clone()
+primitive InvalidChunk is Stringable
+  fun string(): String iso^ =>
+    "InvalidChunk".clone()
 
 type RequestParseError is ( TooLarge | UnknownMethod | InvalidURI | InvalidVersion | InvalidContentLength | InvalidTransferCoding | InvalidChunk )
 
-primitive NeedMore
+primitive NeedMore is Stringable
+  fun string(): String iso^ => "NeedMore".clone()
 
 type ParseReturn is (NeedMore | RequestParseError | None)
   """what is returned from `HTTP11RequestParser.parse(...)`"""
@@ -221,7 +236,6 @@ class HTTP11RequestParser
       | (let name: String, let value: String, let hend: USize) =>
         _handle_special_headers(name, value)
         _current_request.add_header(name, value)
-        _buffer = _buffer.drop(hend) // drop after successfully parsing a header
         header_start = hend
       | let hend: USize => // EOH
         header_start = hend
@@ -332,18 +346,23 @@ class HTTP11RequestParser
       _state = _ExpectChunkStart
       _parse_chunk_start()
     else
+      Debug("_expected_body_length: " + _expected_body_length.string())
       if _expected_body_length > 0 then
-        let available = _expected_body_length.min(_buffer.size() - 1)
+        let available = _expected_body_length.min(_buffer.size())
         let data = _buffer.trim(0, available)
         _buffer = _buffer.drop(data.size())
         _expected_body_length = _expected_body_length - data.size()
         _handler._receive_chunk(data, _request_counter)
       end
+      Debug("_expected_body_length: " + _expected_body_length.string())
+      Debug("remaining: " + _buffer.size().string())
       if _expected_body_length == 0 then
 
         _handler._receive_finished(_request_counter)
         _reset()
-        _parse_request_line()
+        if _buffer.size() > 0 then
+          _parse_request_line()
+        end
 
       else
         NeedMore
@@ -409,7 +428,9 @@ class HTTP11RequestParser
     // we got a final CRLF for this chunked request
     _handler._receive_finished(_request_counter)
     _reset()
-    _parse_request_line()
+    if _buffer.size() > 0 then
+      _parse_request_line()
+    end
 
   fun ref _parse_chunk(): ParseReturn =>
     """

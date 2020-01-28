@@ -1,32 +1,52 @@
-trait val HTTPMethod
+trait val HTTPMethod is (Equatable[HTTPMethod] & Stringable)
   fun repr(): String val
+  fun string(): String iso^
+  fun eq(o: HTTPMethod): Bool
 
 primitive CONNECT is HTTPMethod
   fun repr(): String val => "CONNECT"
+  fun string(): String iso^ => repr().clone()
+  fun eq(o: HTTPMethod): Bool => o is this
 
 primitive GET is HTTPMethod
   fun repr(): String val => "GET"
+  fun string(): String iso^ => repr().clone()
+  fun eq(o: HTTPMethod): Bool => o is this
 
 primitive DELETE is HTTPMethod
   fun repr(): String => "DELETE"
+  fun string(): String iso^ => repr().clone()
+  fun eq(o: HTTPMethod): Bool => o is this
 
 primitive HEAD is HTTPMethod
   fun repr(): String => "HEAD"
+  fun string(): String iso^ => repr().clone()
+  fun eq(o: HTTPMethod): Bool => o is this
 
 primitive OPTIONS is HTTPMethod
   fun repr(): String => "OPTIONS"
+  fun string(): String iso^ => repr().clone()
+  fun eq(o: HTTPMethod): Bool => o is this
 
 primitive PATCH is HTTPMethod
   fun repr(): String => "PATCH"
+  fun string(): String iso^ => repr().clone()
+  fun eq(o: HTTPMethod): Bool => o is this
 
 primitive POST is HTTPMethod
   fun repr(): String => "POST"
+  fun string(): String iso^ => repr().clone()
+  fun eq(o: HTTPMethod): Bool => o is this
 
 primitive PUT is HTTPMethod
   fun repr(): String => "PUT"
+  fun string(): String iso^ => repr().clone()
+  fun eq(o: HTTPMethod): Bool => o is this
 
 primitive TRACE is HTTPMethod
   fun repr(): String => "TRACE"
+  fun string(): String iso^ => repr().clone()
+  fun eq(o: HTTPMethod): Bool => o is this
 
 primitive HTTPMethods
   fun parse(maybe_method: ReadSeq[U8]): (HTTPMethod | None) =>

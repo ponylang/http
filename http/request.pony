@@ -1,9 +1,17 @@
 use "collections"
 use "debug"
 
-primitive HTTP11
-primitive HTTP10
-type HTTPVersion is (HTTP10 | HTTP11)
+primitive HTTP11 is (Equatable[HTTPVersion] & Stringable)
+  fun string(): String iso^ => recover iso String(8).>append("HTTP/1.1") end
+  fun eq(o: HTTPVersion): Bool => o is this
+primitive HTTP10 is (Equatable[HTTPVersion] & Stringable)
+  fun string(): String iso^ => recover iso String(8).>append("HTTP/1.0") end
+  fun eq(o: HTTPVersion): Bool => o is this
+primitive HTTP09 is (Equatable[HTTPVersion] & Stringable)
+  fun string(): String iso^ => recover iso String(8).>append("HTTP/0.9") end
+  fun eq(o: HTTPVersion): Bool => o is this
+
+type HTTPVersion is (HTTP09 | HTTP10 | HTTP11)
 
 
 type Header is (String, String)
@@ -107,13 +115,16 @@ class Headers
           new_value.>append(old_value)
                    .>append(",")
                    .>append(value)
+          Debug("append " + name  + " " + i.string())
           _hl(i)? = (header._1, consume new_value)
         else
           // either Less or Greater - we got the right insertion point
+          Debug("insert " + name  + " " + i.string())
           _hl.insert(i, (name, value))?
         end
       | None =>
         // first node or last node, just push
+        Debug("push " + name)
         _hl.push((name, value))
       end
     else
@@ -131,13 +142,14 @@ class Headers
         let header = _hl(i)?
         match _compare(name, header._1)
         | Less =>
+          Debug("get.Less")
           if i == 0 then return None end
           i = i / 2
         | Equal => return header._2
         | Greater =>
-          if i == s then return None end
           let num_right = s - i
-          i = i + (num_right / 2)
+          if num_right == 0 then return None end
+          i = i + (num_right / 2).max(1)
         end
       end
     end
@@ -152,6 +164,7 @@ class Headers
     // binary search
     let s = _hl.size()
     if s == 0 then return None end
+    Debug("find: " + name + ", s=" + s.string())
 
     var i = s / 2
     var last: (Compare, USize) = (Equal, 0)
@@ -160,6 +173,7 @@ class Headers
         let header = _hl(i)?
         match _compare(name, header._1)
         | Less =>
+          Debug("find Less than " + header._1)
           if (i == 0) or
             match last
             | (Greater, i - 1) => true // name was greater than prev node and is now less, no equal elem in list
@@ -173,6 +187,7 @@ class Headers
           i = i / 2
         | Equal   => return i
         | Greater =>
+          Debug("find Greater than " + header._1 + " @" + i.string())
           let num_right = s - i
           if (num_right == 0) or
             match last
@@ -184,11 +199,11 @@ class Headers
             return i + 1
           end
           last = (Greater, i)
-          let right_half = if num_right == 1 then 1 else num_right / 2 end
-          i = i + right_half
+          i = i + (num_right / 2).max(1)
         end
       end
     end
+    None
 
   fun _compare(left: String, right: String): Compare =>
     """
