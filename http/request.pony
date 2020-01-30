@@ -17,6 +17,18 @@ type HTTPVersion is (HTTP09 | HTTP10 | HTTP11)
 type Header is (String, String)
 
 interface val HTTPRequest
+  """
+  HTTP Request
+
+  * Method
+  * URI
+  * HTTP-Version
+  * Headers
+  * Transfer-Coding
+  * Content-Length
+
+  Without body.
+  """
   fun method(): HTTPMethod
   fun uri(): URL
   fun version(): HTTPVersion
@@ -24,6 +36,7 @@ interface val HTTPRequest
   fun headers(): Iterator[Header]
   fun transfer_coding(): (Chunked | None)
   fun content_length(): (USize | None)
+  fun has_body(): Bool
 
 class val BuildableHTTPRequest is HTTPRequest
   var _method: HTTPMethod
@@ -93,6 +106,15 @@ class val BuildableHTTPRequest is HTTPRequest
   fun ref set_content_length(cl: USize): BuildableHTTPRequest ref =>
     _content_length = cl
     this
+
+  fun has_body(): Bool =>
+    (transfer_coding() is Chunked)
+    or
+    match content_length()
+    | let x: USize if x > 0 => true
+    else
+      false
+    end
 
 
 class Headers

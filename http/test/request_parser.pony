@@ -27,6 +27,33 @@ primitive RequestParserTests is TestList
             h.assert_eq[USize](2, request.content_length() as USize)
             h.assert_eq[String]("2", request.header("Content-Length") as String)
             h.assert_eq[String]("XX", chunks.string())
+            h.assert_true(request.has_body())
+        }
+      )
+    )
+    test(
+      ParserTestBuilder.parse_success(
+        "no-body",
+        _R(
+          """
+          HEAD /upload?param=value HTTP/1.1
+          Host: upload.org
+          User-Agent: ponytest/0.33.1
+          Accept: */*
+
+          """
+        ),
+        {
+          (h: TestHelper, request: HTTPRequest, chunks: ByteArrays)? =>
+            h.assert_eq[HTTPMethod](HEAD, request.method())
+            h.assert_eq[HTTPVersion](HTTP11, request.version())
+            h.assert_eq[String]("/upload?param=value", request.uri().string())
+            h.assert_eq[String]("upload.org", request.header("Host") as String)
+            h.assert_eq[String]("ponytest/0.33.1", request.header("user-agent") as String)
+            h.assert_eq[String]("*/*", request.header("ACCEPT") as String)
+            h.assert_true(request.content_length() is None)
+            h.assert_eq[USize](0, chunks.size())
+            h.assert_false(request.has_body())
         }
       )
     )
@@ -77,6 +104,8 @@ primitive RequestParserTests is TestList
           """
           GET   / HTTP/1.1
           Header:  Value
+           MultiLine
+          Header2: Foo
           """)
     ))
     test(ParserTestBuilder.need_more("body",
