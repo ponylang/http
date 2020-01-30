@@ -346,16 +346,15 @@ class HTTP11RequestParser
       _state = _ExpectChunkStart
       _parse_chunk_start()
     else
-      Debug("_expected_body_length: " + _expected_body_length.string())
       if _expected_body_length > 0 then
         let available = _expected_body_length.min(_buffer.size())
-        let data = _buffer.trim(0, available)
-        _buffer = _buffer.drop(data.size())
-        _expected_body_length = _expected_body_length - data.size()
-        _handler._receive_chunk(data, _request_counter)
+        if available > 0 then
+          let data = _buffer.trim(0, available)
+          _buffer = _buffer.drop(data.size())
+          _expected_body_length = _expected_body_length - data.size()
+          _handler._receive_chunk(data, _request_counter)
+        end
       end
-      Debug("_expected_body_length: " + _expected_body_length.string())
-      Debug("remaining: " + _buffer.size().string())
       if _expected_body_length == 0 then
 
         _handler._receive_finished(_request_counter)
@@ -363,7 +362,6 @@ class HTTP11RequestParser
         if _buffer.size() > 0 then
           _parse_request_line()
         end
-
       else
         NeedMore
       end
@@ -392,6 +390,7 @@ class HTTP11RequestParser
           _state = _ExpectChunkEnd
           _parse_chunk_end()
         | (let chunk_length: USize, _) =>
+           Debug("chunk-length: " + chunk_length.string())
            // set valid chunk length
            _expected_body_length = chunk_length
           _state = _ExpectChunk
@@ -423,7 +422,7 @@ class HTTP11RequestParser
         return _chunk_trailers_exhausted() // trailer line too long or we need more
       end
     else
-      _chunk_trailers_exhausted() // trailer line too long or we need more
+      return _chunk_trailers_exhausted() // trailer line too long or we need more
     end
     // we got a final CRLF for this chunked request
     _handler._receive_finished(_request_counter)
@@ -438,11 +437,14 @@ class HTTP11RequestParser
     See _parse_chunk_start.
     """
     if _expected_body_length > 0 then
-      let available = _expected_body_length.min(_buffer.size() - 1)
-      let data = _buffer.trim(0, available)
-      _buffer = _buffer.drop(data.size())
-      _expected_body_length = _expected_body_length - data.size()
-      _handler._receive_chunk(data, _request_counter)
+      let available = _expected_body_length.min(_buffer.size())
+      if available > 0 then
+        let data = _buffer.trim(0, available)
+        _buffer = _buffer.drop(data.size())
+        _expected_body_length = _expected_body_length - data.size()
+        Debug("send chunk of size " + data.size().string())
+        _handler._receive_chunk(data, _request_counter)
+      end
     end
     if _expected_body_length == 0 then
       // end of chunk, expect CRLF, otherwise fail
