@@ -4,7 +4,7 @@ use "collections"
 use "buffered"
 use "time"
 
-primitive PrivateTests is TestList
+primitive PrivateHTTPTests is TestList
   fun tag tests(test: PonyTest) =>
     test(_Encode)
     test(_EncodeBad)

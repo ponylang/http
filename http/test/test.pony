@@ -7,7 +7,8 @@ actor Main is TestList
   new make() => None
 
   fun tag tests(test: PonyTest) =>
-    PrivateTests.tests(test)
+    PrivateHTTPTests.tests(test)
     ServerErrorHandlingTests.tests(test)
     RequestParserTests.tests(test)
+    HeaderTests.tests(test)
 
