@@ -30,7 +30,36 @@ class Headers
       add(header._1, header._2)
     end
 
+  fun ref set(name: String, value: String) =>
+    """
+    if a header with name already exists, its value will be overriden with this value.
+    """
+    // binary search
+    try
+      var i = USize(0)
+      var l = USize(0)
+      var r = _hl.size()
+      while l < r do
+        i = (l + r).fld(2)
+        let header = _hl(i)?
+        match _compare(header._1, name)
+        | Less =>
+          l = i + 1
+        | Equal =>
+          _hl(i)? = (name, value)
+          return
+        else
+          r = i
+        end
+      end
+      _hl.insert(l, (name, value))?
+    end
+
   fun ref add(name: String, value: String) =>
+    """
+    If a header with this name already exists, value will be
+    appended after a separating comma.
+    """
     // binary search
     try
       var i = USize(0)

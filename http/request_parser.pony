@@ -85,7 +85,7 @@ class HTTP11RequestParser
   new create(handler: HTTP11RequestHandler) =>
     _handler = handler
 
-  fun ref parse(data: Array[U8] iso): ParseReturn =>
+  fun ref parse(data: Array[U8] val): ParseReturn =>
     _buffer = _buffer + (consume data)
     let ret =
       match _state
@@ -106,7 +106,7 @@ class HTTP11RequestParser
     match ret
     | let rpe: RequestParseError =>
       _handler._receive_failed(rpe, _request_counter)
-      _reset(where reset_request = true) // TODO: drop data here?
+      reset(where reset_request = true) // TODO: drop data here?
     end
     ret
 
@@ -358,7 +358,7 @@ class HTTP11RequestParser
       if _expected_body_length == 0 then
 
         _handler._receive_finished(_request_counter)
-        _reset()
+        reset()
         if _buffer.size() > 0 then
           _parse_request_line()
         end
@@ -426,7 +426,7 @@ class HTTP11RequestParser
     end
     // we got a final CRLF for this chunked request
     _handler._receive_finished(_request_counter)
-    _reset()
+    reset()
     if _buffer.size() > 0 then
       _parse_request_line()
     end
@@ -464,7 +464,7 @@ class HTTP11RequestParser
       NeedMore
     end
 
-  fun ref _reset(
+  fun ref reset(
     drop_data: Bool = false,
     reset_request: Bool = false)
   =>

@@ -87,6 +87,10 @@ class val BuildableHTTPRequest is HTTPRequest
     _headers.add(name, value)
     this
 
+  fun ref set_header(name: String, value: String): BuildableHTTPRequest ref =>
+    _headers.set(name, value)
+    this
+
   fun ref clear_headers(): BuildableHTTPRequest ref =>
     _headers.clear()
     this

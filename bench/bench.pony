@@ -1,5 +1,4 @@
-use "../http"
-use "buffered"
+use ".."
 use "ponybench"
 use "debug"
 use "format"
@@ -21,66 +20,46 @@ actor _TestHTTPSession is HTTPSession
   be set_continue(c: AsyncBenchContinue) =>
     _c = c
 
-  be apply(payload: Payload val) =>
-    Debug("apply")
+  be _receive_start(request: HTTPRequest val, request_id: RequestId) =>
+    Debug("_receive_start")
 
-  be finish() =>
+  be _receive_chunk(data: Array[U8] val, request_id: RequestId) =>
+    Debug("_receive_chunk")
+
+  be _receive_finished(request_id: RequestId) =>
     Debug("finish")
+    try
+      (_c as AsyncBenchContinue).complete()
+    end
 
   be dispose() =>
     Debug("dispose")
 
-  be write(data: ByteSeq val) => None
-
-  be cancel(msg: Payload val) => None
+  be send_start(response: HTTPResponse val, request_id: RequestId) => None
+  be send_chunk(data: ByteSeq val, request_id: RequestId) => None
+  be send_cancel(request_id: RequestId) => None
+  be send_finished(request_id: RequestId) => None
 
   be _mute() => None
 
   be _unmute() => None
 
-  be _deliver(payload: Payload val) =>
-    Debug("_deliver")
-    match payload.transfer_mode
-    | OneshotTransfer =>
-      try
-        (_c as AsyncBenchContinue).complete()
-      else
-        Debug("no benchcontinue set")
-      end
-    else
-      Debug("_deliver chunk|stream")
-    end
-
-  be _chunk(data: ByteSeq val) =>
-    Debug("_chunk")
-
-  be _finish() => None
-    Debug("_finish")
-    try
-      (_c as AsyncBenchContinue).complete()
-    else
-      Debug("_finish None")
-    end
-
 class _ParseRequestBenchmark
   let _data: Array[String]
-  let _reader: Reader = Reader
   let _session: _TestHTTPSession = _TestHTTPSession.create()
-  let _parser: HTTPParser = HTTPParser.request(_session)
+  let _parser: HTTP11RequestParser = HTTP11RequestParser.create(_session)
 
   new create(data: Array[String]) =>
     _data = data
 
   fun ref apply(c: AsyncBenchContinue) ? =>
     _session.set_continue(c)
-    _parser.restart()
-    _reader.clear()
+    _parser.reset(true, true)
     let data_iter = _data.values()
     while data_iter.has_next() do
       let chunk = data_iter.next()?
-      _reader.append(chunk)
-      match _parser.parse(_reader)
-      | ParseError =>
+      match _parser.parse(chunk.array())
+      | let err: RequestParseError =>
         Debug("parsing failed.")
         if not data_iter.has_next() then
           c.fail()
