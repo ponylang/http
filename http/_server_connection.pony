@@ -1,5 +1,6 @@
 use "net"
 use "collections"
+use "valbytes"
 
 actor _ServerConnection is HTTPSession
   """
@@ -26,6 +27,13 @@ actor _ServerConnection is HTTPSession
     in order to determine lag in request handling.
     """
   let _max_request_handling_lag: USize = 100 // TODO: make configurable
+
+  // when the request_id in a send call matches the _active_request
+  // - directly send it
+  // if it is bigger than _active_request
+  // - insert it at index `send_request_id - _active_request`
+  // TBD
+  let _pending_responses: _PendingResponses = _PendingResponses.create()
 
   new create(
     handlermaker: HandlerFactory val,
@@ -104,29 +112,60 @@ actor _ServerConnection is HTTPSession
     Request.
     """
     _conn.unmute()
-    _sent_response = request_id
-    _send(response)
+    if request_id == _active_request then
+      // just send it through. all good
+      _sent_response = request_id
+      _send(response)
+    elseif request_id > _active_request then
+      // add serialized response to pending requests
+      _pending_responses.add_pending(request_id, response.to_bytes())
+    else
+      // request_id < _active_request
+      // latecomer - ignore
+      None
+    end
 
   fun ref _send(response: HTTPResponse val) =>
     """
     Send a single response.
     """
-    let okstatus = (response.status().apply() < 300)
-    // TODO
-    //response._write(_keepalive and okstatus, _conn)
+    //let okstatus = (response.status().apply() < 300)
+    _conn.writev(response)
 
   be send_chunk(data: ByteSeq val, request_id: RequestId) =>
     """
     Write low level outbound raw byte stream.
     """
-    _body_bytes_sent = _body_bytes_sent + data.size()
-    _conn.write(data)
+    if request_id == _active_request then
+      _body_bytes_sent = _body_bytes_sent + data.size()
+      _conn.write(data)
+    elseif request_id > _active_request then
+      _pending_responses.append_data(request_id, data)
+      // TODO
+      None
+    else
+      None // latecomer, ignore
+    end
 
   be send_finished(request_id: RequestId) =>
     """
     We are done sending a response. We can close the connection if
     `keepalive` was not requested.
     """
+    // check if the next request_id is already in the pending list
+    // if so, write it
+    var rid = request_id
+    while true do
+      match _pending_responses.pop(rid + 1)
+      | (let next_rid: RequestId, let response_data: ByteArrays) =>
+        rid = next_rid
+        _sent_response = next_rid
+        _conn.writev(response_data.byteseqiter())
+      else
+        // next one not available yet
+        break
+      end
+    end
     if not _keepalive then
       _conn.dispose()
     end

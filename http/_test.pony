@@ -1,4 +1,5 @@
 use "ponytest"
+use "ponycheck"
 use "net"
 use "collections"
 use "buffered"
@@ -362,3 +363,18 @@ primitive _Test
     h.assert_eq[String](path, url.path)
     h.assert_eq[String](query, url.query)
     h.assert_eq[String](fragment, url.fragment)
+
+
+class iso _PendingResponsesTest is Property1[Array[(Requestid, ByteArrays)]]
+  fun name(): String => "http/_pending_responses/property"
+  fun gen(): Generator[Array[(Requestid, ByteArrays)]] =>
+    // generate all ints between x and y in random order
+    // range
+    Generators.array_of[(RequestId, ByteArrays)](
+      Generators.zip2[RequestId, ByteArrays](
+        Generators.usize(where min = 0, max = 100),
+      )
+    )
+
+  fun property(sample: Array[(RequestId, ByteArrays)], h: PropertyHelper) =>
+

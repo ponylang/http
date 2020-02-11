@@ -1,11 +1,16 @@
-interface val HTTPResponse
+use "valbytes"
+
+interface val HTTPResponse is ByteSeqIter
   fun version(): HTTPVersion
   fun status(): Status
   fun header(name: String): (String | None)
   fun headers(): Iterator[Header]
   fun transfer_coding(): (Chunked | None)
   fun content_length(): (USize | None)
+  fun to_bytes(): ByteArrays
 
+// TODO: make internal state a ByteArrays instance and only keep track of
+// indices pointing to values
 class val BuildableHTTPResponse
   var _version: HTTPVersion
   var _status: Status
@@ -54,3 +59,23 @@ class val BuildableHTTPResponse
   fun ref set_content_length(cl: (USize | None)): BuildableHTTPResponse ref =>
     _content_length = cl
     this
+
+  fun to_bytes(): ByteArrays =>
+    let sp: Array[U8] val =   [as U8: ' ']
+    let crlf: Array[U8] val = [as U8: '\r'; '\n']
+    let header_sep: Array[U8] val = [as U8: ':'; ' ']
+    var acc = ByteArrays(version().to_bytes(), sp) + status().string() + crlf
+    for (hname, hvalue) in headers() do
+      acc = acc + hname + header_sep + _format_multiline(hvalue) + crlf
+    end
+    (acc + crlf)
+
+
+  fun values(): Iterator[this->ByteSeq box] =>
+    to_bytes().byteseqiter().values()
+
+  fun tag _format_multiline(header_value: String): String =>
+    // TODO
+    header_value
+
+
