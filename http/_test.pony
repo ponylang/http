@@ -2,6 +2,8 @@ use "ponytest"
 use "ponycheck"
 use "net"
 use "collections"
+use "itertools"
+use "valbytes"
 use "buffered"
 use "time"
 
@@ -26,6 +28,7 @@ primitive PrivateHTTPTests is TestList
     test(_BuildNoEncoding)
     test(_Valid)
     test(_ToStringFun)
+    test(Property1UnitTest[Array[_PendingResponse]](_PendingResponsesTest))
 
 class iso _Encode is UnitTest
   fun name(): String => "http/URLEncode.encode"
@@ -365,16 +368,36 @@ primitive _Test
     h.assert_eq[String](fragment, url.fragment)
 
 
-class iso _PendingResponsesTest is Property1[Array[(Requestid, ByteArrays)]]
+class iso _PendingResponsesTest is Property1[Array[_PendingResponse]]
+  let num_pending: USize = 100
   fun name(): String => "http/_pending_responses/property"
-  fun gen(): Generator[Array[(Requestid, ByteArrays)]] =>
+  fun gen(): Generator[Array[_PendingResponse]] =>
     // generate all ints between x and y in random order
     // range
-    Generators.array_of[(RequestId, ByteArrays)](
-      Generators.zip2[RequestId, ByteArrays](
-        Generators.usize(where min = 0, max = 100),
-      )
-    )
+    let range = Iter[USize](Range[USize](0, num_pending, 1))
+      .map[_PendingResponse]({(s) =>
+        (s, ByteArrays(recover val Array[U8].init(0, s) end))
+      })
+      .collect(Array[_PendingResponse](num_pending))
+    let shuffled_iter_gen = Generators.shuffled_iter[_PendingResponse](range)
+    let shuffled_array_gen = shuffled_iter_gen.map[Array[_PendingResponse]]({(iter) =>
+      Iter[_PendingResponse](iter).collect(Array[_PendingResponse](num_pending))
+    })
+    shuffled_array_gen
 
-  fun property(sample: Array[(RequestId, ByteArrays)], h: PropertyHelper) =>
+
+  fun property(sample: Array[_PendingResponse], h: PropertyHelper) =>
+    let pending_resp = _PendingResponses
+    for (request_id, response) in sample.values() do
+      pending_resp.add_pending(request_id, response)
+      if response.size() > 0 then
+        pending_resp.append_data(request_id, response.array())
+      end
+    end
+    h.log(pending_resp.debug())
+    for i in Range[USize](0, num_pending, 1) do
+      h.assert_isnt[(_PendingResponse | None)](None, pending_resp.pop(i))
+    end
+
+
 

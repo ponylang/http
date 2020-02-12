@@ -1,7 +1,10 @@
 use "valbytes"
 
+
+type _PendingResponse is (RequestId, ByteArrays)
+
 class ref _PendingResponses
-  embed _pending: Array[(RequestId, ByteArrays)] ref = _pending.create(0)
+  embed _pending: Array[_PendingResponse] ref = _pending.create(0)
 
   fun ref add_pending(request_id: RequestId, response_data: ByteArrays) =>
     // - insort by request_id, descending, so that when we pop, we don't need to
@@ -47,7 +50,7 @@ class ref _PendingResponses
       end
     end
 
-  fun ref pop(request_id: RequestId): ((RequestId, ByteArrays) | None) =>
+  fun ref pop(request_id: RequestId): (_PendingResponse | None) =>
     try
       let last_i = _pending.size() - 1
       let entry = _pending(last_i)?

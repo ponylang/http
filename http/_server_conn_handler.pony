@@ -29,9 +29,8 @@ class _ServerConnHandler is TCPConnectionNotify
     manage further communication, and the message parser that feeds it.
     """
 
-    let ip_string = recover val String.from_cstring(@pony_os_netaddr_string[Pointer[U8] ref](conn.remote_address())) end
     _registry.register_session(conn)
-    let sconn = _ServerConnection(_handlermaker, conn, ip_string)
+    let sconn = _ServerConnection(_handlermaker, conn)
     _session = sconn
     _parser = HTTP11RequestParser.create(sconn)
 

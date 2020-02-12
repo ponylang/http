@@ -12,7 +12,6 @@ actor _ServerConnection is HTTPSession
   """
   let _backend: HTTPHandler
   let _conn: TCPConnection
-  let _client_ip: String
   var _keepalive: Bool = true
   var _body_bytes_sent: USize = 0
 
@@ -37,8 +36,7 @@ actor _ServerConnection is HTTPSession
 
   new create(
     handlermaker: HandlerFactory val,
-    conn: TCPConnection,
-    client_ip: String)
+    conn: TCPConnection)
   =>
     """
     Create a connection actor to manage communication with to a new
@@ -47,7 +45,6 @@ actor _ServerConnection is HTTPSession
     """
     _backend = handlermaker(this)
     _conn = conn
-    _client_ip = client_ip
 
   be _receive_start(request: HTTPRequest val, request_id: RequestId) =>
     """
