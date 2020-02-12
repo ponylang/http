@@ -65,7 +65,7 @@ class BackendHandler is HTTPHandler
   let _env: Env
   let _session: HTTPSession
   var _response: BuildableHTTPResponse trn = BuildableHTTPResponse.create()
-  var _response_body: ByteArrays = ByteArrays.create()
+  var _response_body: Array[ByteSeq val] trn = recover trn Array[ByteSeq](3) end
   var _already_sent: Bool = false
 
   new ref create(env: Env, session: HTTPSession) =>
@@ -82,14 +82,19 @@ class BackendHandler is HTTPHandler
     _response.set_status(StatusOK)
     _response.set_header("Content-Type", "text/plain")
 
-    _response_body = _response_body + "You asked for "
-    _response_body = _response_body + request.uri().string()
-    _response_body = _response_body + "\n\n"
+    _response_body.push("You asked for ")
+    _response_body.push(request.uri().string())
+    _response_body.push("\n\n")
     if not request.has_body() then
-      _response.set_content_length(_response_body.size())
+      _already_sent = true
+      var cl = USize(0)
+      for data in _response_body.values() do
+        cl = cl + data.size()
+      end
+      _response.set_content_length(cl)
       _session.send(
         _response = BuildableHTTPResponse.create(),
-        (_response_body = ByteArrays.create()).byteseqiter(),
+        _response_body = recover trn Array[ByteSeq val].create(3) end,
         request_id
       )
     end
@@ -98,19 +103,24 @@ class BackendHandler is HTTPHandler
     """
     Process the next chunk of data received.
     """
-    _response_body = _response_body + data
+    _response_body.push(data)
 
   fun ref finished(request_id: RequestId) =>
     """
     Called when the last chunk has been handled.
     """
     if not _already_sent then
-      _already_sent = false
-      _response.set_content_length(_response_body.size())
-
+      var cl = USize(0)
+      for data in _response_body.values() do
+        cl = cl + data.size()
+      end
+      _response.set_content_length(cl)
       _session.send(
         _response = BuildableHTTPResponse.create(),
-        (_response_body = ByteArrays.create()).byteseqiter(),
+        _response_body = recover trn Array[ByteSeq val].create(3) end,
         request_id
-      ) // TODO: this can be improved
+      )
+    else
+      // reset
+      _already_sent = false
     end
