@@ -50,6 +50,30 @@ class ref _PendingResponses
       end
     end
 
+  fun ref append_iter(request_id: RequestId, iter: ByteSeqIter) =>
+    try
+      var i = USize(0)
+      var l = USize(0)
+      var r = _pending.size()
+      while l < r do
+        i = (l + r).fld(2)
+        let entry = _pending(i)?
+        match entry._1.compare(request_id)
+        | Greater =>
+          l = i + 1
+        | Equal =>
+          var acc = entry._2
+          for data in iter.values() do
+            acc = acc + data
+          end
+          _pending(i)? = (entry._1, acc)
+          return
+        else
+          r = i
+        end
+      end
+    end
+
   fun ref pop(request_id: RequestId): (_PendingResponse | None) =>
     try
       let last_i = _pending.size() - 1
@@ -58,6 +82,8 @@ class ref _PendingResponses
         _pending.delete(last_i)?
       end
     end
+
+  fun has_pending(): Bool => _pending.size() > 0
 
   fun debug(): String =>
     let size = _pending.size() * 3

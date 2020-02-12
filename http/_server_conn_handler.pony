@@ -54,12 +54,12 @@ class _ServerConnHandler is TCPConnectionNotify
       match res
       // Any syntax errors will terminate the connection.
       | let rpe: RequestParseError =>
-        Debug("RPE")
+        Debug("Parser: RPE")
         conn.close()
       | NeedMore =>
-        Debug("NeedMore")
+        Debug("Parser: NeedMore")
       | None =>
-        Debug("None")
+        Debug("Parser: ok. all good.")
       end
     end
     true

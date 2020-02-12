@@ -58,6 +58,12 @@ class val BuildableHTTPResponse
   fun content_length(): (USize | None) => _content_length
   fun ref set_content_length(cl: (USize | None)): BuildableHTTPResponse ref =>
     _content_length = cl
+    match cl
+    | let clu: USize =>
+      set_header("Content-Length", cl.string())
+    // | None =>
+    // TODO: drop header
+    end
     this
 
   fun to_bytes(): ByteArrays =>

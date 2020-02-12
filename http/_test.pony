@@ -395,6 +395,7 @@ class iso _PendingResponsesTest is Property1[Array[_PendingResponse]]
       end
     end
     h.log(pending_resp.debug())
+    // assert it has all the responses in correct order
     for i in Range[USize](0, num_pending, 1) do
       h.assert_isnt[(_PendingResponse | None)](None, pending_resp.pop(i))
     end

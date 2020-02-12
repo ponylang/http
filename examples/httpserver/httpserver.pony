@@ -1,4 +1,6 @@
 use "../../http"
+use "valbytes"
+use "debug"
 
 actor Main
   """
@@ -9,9 +11,6 @@ actor Main
     let limit = try env.args(2)?.usize()? else 100 end
     let host = "localhost"
 
-    let logger = CommonLog(env.out)
-    // let logger = ContentsLog(env.out)
-    // let logger = DiscardLog
 
     let auth = try
       env.root as AmbientAuth
@@ -24,11 +23,10 @@ actor Main
     HTTPServer(
       auth,
       ListenHandler(env),
-      BackendMaker.create(env),
-      logger
-      where service=service, host=host, limit=limit, reversedns=auth)
+      BackendMaker.create(env)
+      where service=service, host=host, limit=limit)
 
-class ListenHandler
+class ListenHandler is ServerNotify
   let _env: Env
 
   new iso create(env: Env) =>
@@ -66,7 +64,9 @@ class BackendHandler is HTTPHandler
   """
   let _env: Env
   let _session: HTTPSession
-  var _response: Payload = Payload.response()
+  var _response: BuildableHTTPResponse trn = BuildableHTTPResponse.create()
+  var _response_body: ByteArrays = ByteArrays.create()
+  var _already_sent: Bool = false
 
   new ref create(env: Env, session: HTTPSession) =>
     """
@@ -75,37 +75,42 @@ class BackendHandler is HTTPHandler
     _env = env
     _session = session
 
-  fun ref apply(request: Payload val) =>
+  fun ref apply(request: HTTPRequest val, request_id: RequestId) =>
     """
     Start processing a request.
     """
-    _response.add_chunk("You asked for ")
-    _response.add_chunk(request.url.path)
+    _response.set_status(StatusOK)
+    _response.set_header("Content-Type", "text/plain")
 
-    if request.url.query.size() > 0 then
-      _response.add_chunk("?")
-      _response.add_chunk(request.url.query)
+    _response_body = _response_body + "You asked for "
+    _response_body = _response_body + request.uri().string()
+    _response_body = _response_body + "\n\n"
+    if not request.has_body() then
+      _response.set_content_length(_response_body.size())
+      _session.send(
+        _response = BuildableHTTPResponse.create(),
+        (_response_body = ByteArrays.create()).byteseqiter(),
+        request_id
+      )
     end
 
-    if request.url.fragment.size() > 0 then
-      _response.add_chunk("#")
-      _response.add_chunk(request.url.fragment)
-    end
-
-    if request.method.eq("GET") then
-      _session(_response = Payload.response())
-    end
-
-  fun ref chunk(data: ByteSeq val) =>
+  fun ref chunk(data: ByteSeq val, request_id: RequestId) =>
     """
     Process the next chunk of data received.
     """
-    _response.add_chunk("\n")
-    _response.add_chunk(data)
+    _response_body = _response_body + data
 
-  fun ref finished() =>
+  fun ref finished(request_id: RequestId) =>
     """
     Called when the last chunk has been handled.
     """
-    _env.out.print("Finished")
-    _session(_response = Payload.response())
+    if not _already_sent then
+      _already_sent = false
+      _response.set_content_length(_response_body.size())
+
+      _session.send(
+        _response = BuildableHTTPResponse.create(),
+        (_response_body = ByteArrays.create()).byteseqiter(),
+        request_id
+      ) // TODO: this can be improved
+    end

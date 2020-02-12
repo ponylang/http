@@ -1,3 +1,4 @@
+/*
 use "assert"
 use "cli"
 use "collections"
@@ -239,3 +240,8 @@ class HttpNotify is HTTPHandler
 
   fun ref failed(reason: HTTPFailureReason) =>
     _main.failed(reason)
+*/
+actor Main
+  new create(env: Env) =>
+    env.err.print("TODO")
+    env.exitcode(1)
