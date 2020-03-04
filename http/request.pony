@@ -101,7 +101,6 @@ class val BuildableHTTPRequest is HTTPRequest
   fun transfer_coding(): (Chunked | None) => _transfer_coding
 
   fun ref set_transfer_coding(te: (Chunked | None)): BuildableHTTPRequest ref =>
-    // TODO: also update headers
     _transfer_coding = te
     this
 

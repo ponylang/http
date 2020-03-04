@@ -25,7 +25,7 @@ actor _ServerConnection is HTTPSession
     Keeps track of the request_id for which we sent a response already
     in order to determine lag in request handling.
     """
-  let _max_request_handling_lag: USize = 100 // TODO: make configurable
+  let _max_request_handling_lag: USize = 10000 // TODO: make configurable
 
   let _pending_responses: _PendingResponses = _PendingResponses.create()
 
@@ -50,15 +50,14 @@ actor _ServerConnection is HTTPSession
       | "close" => false
       else
         // keepalive is the default in HTTP/1.1, not supported in HTTP/1.0
-        request.version() isnt HTTP10
+        request.version() is HTTP11
       end
     _backend(request, request_id)
-    // TODO: handle wrap around
-    if (_active_request - _sent_response).abs() >= _max_request_handling_lag then
+    if _pending_responses.size() >= _max_request_handling_lag then
       // Backpressure incoming requests if the queue grows too much.
       // The backpressure prevents filling up memory with queued
       // requests in the case of a runaway client.
-      Debug("muting")
+      @printf[None]("muting\n".cstring())
       _conn.mute()
     end
 
@@ -115,6 +114,16 @@ actor _ServerConnection is HTTPSession
     """
     _send_start(response, request_id)
 
+  be send_raw(raw: ByteSeqIter, request_id: RequestId) =>
+    _conn.unmute()
+    let expected_id = RequestIds.next(_sent_response)
+    if request_id == expected_id then
+      _sent_response = request_id
+      _conn.writev(raw)
+    elseif RequestIds.gt(request_id, expected_id) then
+      _pending_responses.add_pending(request_id, ByteArrays)
+      _pending_responses.append_iter(request_id, raw)
+    end
 
   fun ref _send_start(response: HTTPResponse val, request_id: RequestId) =>
     _conn.unmute()
@@ -137,8 +146,7 @@ actor _ServerConnection is HTTPSession
     """
     Send a single response.
     """
-    //let okstatus = (response.status().apply() < 300)
-    _conn.writev(response)
+    _conn.write(response.to_bytes().array())
 
   be send_chunk(data: ByteSeq val, request_id: RequestId) =>
     """

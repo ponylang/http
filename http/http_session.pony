@@ -43,6 +43,8 @@ interface tag HTTPSession
   be send_no_body(response: HTTPResponse val, request_id: RequestId)
   be send(response: HTTPResponse val, body: ByteSeqIter, request_id: RequestId)
 
+  be send_raw(raw: ByteSeqIter, request_id: RequestId)
+
   // verbose api
   be send_start(respone: HTTPResponse val, request_id: RequestId)
     """

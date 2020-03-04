@@ -83,11 +83,12 @@ class ref _PendingResponses
       end
     end
 
-  fun has_pending(): Bool => _pending.size() > 0
+  fun has_pending(): Bool => size() > 0
+  fun size(): USize => _pending.size()
 
   fun debug(): String =>
-    let size = _pending.size() * 3
-    let s = recover trn String(size) end
+    let ps = _pending.size() * 3
+    let s = recover trn String(ps) end
     for k in _pending.values() do
       s.>append(k._1.string()).append(", ")
     end
