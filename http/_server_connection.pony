@@ -13,7 +13,7 @@ actor _ServerConnection is HTTPSession
   """
   let _backend: HTTPHandler
   let _conn: TCPConnection
-  var _keepalive: Bool = true
+  var _close_after: (RequestId | None) = None
 
   var _active_request: RequestId = RequestIds.max_value()
     """
@@ -45,9 +45,9 @@ actor _ServerConnection is HTTPSession
     """
     """
     _active_request = request_id
-    _keepalive =
       match request.header("Connection")
-      | "close" => false
+      | "close" =>
+        _close_after = request_id
       else
         // keepalive is the default in HTTP/1.1, not supported in HTTP/1.0
         request.version() is HTTP11
@@ -57,7 +57,6 @@ actor _ServerConnection is HTTPSession
       // Backpressure incoming requests if the queue grows too much.
       // The backpressure prevents filling up memory with queued
       // requests in the case of a runaway client.
-      @printf[None]("muting\n".cstring())
       _conn.mute()
     end
 
@@ -89,23 +88,9 @@ actor _ServerConnection is HTTPSession
     _backend.failed(ConnectionClosed, _active_request)
     _conn.unmute()
 
-  be send_no_body(response: HTTPResponse val, request_id: RequestId) =>
-    _send_start(response, request_id)
-    _send_finished(request_id)
 
-  be send(response: HTTPResponse val, body: ByteSeqIter, request_id: RequestId) =>
-    _send_start(response, request_id)
-    if request_id == _sent_response then
-      _conn.writev(body)
-      _send_finished(request_id)
-    elseif RequestIds.gt(request_id, _active_request) then
-      // TODO: optimize this case later on
-      _pending_responses.add_pending(request_id, response.to_bytes())
-      _pending_responses.append_iter(request_id, body)
-    else
-      None // latecomer, ignore
-    end
-
+//// SEND RESPONSE API ////
+//// STANDARD API
 
   be send_start(response: HTTPResponse val, request_id: RequestId) =>
     """
@@ -114,16 +99,6 @@ actor _ServerConnection is HTTPSession
     """
     _send_start(response, request_id)
 
-  be send_raw(raw: ByteSeqIter, request_id: RequestId) =>
-    _conn.unmute()
-    let expected_id = RequestIds.next(_sent_response)
-    if request_id == expected_id then
-      _sent_response = request_id
-      _conn.writev(raw)
-    elseif RequestIds.gt(request_id, expected_id) then
-      _pending_responses.add_pending(request_id, ByteArrays)
-      _pending_responses.append_iter(request_id, raw)
-    end
 
   fun ref _send_start(response: HTTPResponse val, request_id: RequestId) =>
     _conn.unmute()
@@ -135,7 +110,7 @@ actor _ServerConnection is HTTPSession
     elseif RequestIds.gt(request_id, expected_id) then
       Debug("received response out of order. store it for later.")
       // add serialized response to pending requests
-      _pending_responses.add_pending(request_id, response.to_bytes())
+      _pending_responses.add_pending(request_id, response.array())
     else
       // request_id < _active_request
       // latecomer - ignore
@@ -144,9 +119,9 @@ actor _ServerConnection is HTTPSession
 
   fun ref _send(response: HTTPResponse val) =>
     """
-    Send a single response.
+    Send a single response to the underlying TCPConnection.
     """
-    _conn.write(response.to_bytes().array())
+    _conn.write(response.array())
 
   be send_chunk(data: ByteSeq val, request_id: RequestId) =>
     """
@@ -162,7 +137,7 @@ actor _ServerConnection is HTTPSession
 
   be send_finished(request_id: RequestId) =>
     """
-    We are done sending a response. We can close the connection if
+    We are done sending a response. We close the connection if
     `keepalive` was not requested.
     """
     _send_finished(request_id)
@@ -174,17 +149,21 @@ actor _ServerConnection is HTTPSession
     var rid = request_id
     while _pending_responses.has_pending() do
       match _pending_responses.pop(RequestIds.next(rid))
-      | (let next_rid: RequestId, let response_data: ByteArrays) =>
+      | (let next_rid: RequestId, let response_data: ByteSeqIter) =>
         Debug("also sending next response for request: " + next_rid.string())
         rid = next_rid
         _sent_response = next_rid
-        _conn.writev(response_data.byteseqiter())
+        _conn.writev(response_data)
       else
         // next one not available yet
         break
       end
     end
-    if not _keepalive then
+    match _close_after
+    | let close_after_me: RequestId if RequestIds.gte(request_id, close_after_me) =>
+      // only close after a request that requested it
+      // in case of pipelining, we might receive a response for another, later
+      // request earlier and would close prematurely.
       _conn.dispose()
     end
 
@@ -200,6 +179,57 @@ actor _ServerConnection is HTTPSession
     if (_active_request - _sent_response) != 0 then
       // we still have some stuff in flight at the backend
       _backend.cancelled(request_id)
+    end
+
+//// CONVENIENCE API
+
+  be send_no_body(response: HTTPResponse val, request_id: RequestId) =>
+    """
+    Start and finish sending a response without a body.
+
+    This function calls `send_finished` for you, so no need to call it yourself.
+    """
+    _send_start(response, request_id)
+    _send_finished(request_id)
+
+  be send(response: HTTPResponse val, body: ByteArrays, request_id: RequestId) =>
+    """
+    Start and finish sending a response with body.
+    """
+    _send_start(response, request_id)
+    if request_id == _sent_response then
+      _conn.writev(body.arrays())
+      _send_finished(request_id)
+    elseif RequestIds.gt(request_id, _active_request) then
+
+      _pending_responses.add_pending_arrays(
+        request_id,
+        body.arrays().>unshift(response.array())
+      )
+    else
+      None // latecomer, ignore
+    end
+
+//// OPTIMIZED API
+
+  be send_raw(raw: ByteSeqIter, request_id: RequestId) =>
+    """
+    If you have your response already in bytes, and don't want to build an expensive
+    [HTTPResponse](http-HTTPResponse) object, use this method to send your [ByteSeqIter](builtin-ByteSeqIter).
+    This `raw` argument can contain only the response without body,
+    in which case you can send the body chunks later on using `send_chunk`,
+    or, to further optimize your writes to the network, it might already contain
+    the response body.
+
+    In each case, finish sending your raw response using `send_finished`.
+    """
+    _conn.unmute()
+    let expected_id = RequestIds.next(_sent_response)
+    if request_id == expected_id then
+      _sent_response = request_id
+      _conn.writev(raw)
+    elseif RequestIds.gt(request_id, expected_id) then
+      _pending_responses.add_pending_arrays(request_id, raw)
     end
 
   be throttled() =>

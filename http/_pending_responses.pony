@@ -1,12 +1,38 @@
-use "valbytes"
+use "collections/persistent"
+use "itertools"
 
+class val _ByteSeqsWrapper is ByteSeqIter
+  var byteseqs: Vec[_ByteSeqs]
 
-type _PendingResponse is (RequestId, ByteArrays)
+  new val create(bs: Vec[_ByteSeqs]) =>
+    byteseqs = bs
+
+  fun values(): Iterator[ByteSeq] ref^ =>
+    Iter[_ByteSeqs](byteseqs.values())
+      .flat_map[ByteSeq](
+        {(bs) =>
+          match bs
+          | let b: ByteSeq =>
+            object ref is Iterator[ByteSeq]
+              var returned: Bool = false
+              fun has_next(): Bool =>
+                not returned
+              fun next(): ByteSeq =>
+                b
+            end
+          | let bsi: ByteSeqIter => bsi.values()
+          end
+        })
+
+type _ByteSeqs is (ByteSeq | ByteSeqIter)
+type _PendingResponse is (RequestId, Vec[_ByteSeqs])
 
 class ref _PendingResponses
   embed _pending: Array[_PendingResponse] ref = _pending.create(0)
 
-  fun ref add_pending(request_id: RequestId, response_data: ByteArrays) =>
+  new ref create() => None // forcing ref refcap
+
+  fun ref add_pending(request_id: RequestId, response_data: Array[U8] val) =>
     // - insort by request_id, descending, so that when we pop, we don't need to
     //   move the other entries, only when we receive entries with higher request-id
     try
@@ -27,7 +53,35 @@ class ref _PendingResponses
           r = i
         end
       end
-      _pending.insert(l, (request_id, response_data))?
+      _pending.insert(
+        l,
+        (
+          request_id,
+          Vec[_ByteSeqs].>push(response_data)
+        )
+      )?
+    end
+
+  fun ref add_pending_arrays(request_id: RequestId, data: ByteSeqIter) =>
+    try
+      var i = USize(0)
+      var l = USize(0)
+      var r = _pending.size()
+      while l < r do
+        i = (l + r).fld(2)
+        let entry = _pending(i)?
+        match entry._1.compare(request_id)
+        | Greater =>
+          l = i + 1
+        | Equal =>
+          // already there, ignore
+          // TODO: we should error here
+          return
+        else
+          r = i
+        end
+      end
+      _pending.insert(l, (request_id, Vec[_ByteSeqs].>push(data)))?
     end
 
   fun ref append_data(request_id: RequestId, data: ByteSeq val) =>
@@ -42,7 +96,7 @@ class ref _PendingResponses
         | Greater =>
           l = i + 1
         | Equal =>
-          _pending(i)? = (entry._1, entry._2 + data)
+          _pending(i)? = (entry._1, entry._2.push(data))
           return
         else
           r = i
@@ -50,36 +104,14 @@ class ref _PendingResponses
       end
     end
 
-  fun ref append_iter(request_id: RequestId, iter: ByteSeqIter) =>
-    try
-      var i = USize(0)
-      var l = USize(0)
-      var r = _pending.size()
-      while l < r do
-        i = (l + r).fld(2)
-        let entry = _pending(i)?
-        match entry._1.compare(request_id)
-        | Greater =>
-          l = i + 1
-        | Equal =>
-          var acc = entry._2
-          for data in iter.values() do
-            acc = acc + data
-          end
-          _pending(i)? = (entry._1, acc)
-          return
-        else
-          r = i
-        end
-      end
-    end
 
-  fun ref pop(request_id: RequestId): (_PendingResponse | None) =>
+  fun ref pop(request_id: RequestId): ((RequestId, ByteSeqIter) | None) =>
     try
       let last_i = _pending.size() - 1
       let entry = _pending(last_i)?
       if entry._1 == request_id then
-        _pending.delete(last_i)?
+        (let id, let byteseqs) = _pending.delete(last_i)?
+        (id, _ByteSeqsWrapper(byteseqs))
       end
     end
 

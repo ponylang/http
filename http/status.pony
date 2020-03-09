@@ -1,6 +1,18 @@
-trait val Status
+interface val Status
+  """
+  HTTP status code.
+
+  See: https://tools.ietf.org/html/rfc2616#section-10
+  """
   fun apply(): U16
+    """
+    Get the status code as number.
+    """
   fun string(): String
+    """
+    Get the status code as string including Status-Code and Reason-Phrase
+    as it usually appears in the response status line: https://tools.ietf.org/html/rfc2616#section-6.1
+    """
 
 primitive StatusContinue is Status
   fun apply(): U16 => 100

@@ -9,6 +9,7 @@ interface val HTTPResponse is ByteSeqIter
   fun transfer_coding(): (Chunked | None)
   fun content_length(): (USize | None)
   fun to_bytes(): ByteArrays
+  fun array(): Array[U8] iso^
 
 primitive HTTPResponses // TODO: better naming
   fun builder(version: HTTPVersion = HTTP11): ResponseBuilder =>
@@ -139,7 +140,11 @@ class iso _FullResponseBuilder
   fun ref build(): ByteSeqIter =>
     """
     This will not add the final chunk
-    TODO: maybe it should do this.
+    Do this manually by calling:
+
+    ```pony
+    builder.add_chunk(recover val Array[U8](0) end)
+    ```
     """
     let response =
       (_array = (recover iso Array[U8].create(128) end)
@@ -154,7 +159,7 @@ class iso _FullResponseBuilder
       .>push(_empty_placeholder))
     _transfer_coding = None
     _needs_reset = false
-    byteseqs
+    consume byteseqs
 
 
 // TODO: make internal state a ByteArrays instance and only keep track of
@@ -214,6 +219,32 @@ class val BuildableHTTPResponse
     end
     this
 
+  fun array(): Array[U8] iso^ =>
+    let sp: Array[U8] val =   [as U8: ' ']
+    let crlf: Array[U8] val = [as U8: '\r'; '\n']
+    let header_sep: Array[U8] val = [as U8: ':'; ' ']
+    let version_bytes = _version.to_bytes()
+    let status_bytes = _status.string()
+    let header_size = _headers.byte_size()
+    let arr =
+      recover iso
+        Array[U8](
+          version_bytes.size() + 1 + status_bytes.size() + 2 + header_size + 2)
+      end
+    arr.>append(version_bytes)
+       .>append(sp)
+       .>append(status_bytes)
+       .append(crlf)
+
+    for (hname, hvalue) in headers() do
+      arr.>append(hname)
+         .>append(header_sep)
+         .>append(_format_multiline(hvalue))
+         .>append(crlf)
+    end
+    arr.append(crlf)
+    consume arr
+
   fun to_bytes(): ByteArrays =>
     let sp: Array[U8] val =   [as U8: ' ']
     let crlf: Array[U8] val = [as U8: '\r'; '\n']
@@ -225,7 +256,7 @@ class val BuildableHTTPResponse
     (acc + crlf)
 
   fun values(): Iterator[this->ByteSeq box] =>
-    to_bytes().byteseqiter().values()
+    to_bytes().arrays().values()
 
   fun tag _format_multiline(header_value: String): String =>
     // TODO

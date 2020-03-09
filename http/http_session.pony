@@ -1,11 +1,22 @@
+use "valbytes"
+
 interface tag HTTPSession
   """
   An HTTP Session is the external API to the communication link
-  between client and server. A session can only transfer one message
-  at a time in each direction. The client and server each have their
-  own ways of implementing this interface, but to application code (either
-  in the client or in the server 'back end') this interface provides a
-  common view of how information is passed *into* the `http` package.
+  between client and server.
+
+  Every request is executed as part of a HTTP Session.
+  A HTTP Session lives as long as the underlying TCP connection and receives
+  request data from it and writes response data to it.
+
+  Receiving data and parsing this data to HTTP requests is happening on
+  the TCPConnection actor. The HTTPSession actor, started when a new TCPConnection
+  is accepted, is called with request results.
+
+  ### Receiving a Request
+
+  ### Sending a Response
+
   """
   ////////////////////////
   // API THAT CALLS YOU //
@@ -39,11 +50,6 @@ interface tag HTTPSession
   // API THAT YOU CALL //
   ///////////////////////
 
-  // simple api
-  be send_no_body(response: HTTPResponse val, request_id: RequestId)
-  be send(response: HTTPResponse val, body: ByteSeqIter, request_id: RequestId)
-
-  be send_raw(raw: ByteSeqIter, request_id: RequestId)
 
   // verbose api
   be send_start(respone: HTTPResponse val, request_id: RequestId)
@@ -53,9 +59,16 @@ interface tag HTTPSession
 
   be send_chunk(data: ByteSeq val, request_id: RequestId)
 
+  be send_finished(request_id: RequestId)
+
   be send_cancel(request_id: RequestId)
 
-  be send_finished(request_id: RequestId)
+  // simple api
+  be send_no_body(response: HTTPResponse val, request_id: RequestId)
+  be send(response: HTTPResponse val, body: ByteArrays, request_id: RequestId)
+
+  // optimized raw api
+  be send_raw(raw: ByteSeqIter, request_id: RequestId)
 
   be dispose()
     """

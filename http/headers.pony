@@ -1,8 +1,51 @@
 use "collections"
 
 type Header is (String, String)
+  """
+  Defining a HTTP header as Tuple Strings for name and value.
+  """
 
 class Headers
+  """
+  Collection for headers
+  based on a sorted array we use bisect to insert and get values.
+  We compare the strings case-insensitive when sorting, inserting and getting headers.
+
+  We want to use the bytes we get to build the headers as is without changing them, in order to avoid allocation.
+
+  This isn't using a hashmap because getting the hash in a case-insensitive manner
+  would require to iterate over single bytes, which isn't as fast as it could be.
+  Also the amount of headers in a request is usually small, so the penalty of doing
+  a binary search isn't as bad.
+
+  Getting a header is case insensitive, so you don't need to care about header name casing
+  when asking for a header.
+
+  ### Usage
+
+  ```pony
+  let headers = Headers
+  header.set("Connection", "Close") // setting a header, possibly overwriting previous values
+  header.add("Multiple", "1")       // adding a header, concatenating previous and this value with a comma.
+  header.add("Multiple", "2")
+
+  // getting a header is case-insensitive
+  match header.get("cOnNeCTiOn")
+  | let value: String => // do something with value
+  else
+    // not found
+  end
+
+  // iterating over headers
+  for (name, value) in headers.values() do
+    env.out.print(name + ": " + value)
+  end
+
+  // remove all headers from this structure
+  headers.clear()
+  ```
+
+  """
   // avoid reallocating new strings just because header names are case
   // insensitive.
   // handle insensitivity during add and get
@@ -111,6 +154,16 @@ class Headers
     _hl.clear()
 
   fun values(): Iterator[Header] => _hl.values()
+
+  fun byte_size(): USize =>
+    """
+    size of the given headers including header-separator and crlf.
+    """
+    var s = USize(0)
+    for (k, v) in _hl.values() do
+      s + k.size() + 2 + v.size() + 2
+    end
+    s
 
   fun _compare(left: String, right: String): Compare =>
     """

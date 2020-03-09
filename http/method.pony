@@ -1,4 +1,9 @@
 trait val HTTPMethod is (Equatable[HTTPMethod] & Stringable)
+  """
+  HTTP method
+
+  See: https://tools.ietf.org/html/rfc2616#section-5.1.1
+  """
   fun repr(): String val
   fun string(): String iso^
   fun eq(o: HTTPMethod): Bool
@@ -70,6 +75,7 @@ primitive _Equality
     else
       var ri: USize = 0
       try
+        // TODO: vectorize if possible
         while ri < size do
           if left(ri)? != right(ri)? then
             return false

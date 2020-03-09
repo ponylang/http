@@ -153,7 +153,7 @@ class BackendHandler is HTTPHandler
       end
       if not _sent then
         let resp = builder.build()
-        _session.send_raw(resp, request_id)
+        _session.send_raw(consume resp, request_id)
       end
       _response_builder = builder.reset()
     end

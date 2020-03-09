@@ -28,7 +28,7 @@ primitive PrivateHTTPTests is TestList
     test(_BuildNoEncoding)
     test(_Valid)
     test(_ToStringFun)
-    test(Property1UnitTest[Array[_PendingResponse]](_PendingResponsesTest))
+    test(Property1UnitTest[Array[(RequestId, Array[U8] val)]](_PendingResponsesTest))
 
 class iso _Encode is UnitTest
   fun name(): String => "http/URLEncode.encode"
@@ -368,36 +368,39 @@ primitive _Test
     h.assert_eq[String](fragment, url.fragment)
 
 
-class iso _PendingResponsesTest is Property1[Array[_PendingResponse]]
+class iso _PendingResponsesTest is Property1[Array[(RequestId, Array[U8] val)]]
   let num_pending: USize = 100
   fun name(): String => "http/_pending_responses/property"
-  fun gen(): Generator[Array[_PendingResponse]] =>
+  fun gen(): Generator[Array[(RequestId, Array[U8] val)]] =>
     // generate all ints between x and y in random order
     // range
     let range = Iter[USize](Range[USize](0, num_pending, 1))
-      .map[_PendingResponse]({(s) =>
-        (s, ByteArrays(recover val Array[U8].init(0, s) end))
+      .map[(RequestId, Array[U8] val)]({(s) =>
+        (
+          s,
+          recover val Array[U8].init(0, s) end
+        )
       })
-      .collect(Array[_PendingResponse](num_pending))
-    let shuffled_iter_gen = Generators.shuffled_iter[_PendingResponse](range)
-    let shuffled_array_gen = shuffled_iter_gen.map[Array[_PendingResponse]]({(iter) =>
-      Iter[_PendingResponse](iter).collect(Array[_PendingResponse](num_pending))
+      .collect(Array[(RequestId, Array[U8] val)](num_pending))
+    let shuffled_iter_gen = Generators.shuffled_iter[(RequestId, Array[U8] val)](range)
+    let shuffled_array_gen = shuffled_iter_gen.map[Array[(RequestId, Array[U8] val)]]({(iter) =>
+      Iter[(RequestId, Array[U8] val)](iter).collect(Array[(RequestId, Array[U8] val)](num_pending))
     })
     shuffled_array_gen
 
 
-  fun property(sample: Array[_PendingResponse], h: PropertyHelper) =>
+  fun property(sample: Array[(RequestId, Array[U8] val)], h: PropertyHelper) =>
     let pending_resp = _PendingResponses
     for (request_id, response) in sample.values() do
       pending_resp.add_pending(request_id, response)
       if response.size() > 0 then
-        pending_resp.append_data(request_id, response.array())
+        pending_resp.append_data(request_id, response)
       end
     end
     h.log(pending_resp.debug())
     // assert it has all the responses in correct order
     for i in Range[USize](0, num_pending, 1) do
-      h.assert_isnt[(_PendingResponse | None)](None, pending_resp.pop(i))
+      h.assert_isnt[((RequestId, ByteSeqIter val) | None)](None, pending_resp.pop(i))
     end
 
 
