@@ -28,6 +28,9 @@ type _ByteSeqs is (ByteSeq | ByteSeqIter)
 type _PendingResponse is (RequestId, Vec[_ByteSeqs])
 
 class ref _PendingResponses
+  // TODO: find out what is the most efficient way to
+  //       keep and acucmulate a pending response
+  //       from ByteSeq and ByteSeqIter
   embed _pending: Array[_PendingResponse] ref = _pending.create(0)
 
   new ref create() => None // forcing ref refcap
