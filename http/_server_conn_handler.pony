@@ -58,8 +58,6 @@ class _ServerConnHandler is TCPConnectionNotify
         conn.close()
       | NeedMore =>
         Debug("Parser: NeedMore")
-      | None =>
-        Debug("Parser: ok. all good.")
       end
     end
     true
