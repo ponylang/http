@@ -37,7 +37,7 @@ class ListenHandler is ServerNotify
   fun ref listening(server: HTTPServer ref) =>
     try
       (let host, let service) = server.local_address().name()?
-      Debug("connected: " + host)
+      Debug("connected: " + host + ":" + service)
     else
       _env.err.print("Couldn't get local address.")
       _env.exitcode(1)
@@ -88,6 +88,7 @@ class BackendHandler is HTTPHandler
     array.>append(request.method().repr())
          .>append(" ")
          .>append(request.uri().string())
+         .>append(" ")
          .>append(request.version().to_bytes())
          .append("\r\n")
     for (name, value) in request.headers() do
