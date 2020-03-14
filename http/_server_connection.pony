@@ -2,6 +2,7 @@ use "net"
 use "collections"
 use "valbytes"
 use "debug"
+use "time"
 
 actor _ServerConnection is HTTPSession
   """
@@ -29,6 +30,10 @@ actor _ServerConnection is HTTPSession
 
   let _pending_responses: _PendingResponses = _PendingResponses.create()
 
+  let _timeout_seconds: U64 = 30
+
+  var _last_activity_ts: I64 = Time.seconds()
+
   new create(
     handlermaker: HandlerFactory val,
     conn: TCPConnection)
@@ -41,9 +46,12 @@ actor _ServerConnection is HTTPSession
     _backend = handlermaker(this)
     _conn = conn
 
+
+  fun ref _reset_timeout() =>
+    _last_activity_ts = Time.seconds()
+
   be _receive_start(request: HTTPRequest val, request_id: RequestId) =>
-    """
-    """
+    _reset_timeout()
     _active_request = request_id
       match request.header("Connection")
       | "close" =>
@@ -64,6 +72,7 @@ actor _ServerConnection is HTTPSession
     """
     Receive some `request` body data, which we pass on to the handler.
     """
+    _reset_timeout()
     _backend.chunk(data, request_id)
 
   be _receive_finished(request_id: RequestId) =>
@@ -83,11 +92,9 @@ actor _ServerConnection is HTTPSession
     """
     _conn.dispose()
 
-
   be closed() =>
     _backend.failed(ConnectionClosed, _active_request)
     _conn.unmute()
-
 
 //// SEND RESPONSE API ////
 //// STANDARD API
@@ -121,6 +128,7 @@ actor _ServerConnection is HTTPSession
     """
     Send a single response to the underlying TCPConnection.
     """
+    _reset_timeout()
     _conn.write(response.array())
 
   be send_chunk(data: ByteSeq val, request_id: RequestId) =>
@@ -128,6 +136,7 @@ actor _ServerConnection is HTTPSession
     Write low level outbound raw byte stream.
     """
     if request_id == _sent_response then
+      _reset_timeout()
       _conn.write(data)
     elseif RequestIds.gt(request_id, _active_request) then
       _pending_responses.append_data(request_id, data)
@@ -153,6 +162,7 @@ actor _ServerConnection is HTTPSession
         Debug("also sending next response for request: " + next_rid.string())
         rid = next_rid
         _sent_response = next_rid
+        _reset_timeout()
         _conn.writev(response_data)
       else
         // next one not available yet
@@ -198,6 +208,7 @@ actor _ServerConnection is HTTPSession
     """
     _send_start(response, request_id)
     if request_id == _sent_response then
+      _reset_timeout()
       _conn.writev(body.arrays())
       _send_finished(request_id)
     elseif RequestIds.gt(request_id, _active_request) then
@@ -227,6 +238,7 @@ actor _ServerConnection is HTTPSession
     let expected_id = RequestIds.next(_sent_response)
     if request_id == expected_id then
       _sent_response = request_id
+      _reset_timeout()
       _conn.writev(raw)
     elseif RequestIds.gt(request_id, expected_id) then
       _pending_responses.add_pending_arrays(request_id, raw)
@@ -249,4 +261,12 @@ actor _ServerConnection is HTTPSession
 
   be _unmute() =>
     _conn.unmute()
+
+  be _heartbeat(current_seconds: I64) =>
+    Debug("current_seconds=" + current_seconds.string() + ", last_activity=" + _last_activity_ts.string())
+    if (current_seconds - _last_activity_ts) >= _timeout_seconds.i64() then
+      Debug("Connection timed out.")
+      // TODO: notify backend about it
+      dispose()
+    end
 

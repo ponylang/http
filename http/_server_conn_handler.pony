@@ -29,8 +29,8 @@ class _ServerConnHandler is TCPConnectionNotify
     manage further communication, and the message parser that feeds it.
     """
 
-    _registry.register_session(conn)
     let sconn = _ServerConnection(_handlermaker, conn)
+    _registry.register_session(sconn)
     _session = sconn
     _parser = HTTP11RequestParser.create(sconn)
 
@@ -83,9 +83,10 @@ class _ServerConnHandler is TCPConnectionNotify
     """
     The connection has been closed. Abort the session.
     """
-    _registry.unregister_session(conn)
     try
-      (_session as _ServerConnection).closed()
+      let sconn = (_session as _ServerConnection)
+      _registry.unregister_session(sconn)
+      sconn.closed()
     end
 
   fun ref connect_failed(conn: TCPConnection ref) =>

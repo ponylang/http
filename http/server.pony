@@ -1,6 +1,8 @@
 use "collections"
 use "net"
 use "net_ssl"
+use "time"
+use "debug"
 
 actor HTTPServer
   """
@@ -63,8 +65,9 @@ actor HTTPServer
   let _sslctx: (SSLContext | None)
   let _listen: TCPListener
   var _address: NetAddress
-  var _dirty_routes: Bool = false
-  let _sessions: SetIs[TCPConnection tag] = SetIs[TCPConnection tag]
+  let _sessions: SetIs[_ServerConnection tag] = SetIs[_ServerConnection tag]
+  let _timers: Timers = Timers
+  var _timer: (Timer tag | None) = None
 
   new create(
     auth: TCPListenerAuth,
@@ -90,10 +93,33 @@ actor HTTPServer
 
     _address = recover NetAddress end
 
-  be register_session(conn: TCPConnection) =>
+  be register_session(conn: _ServerConnection) =>
     _sessions.set(conn)
 
-  be unregister_session(conn: TCPConnection) =>
+    match _timer
+    | None =>
+      let that: HTTPServer tag = this
+      let t = Timer(
+        object iso is TimerNotify
+          fun ref apply(timer': Timer, count: U64): Bool =>
+            that._start_heartbeat()
+            // TODO: when to cancel?
+            true
+        end,
+        Nanos.from_seconds(10), // TODO: make configurable, by default quarter of timeout
+        Nanos.from_seconds(10))
+      _timer = t
+      _timers(consume t)
+    end
+
+  be _start_heartbeat() =>
+    // iterate through _sessions and ping all connections
+    let current_seconds = Time.seconds() // seconds resolution is fine
+    for session in _sessions.values() do
+      session._heartbeat(current_seconds)
+    end
+
+  be unregister_session(conn: _ServerConnection) =>
     _sessions.unset(conn)
 
   be set_handler(handler: HandlerFactory val) =>
@@ -107,10 +133,11 @@ actor HTTPServer
   be dispose() =>
     """
     Shut down the server gracefully. To do this we have to eliminate
-    and source of further inputs. So we stop listening for new incoming
+    any source of further inputs. So we stop listening for new incoming
     TCP connections, and close any that still exist.
     """
     _listen.dispose()
+    _timers.dispose()
     for conn in _sessions.values() do
       conn.dispose()
     end
@@ -139,3 +166,4 @@ actor HTTPServer
     Called when we stop listening.
     """
     _notify.closed(this)
+
