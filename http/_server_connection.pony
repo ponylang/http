@@ -52,13 +52,13 @@ actor _ServerConnection is HTTPSession
   be _receive_start(request: HTTPRequest val, request_id: RequestId) =>
     _reset_timeout()
     _active_request = request_id
-      match request.header("Connection")
-      | "close" =>
-        _close_after = request_id
-      else
-        // keepalive is the default in HTTP/1.1, not supported in HTTP/1.0
-        request.version() is HTTP11
-      end
+    // detemine if we need to close the connection after this request
+    match (request.version(), request.header("Connection"))
+    | (HTTP11, "close") =>
+      _close_after = request_id
+    | (HTTP10, let connection_header: String) if connection_header != "Keep-Alive" =>
+      _close_after = request_id
+    end
     _backend(request, request_id)
     if _pending_responses.size() >= _config.max_request_handling_lag then
       // Backpressure incoming requests if the queue grows too much.

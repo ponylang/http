@@ -11,4 +11,5 @@ actor Main is TestList
     ServerErrorHandlingTests.tests(test)
     RequestParserTests.tests(test)
     HeaderTests.tests(test)
+    ConnectionHandlingTests.tests(test)
 
