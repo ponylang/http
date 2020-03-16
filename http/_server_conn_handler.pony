@@ -9,19 +9,23 @@ class _ServerConnHandler is TCPConnectionNotify
   `TCPConnection` actor.
   """
   let _handlermaker: HandlerFactory val
+  let _registry: _SessionRegistry tag
+  let _config: HTTPServerConfig
+
   var _parser: (HTTP11RequestParser | None) = None
   var _session: (_ServerConnection | None) = None
-  let _registry: HTTPServer tag
 
   new iso create(
     handlermaker: HandlerFactory val,
-    registry: HTTPServer)
+    registry: _SessionRegistry,
+    config: HTTPServerConfig)
     =>
     """
     Initialize the context for parsing incoming HTTP requests.
     """
     _handlermaker = handlermaker
     _registry = registry
+    _config = config
 
   fun ref accepted(conn: TCPConnection ref) =>
     """
@@ -29,7 +33,7 @@ class _ServerConnHandler is TCPConnectionNotify
     manage further communication, and the message parser that feeds it.
     """
 
-    let sconn = _ServerConnection(_handlermaker, conn)
+    let sconn = _ServerConnection(_handlermaker, _config, conn)
     _registry.register_session(sconn)
     _session = sconn
     _parser = HTTP11RequestParser.create(sconn)

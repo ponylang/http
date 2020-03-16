@@ -7,11 +7,13 @@ class _ServerListener is TCPListenNotify
   are assembled and dispatched.
   """
   let _server: HTTPServer
+  let _config: HTTPServerConfig
   let _sslctx: (SSLContext | None)
   let _handlermaker: HandlerFactory val
 
   new iso create(
     server: HTTPServer,
+    config: HTTPServerConfig,
     sslctx: (SSLContext | None),
     handler: HandlerFactory val)  // Makes a unique session handler
   =>
@@ -19,6 +21,7 @@ class _ServerListener is TCPListenNotify
     Creates a new listening socket manager.
     """
     _server = server
+    _config = config
     _sslctx = sslctx
     _handlermaker = handler
 
@@ -47,10 +50,10 @@ class _ServerListener is TCPListenNotify
     """
     match _sslctx
     | None =>
-      _ServerConnHandler(_handlermaker, _server)
+      _ServerConnHandler(_handlermaker, _server, _config)
     | let ctx: SSLContext =>
       let ssl = ctx.server()?
       SSLConnection(
-        _ServerConnHandler(_handlermaker, _server),
+        _ServerConnHandler(_handlermaker, _server, _config),
         consume ssl)
     end

@@ -4,7 +4,11 @@ use "net_ssl"
 use "time"
 use "debug"
 
-actor HTTPServer
+interface tag _SessionRegistry
+  be register_session(conn: _ServerConnection)
+  be unregister_session(conn: _ServerConnection)
+
+actor HTTPServer is _SessionRegistry
   """
   Runs an HTTP server.
 
@@ -62,6 +66,7 @@ actor HTTPServer
   """
   let _notify: ServerNotify
   var _handler_maker: HandlerFactory val
+  let _config: HTTPServerConfig
   let _sslctx: (SSLContext | None)
   let _listen: TCPListener
   var _address: NetAddress
@@ -73,9 +78,7 @@ actor HTTPServer
     auth: TCPListenerAuth,
     notify: ServerNotify iso,
     handler: HandlerFactory val,
-    host: String = "",
-    service: String = "0",
-    limit: USize = 0,
+    config: HTTPServerConfig,
     sslctx: (SSLContext | None) = None)
   =>
     """
@@ -85,31 +88,35 @@ actor HTTPServer
     """
     _notify = consume notify
     _handler_maker = handler
+    _config = HTTPServerConfig
     _sslctx = sslctx
 
     _listen = TCPListener(auth,
-        _ServerListener(this, sslctx, _handler_maker),
-        host, service, limit)
+        _ServerListener(this, config, sslctx, _handler_maker),
+        config.host, config.port, config.max_concurrent_connections)
 
     _address = recover NetAddress end
 
   be register_session(conn: _ServerConnection) =>
     _sessions.set(conn)
 
-    match _timer
-    | None =>
-      let that: HTTPServer tag = this
-      let t = Timer(
-        object iso is TimerNotify
-          fun ref apply(timer': Timer, count: U64): Bool =>
-            that._start_heartbeat()
-            // TODO: when to cancel?
-            true
-        end,
-        Nanos.from_seconds(10), // TODO: make configurable, by default quarter of timeout
-        Nanos.from_seconds(10))
-      _timer = t
-      _timers(consume t)
+    // only start a timer if we have a connection-timeout configured
+    if _config.has_timeout() then
+      match _timer
+      | None =>
+        let that: HTTPServer tag = this
+        let timeout_interval = _config.timeout_heartbeat_interval
+        let t = Timer(
+          object iso is TimerNotify
+            fun ref apply(timer': Timer, count: U64): Bool =>
+              that._start_heartbeat()
+              true
+          end,
+          Nanos.from_seconds(timeout_interval),
+          Nanos.from_seconds(timeout_interval))
+        _timer = t
+        _timers(consume t)
+      end
     end
 
   be _start_heartbeat() =>
@@ -128,7 +135,7 @@ actor HTTPServer
     """
     _handler_maker = handler
     _listen.set_notify(
-      _ServerListener(this, _sslctx, _handler_maker))
+      _ServerListener(this, _config, _sslctx, _handler_maker))
 
   be dispose() =>
     """

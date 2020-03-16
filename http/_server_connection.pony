@@ -13,6 +13,7 @@ actor _ServerConnection is HTTPSession
   TODO: how to handle 101 Upgrade - set new notify for the connection
   """
   let _backend: HTTPHandler
+  let _config: HTTPServerConfig
   let _conn: TCPConnection
   var _close_after: (RequestId | None) = None
 
@@ -26,16 +27,13 @@ actor _ServerConnection is HTTPSession
     Keeps track of the request_id for which we sent a response already
     in order to determine lag in request handling.
     """
-  let _max_request_handling_lag: USize = 10000 // TODO: make configurable
-
   let _pending_responses: _PendingResponses = _PendingResponses.create()
-
-  let _timeout_seconds: U64 = 30
 
   var _last_activity_ts: I64 = Time.seconds()
 
   new create(
     handlermaker: HandlerFactory val,
+    config: HTTPServerConfig,
     conn: TCPConnection)
   =>
     """
@@ -44,6 +42,7 @@ actor _ServerConnection is HTTPSession
     handler that will process incoming requests.
     """
     _backend = handlermaker(this)
+    _config = config
     _conn = conn
 
 
@@ -61,7 +60,7 @@ actor _ServerConnection is HTTPSession
         request.version() is HTTP11
       end
     _backend(request, request_id)
-    if _pending_responses.size() >= _max_request_handling_lag then
+    if _pending_responses.size() >= _config.max_request_handling_lag then
       // Backpressure incoming requests if the queue grows too much.
       // The backpressure prevents filling up memory with queued
       // requests in the case of a runaway client.
@@ -263,10 +262,11 @@ actor _ServerConnection is HTTPSession
     _conn.unmute()
 
   be _heartbeat(current_seconds: I64) =>
-    Debug("current_seconds=" + current_seconds.string() + ", last_activity=" + _last_activity_ts.string())
-    if (current_seconds - _last_activity_ts) >= _timeout_seconds.i64() then
-      Debug("Connection timed out.")
-      // TODO: notify backend about it
+    let timeout = _config.connection_timeout.i64()
+    //Debug("current_seconds=" + current_seconds.string() + ", last_activity=" + _last_activity_ts.string())
+    if (timeout > 0) and ((current_seconds - _last_activity_ts) >= timeout) then
+      //Debug("Connection timed out.")
+      // backend is notified asynchronously when the close happened
       dispose()
     end
 

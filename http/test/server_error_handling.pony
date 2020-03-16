@@ -77,6 +77,6 @@ class iso ServerConnectionClosedTest is UnitTest
           _h.log("server stopped listening")
       end,
       _ServerConnectionClosedHandlerFactory(h)
-      where host = "127.0.0.1"
+      where config = HTTPServerConfig(where host'="127.0.0.1")
     )
     h.dispose_when_done(server)
