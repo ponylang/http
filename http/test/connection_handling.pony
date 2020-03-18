@@ -123,6 +123,10 @@ class iso ConnectionCloseHeaderTest is UnitTest
     )
 
 class iso ConnectionHTTP10Test is UnitTest
+  """
+  test that connection is closed when HTTP version is 1.0
+  and no 'Connection: keep-alive' is given.
+  """
   fun name(): String => "connection/no_keep_alive"
 
   fun apply(h: TestHelper) ? =>

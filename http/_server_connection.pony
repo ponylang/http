@@ -114,7 +114,6 @@ actor _ServerConnection is HTTPSession
       _sent_response = request_id
       _send(response)
     elseif RequestIds.gt(request_id, expected_id) then
-      Debug("received response out of order. store it for later.")
       // add serialized response to pending requests
       _pending_responses.add_pending(request_id, response.array())
     else
@@ -158,7 +157,7 @@ actor _ServerConnection is HTTPSession
     while _pending_responses.has_pending() do
       match _pending_responses.pop(RequestIds.next(rid))
       | (let next_rid: RequestId, let response_data: ByteSeqIter) =>
-        Debug("also sending next response for request: " + next_rid.string())
+        //Debug("also sending next response for request: " + next_rid.string())
         rid = next_rid
         _sent_response = next_rid
         _reset_timeout()
@@ -240,6 +239,7 @@ actor _ServerConnection is HTTPSession
       _reset_timeout()
       _conn.writev(raw)
     elseif RequestIds.gt(request_id, expected_id) then
+      //Debug("enqueing " + request_id.string() + ". Expected " + expected_id.string())
       _pending_responses.add_pending_arrays(request_id, raw)
     end
 

@@ -199,12 +199,12 @@ class HTTP11RequestParser
                 end
               _current_request.set_version(http_version)
 
-              let start_headers = _skip_whitespace(version_start + 8)
-              if start_headers == USize.max_value() then
-                return _request_line_exhausted()
+              // expect CRLF
+              if (_buffer(version_start + 8)? != '\r') and (_buffer(version_start + 9)? != '\n') then
+                return InvalidVersion
               end
               // trim the buffer
-              _buffer = _buffer.drop(start_headers)
+              _buffer = _buffer.drop(version_start + 10)
               _state = _ExpectHeaders
               _parse_headers()
 
@@ -442,7 +442,7 @@ class HTTP11RequestParser
         let data = _buffer.trim(0, available)
         _buffer = _buffer.drop(data.size())
         _expected_body_length = _expected_body_length - data.size()
-        Debug("send chunk of size " + data.size().string())
+        //Debug("send chunk of size " + data.size().string())
         _handler._receive_chunk(data, _request_counter)
       end
     end

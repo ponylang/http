@@ -60,7 +60,7 @@ class ref _PendingResponses
         l,
         (
           request_id,
-          Vec[_ByteSeqs].>push(response_data)
+          Vec[_ByteSeqs].push(response_data)
         )
       )?
     end
@@ -84,7 +84,7 @@ class ref _PendingResponses
           r = i
         end
       end
-      _pending.insert(l, (request_id, Vec[_ByteSeqs].>push(data)))?
+      _pending.insert(l, (request_id, Vec[_ByteSeqs].push(data)))?
     end
 
   fun ref append_data(request_id: RequestId, data: ByteSeq val) =>

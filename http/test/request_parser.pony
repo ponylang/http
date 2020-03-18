@@ -33,6 +33,25 @@ primitive RequestParserTests is TestList
     )
     test(
       ParserTestBuilder.parse_success(
+        "no-headers",
+        _R(
+          """
+          GET / HTTP/1.1
+
+          """
+        ),
+        {
+          (h: TestHelper, request: HTTPRequest, chunks: ByteArrays) =>
+            h.assert_eq[HTTPMethod](GET, request.method())
+            h.assert_eq[HTTPVersion](HTTP11, request.version())
+            h.assert_eq[String]("/", request.uri().string())
+            h.assert_false(request.headers().has_next())
+            h.assert_false(request.has_body())
+        }
+      )
+    )
+    test(
+      ParserTestBuilder.parse_success(
         "no-body",
         _R(
           """

@@ -12,4 +12,5 @@ actor Main is TestList
     RequestParserTests.tests(test)
     HeaderTests.tests(test)
     ConnectionHandlingTests.tests(test)
+    PipeliningTests.tests(test)
 
