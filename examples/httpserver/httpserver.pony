@@ -4,13 +4,21 @@ use "debug"
 
 actor Main
   """
-  A simple HTTP Echo server, sending back the received request in the response body .
+  A simple HTTP Echo server, sending back the received request in the response body.
   """
   new create(env: Env) =>
+    for arg in env.args.values() do
+      if (arg == "-h") or (arg == "--help") then
+        _print_help(env)
+        return
+      end
+    end
+
     let port = try env.args(1)? else "50000" end
     let limit = try env.args(2)?.usize()? else 100 end
     let host = "localhost"
 
+    // we need sufficient authority to listen on a TCP port for http traffic
     let auth = try
       env.root as AmbientAuth
     else
@@ -21,24 +29,46 @@ actor Main
     // Start the top server control actor.
     let server = HTTPServer(
       auth,
-      ListenHandler(env),
-      BackendMaker.create(env)
-      where config = HTTPServerConfig(
+      LoggingServerNotify(env),  // notify for server lifecycle events
+      BackendMaker.create(env)   // factory for session-based application backend
+      where config = HTTPServerConfig( // configuration of HTTPServer
         where host' = host,
               port' = port,
               max_concurrent_connections' = limit)
     )
+    // everything is initialized, if all goes well
+    // the server is listening on the given port
+    // and thus kept alive by the runtime, as long its listening socket is not
+    // closed.
 
-class ListenHandler is ServerNotify
+  fun _print_help(env: Env) =>
+    env.err.print(
+      """
+      Usage:
+
+         httpserver [<PORT> = 50000] [<MAX_CONCURRENT_CONNECTIONS> = 100]
+
+      """
+    )
+
+
+class LoggingServerNotify is ServerNotify
+  """
+  Notification class that is notified about
+  important lifecycle events for the HTTPServer
+  """
   let _env: Env
 
   new iso create(env: Env) =>
     _env = env
 
   fun ref listening(server: HTTPServer ref) =>
+    """
+    Called when the HTTPServer starts listening on its host:port pair via TCP.
+    """
     try
       (let host, let service) = server.local_address().name()?
-      Debug("connected: " + host + ":" + service)
+      _env.err.print("connected: " + host + ":" + service)
     else
       _env.err.print("Couldn't get local address.")
       _env.exitcode(1)
@@ -46,13 +76,22 @@ class ListenHandler is ServerNotify
     end
 
   fun ref not_listening(server: HTTPServer ref) =>
+    """
+    Called when the HTTPServer was not able to start listening on its host:port pair via TCP.
+    """
     _env.err.print("Failed to listen.")
     _env.exitcode(1)
 
   fun ref closed(server: HTTPServer ref) =>
-    Debug("Shutdown.")
+    """
+    Called when the HTTPServer is closed.
+    """
+    _env.err.print("Shutdown.")
 
 class BackendMaker is HandlerFactory
+  """
+  Fatory to instantiate a new HTTP-session-scoped backend instance.
+  """
   let _env: Env
 
   new val create(env: Env) =>
@@ -63,14 +102,19 @@ class BackendMaker is HandlerFactory
 
 class BackendHandler is HTTPHandler
   """
-  Notification class for a single HTTP session.
+  Backend application instance for a single HTTP session.
+
+  Executed on an actor representing the HTTP Session.
+  That means we have 1 actor per TCP Connection
+  (to be exact it is 2 as the TCPConnection is also an actor).
   """
   let _env: Env
   let _session: HTTPSession
+
   var _response_builder: ResponseBuilder
+  var _body_builder: (ResponseBuilderBody | None) = None
   var _sent: Bool = false
   var _chunked: (Chunked | None) = None
-  var _body_builder: (ResponseBuilderBody | None) = None
 
   new ref create(env: Env, session: HTTPSession) =>
     _env = env
@@ -80,6 +124,14 @@ class BackendHandler is HTTPHandler
   fun ref apply(request: HTTPRequest val, request_id: RequestId) =>
     """
     Start processing a request.
+
+    Called when request-line and all headers have been parsed.
+    Body is not yet parsed, not even received maybe.
+
+    Here we already build the start of the response body and prepare
+    the response as far as we can. If the request has no body, we send out the
+    response already, as we have all information we need.
+
     """
     _sent = false
     _chunked = request.transfer_coding()
@@ -108,23 +160,30 @@ class BackendHandler is HTTPHandler
     var header_builder = _response_builder
       .set_status(StatusOK)
       .add_header("Content-Type", "text/plain")
+    // if request is chunked, we also send the response in chunked Transfer
+    // Encoding
     header_builder =
       match _chunked
       | Chunked =>
         header_builder.set_transfer_encoding(Chunked)
       | None =>
-        header_builder = header_builder.add_header("Content-Length", content_length.string())
+        header_builder.add_header("Content-Length", content_length.string())
       end
+    // The response builder has refcap iso, so we need to do some consume and
+    // reassign dances here
     _body_builder =
       (consume header_builder)
         .finish_headers()
-        .add_chunk(consume array)
+        .add_chunk(consume array) // add the request headers etc as response body here
 
     if not request.has_body() then
       match (_body_builder = None)
       | let builder: ResponseBuilderBody =>
+        // already send the response if request has no body
+        // use optimized HTTPSession API to send out all available chunks at
+        // once using writev on the socket
         _session.send_raw(builder.build(), request_id)
-        _response_builder = builder.reset()
+        _response_builder = builder.reset() // reset the builder for later reuse within this session
         _sent = true
       end
     end
@@ -132,6 +191,9 @@ class BackendHandler is HTTPHandler
   fun ref chunk(data: ByteSeq val, request_id: RequestId) =>
     """
     Process the next chunk of data received.
+
+    If we receive any data, we append it to the builder.
+    We send stuff later, when we know we are finished.
     """
     match (_body_builder = None)
     | let builder: ResponseBuilderBody =>
@@ -145,7 +207,11 @@ class BackendHandler is HTTPHandler
 
   fun ref finished(request_id: RequestId) =>
     """
-    Called when the last chunk has been handled.
+    Called when the last chunk has been handled and the full request has been received.
+
+    Here we send out the full response, if the request had a body we needed to process first (see `fun chunk` above).
+    We call `HTTPSession.send_finished(request_id)` to let the HTTP machinery finish sending and clena up resources
+    connected to this request.
     """
     match (_body_builder = None)
     | let builder: ResponseBuilderBody =>
@@ -159,5 +225,7 @@ class BackendHandler is HTTPHandler
       end
       _response_builder = builder.reset()
     end
+    // Required call to finish request handling
+    // if missed out, the server will misbehave
     _session.send_finished(request_id)
 

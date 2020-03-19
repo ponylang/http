@@ -1,11 +1,11 @@
 """
- Baseline for comparing benchmark results.
+Baseline for comparing benchmark results.
 
- This file is intende ot receive body-less HTTP requests
- and is writing out a pre-allocated response for each request it receives.
+This file is intende ot receive body-less HTTP requests
+and is writing out a pre-allocated response for each request it receives.
 
- There is no actual parsing happening, other than looking for a double CRLF,
- marking the request end.
+There is no actual parsing happening, other than looking for a double CRLF,
+marking the request end.
 """
 use "net"
 use "valbytes"
