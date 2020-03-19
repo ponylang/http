@@ -1,8 +1,6 @@
 use "../../http"
 use "valbytes"
 use "debug"
-use "time"
-use "format"
 
 actor Main
   """
@@ -12,7 +10,6 @@ actor Main
     let port = try env.args(1)? else "50000" end
     let limit = try env.args(2)?.usize()? else 100 end
     let host = "localhost"
-    let timers = Timers
 
     let auth = try
       env.root as AmbientAuth

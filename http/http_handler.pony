@@ -114,37 +114,6 @@ interface HTTPHandler
     Notification that the session can resume accepting data.
     """
 
-/*
-interface SyncHTTPHandler
-  fun ref apply(request: HTTPRequest val, body: (ByteArrays | None)): ByteSeqIter
-
-class SyncHTTPHandlerWrapper is HTTPHandler
-  let _session: HTTPSession
-  let _handler: SyncHTTPHandler
-  var _request_id: (RequestId | None) = None
-  var _sent: Bool = false
-
-  new create(session: HTTPSession, handler: SyncHTTPHandler) =>
-    _handler = handler
-    _session = session
-
-  fun ref apply(request: HTTPRequest val, request_id: RequestId) =>
-    _request_id = request_id
-    if not request.has_body() then
-      _sent = true
-      _session.send_raw(_handler(request, None), request_id)
-    end
-
-  fun ref chunk(data: ByteSeq val, request_id: RequestId) =>
-
-  fun ref finished(request_id: RequestId) =>
-    if not _sent then
-
-    _session.send_finished(request_id)
-*/
-
-
-
 
 interface HandlerFactory
   """
