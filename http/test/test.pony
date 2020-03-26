@@ -1,6 +1,5 @@
 use "ponytest"
 use ".."
-use "regex"
 
 actor Main is TestList
   new create(env: Env) => PonyTest(env, this)
