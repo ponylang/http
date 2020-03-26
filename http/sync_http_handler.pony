@@ -2,6 +2,9 @@ use "valbytes"
 use "debug"
 
 interface SyncHTTPHandler
+  """
+  Use this handler, when you want to handle your requests without accessing other actors.
+  """
   fun ref apply(request: HTTPRequest val, body: (ByteArrays | None)): ByteSeqIter ?
 
   fun error_response(request: HTTPRequest): (ByteSeqIter | None) => None

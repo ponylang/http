@@ -1,76 +1,103 @@
-"""
-This package includes all the support functions necessary to build client
-and server applications for the HTTP protocol.
-
-The important interfaces an application needs to deal with are:
-
-* [HTTPSession](http-HTTPSession), the API to an HTTP connection.
-
-* [HTTPHandler](http-HTTPHandler), the interface to a handler you
-need to write that will receive notifications from the `HTTPSession`.
-
-* [HandlerFactory](http-HandlerFactory), the interface to a class you
-need to write that creates instances of your `HTTPHandler`.
-
-* [Payload](http-Payload), the class that represents a single HTTP
-message, with its headers.
-
-If you are writing a client, you will need to deal with the
-[HTTPClient](http-HTTPClient) class.
-
-If you are writing a server, you will need to deal with the
-[HTTPServer](http-HTTPServer) class.
-
-"""
-
-primitive AuthFailed
-  """
-  HTTP failure reason for when SSL Authentication failed.
-
-  This failure reason is only reported to HTTP client HTTPHandler instances.
-  """
-
-primitive ConnectionClosed
-  """
-  HTTP failure reason for when the connection was closed
-  either from the other side (detectable when using TCP keepalive)
-  or locally (e.g. due to an error).
-  """
-primitive ConnectFailed
-  """
-  HTTP failure reason for when a connection could not be established.
-
-  This failure reason is only valid for HTTP client HTTPHandlers.
-  """
-
-type HTTPFailureReason is (
-  AuthFailed |
-  ConnectionClosed |
-  ConnectFailed |
-  RequestParseError
-  )
-  """
-  HTTP failure reason reported to `HTTPHandler.failed()`.
-  """
-
 interface HTTPHandler
   """
-  This is the interface through which HTTP messages are delivered *to*
-  application code. On the server, this will be HTTP Requests (GET,
-  HEAD, DELETE, POST, etc) sent from a client. On the client, this will
-  be the HTTP Responses coming back from the server. The protocol is largely
-  symmetrical and the same interface definition is used, though what
-  processing happens behind the interface will of course vary.
+  This is the interface through which HTTP requests are delivered *to*
+  application code and through which HTTP responses are sent to the underlying connection.
 
-  This interface delivers asynchronous events when receiving an HTTP
-  message (called a `Payload`). Calls to these methods are made in
-  the context of the `HTTPSession` actor so most of them should be
+  Instances of a HTTPHandler are executed in the context of the `HTTPSession` actor so most of them should be
   passing data on to a processing actor.
 
   Each `HTTPSession` must have a unique instance of the handler. The
   application code does not necessarily know when an `HTTPSession` is created,
   so the application must provide an instance of `HandlerFactory` that
   will be called at the appropriate time.
+
+  ### Receiving Requests
+
+  When an [HTTPRequest](http-HTTPRequest.md) is received on an [HTTPSession](http-HTTPSession.md) actor,
+  the corresponding [HTTPHandler.apply](http-HTTPHandler.md#apply) method is called
+  with the request and a [RequestId](http-RequestId). The [HTTPRequest](http-HTTPRequest.md)
+  contains the information extracted from HTTP Headers and the Request Line, but it does not
+  contain any body data. It is sent to [HTTPHandler.apply](http-HTTPHandler.md#apply) before the body
+  is fully received.
+
+  If the request has a body, its raw data is sent to the [HTTPHandler.chunk](http-HTTPHandler.md#chunk) method
+  together with the [RequestId](http-RequestId.md) of the request it belongs to.
+
+  Once all body data is received, [HTTPHandler.finished](http-HTTPHandler.md#finished) is called with the
+  [RequestId](http-RequestId.md) of the request it belongs to. Now is the time to act on the full body data,
+  if it hasn't been processed yet.
+
+  The [RequestId](http-Requestid.md) must be kept around for sending the response for this request.
+  This way the session can ensure, all responses are sent in the same order as they have been received,
+  which is required for HTTP pipelining. This way processing responses can be passed to other actors and
+  processing can take arbitrary times. The [HTTPSession](http-HTTPSession.md) will take care of sending
+  the responses in the correct order.
+
+  It is guaranteed that the call sequence is always:
+
+  - exactly once:       `apply(request_n, requestid_n)`
+  - zero or more times: `chunk(data, requestid_n)`
+  - exactly once:       `finished(requestid_n)`
+
+  And so on for `requestid_(n + 1)`. Only after `finished` has been called for a
+  `RequestId`, the next request will be received by the HTTPHandler instance, there will
+  be no interleaving. So it is save to keep state for the given request in a Handler between calls to `apply`
+  and `finished`.
+
+  #### Failures and Cancelling
+
+  If a [HTTPSession](http-HTTPSession.md) experienced faulty requests, the [HTTPHandler](http-HTTPHandler.md)
+  is notified via [HTTPHandler.failed](http-HTTPHandler.md#failed).
+
+  If the underlying connection to a [HTTPSession](http-HTTPSession.md) has been closed,
+  the [HTTPHandler](http-HTTPHandler.md) is notified via [HTTPHandler.closed](http-HTTPHandler.md#closed).
+
+  ### Sending Responses
+
+  A handler is instantiated using a [HandlerFactory](http-HandlerFactory.md), which passes an instance of
+  [HTTPSession](http-HTTPSession.md) to be used in constructing a handler.
+
+  A HTTPSession is required to be able to send responses.
+  See the docs for [HTTPSession](http-HTTPSession.md) for ways to send responses.
+
+  Example Handler:
+
+  ```pony
+  use "http"
+  use "valbytes"
+
+  class MyHTTPHandler is HTTPHandler
+    let _session: HTTPSession
+
+    var _path: String = ""
+    var _body: ByteArrays = ByteArrays
+
+    new create(session: HTTPSession) =>
+      _session = session
+
+    fun ref apply(request: HTTPRequest val, request_id: RequestId): Any =>
+      _path = request.uri().path
+
+    fun ref chunk(data: ByteSeq val, request_id: RequestId) =>
+      _body = _body + data
+
+    fun ref finished(request_id: RequestId) =>
+      _session.send_raw(
+        HTTPResponses.builder()
+          .set_status(StatusOk)
+          .add_header("Content-Length", (_body.size() + _path.size() + 13).string())
+          .add_header("Content-Type", "text/plain")
+          .finish_headers()
+          .add_chunk("received ")
+          .add_chunk((_body = ByteArrays).array())
+          .add_chunk(" at ")
+          .add_chunk(_path)
+          .build(),
+        request_id
+      )
+      _session.send_finished(request_id)
+  ```
+
   """
   fun ref apply(request: HTTPRequest val, request_id: RequestId): Any =>
     """
@@ -136,9 +163,38 @@ interface HandlerFactory
 
   fun apply(session: HTTPSession): HTTPHandler ref^
     """
-    Called by the `HTTPSession` when it needs a new instance of the
-    application's `HTTPHandler`. It is suggested that the
+    Called by the [HTTPSession](http-HTTPSession.md) when it needs a new instance of the
+    application's [HTTPHandler](http-HTTPHandler.md). It is suggested that the
     `session` value be passed to the constructor for the new
-    `HTTPHandler` so that it is available for making
-    `throttle` and `unthrottle` calls.
+    [HTTPHandler](http-HTTPHandler.md), you will need it for sending stuff back.
+
+    This part must be implemented, as there might be more paramaters
+    that need to be passed for creating a HTTPHandler.
     """
+
+interface HTTPHandlerWithoutContext is HTTPHandler
+  """
+  Simple [HTTPHandler](http-HTTPHandler.md) that can be constructed
+  with only a HTTPSession.
+  """
+  new create(session: HTTPSession)
+
+
+primitive SimpleHandlerFactory[T: HTTPHandlerWithoutContext]
+  """
+  HandlerFactory for a HTTPHandlerWithoutContext.
+
+  Just create it like:
+
+  ```pony
+  let server =
+    HTTPServer(
+      ...,
+      SimpleHandlerFactory[MySimpleHandler],
+      ...
+    )
+  ```
+
+  """
+  fun apply(session: HTTPSession): HTTPHandler ref^ =>
+    T.create(session)

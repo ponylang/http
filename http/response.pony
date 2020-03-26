@@ -2,6 +2,9 @@ use "valbytes"
 use "format"
 
 interface val HTTPResponse is ByteSeqIter
+  """
+  Representing a HTTP response minus the body.
+  """
   fun version(): HTTPVersion
   fun status(): Status
   fun header(name: String): (String | None)
@@ -12,11 +15,46 @@ interface val HTTPResponse is ByteSeqIter
   fun array(): Array[U8] iso^
 
 primitive HTTPResponses // TODO: better naming
+  """
+  The entry-point into building HTTPResponses.
+  """
   fun builder(version: HTTPVersion = HTTP11): ResponseBuilder =>
-    """Official way to get a reusable ResponseBuilder to build your responses."""
+    """
+    Official way to get a reusable [ResponseBuilder](http-ResponseBuilder.md)
+    to build your responses efficiently.
+    """
     _FullResponseBuilder._create(version)
 
 interface ResponseBuilder
+  """
+  Basic interface for a ResponseBuilder that can be used with chaining method calls.
+  It enforces a strict order of build steps by only making the next step available
+  as a return to a function required to transition. E.g. You must call `set_status(...)`
+  in order to get back a [ResponseBuilderHeaders](http-ResponseBuilderHeaders.md) to add
+  headers to the response. You need to call `finish_headers()` in order to
+  be able to add body data with [ResponseBuilderBody](http-ResponseBuilderBody.md).
+
+  You can always reset the builder to start out fresh from the beginning.
+  Implementations may take advantage of `reset()` by returning itself here,
+  allowing for object reuse.
+
+  Use [ResponseBuilderBody.build()](http-ResponseBuilderBody.md#build) to finally build the
+  response into a [ByteSeqIter](builtin-ByteSeqIter.md),
+  taylored for use with [HTTPSession.send_raw()](http-HTTPSession.md#send_raw).
+
+  Example usage:
+
+  ```pony
+  let builder: ResponseBuilder = HTTPResponses.builder()
+  builder.set_status(StatusOK)
+         .add_header("Content-Length", "4")
+         .add_header("Content-Type", "text/plain; charset=UTF-8")
+         .add_header("Server", "pony-http")
+         .finish_headers()
+         .add_chunk("COOL")
+         .build()
+  ```
+  """
   fun ref set_status(status: Status): ResponseBuilderHeaders
   fun ref reset(): ResponseBuilder
 
@@ -28,17 +66,35 @@ interface ResponseBuilderHeaders
 
 interface ResponseBuilderBody
   fun ref add_chunk(data: Array[U8] val): ResponseBuilderBody
+    """
+    Add some body data.
+
+    If Transfer-Encoding is set to [Chunked](http-Chunked.md) in [ResponseBuilderHeaders](http-ResponseBuilderHeaders.md)
+    each call to this function will take care of encoding every added array here in Chunked encoding.
+    Add an empty array to add the finishing chunk..
+    """
   fun ref build(): ByteSeqIter
+    """
+    Serialize the accumulated response data into a [ByteSeqIter](builtin-ByteSeqIter.md).
+    """
   fun ref reset(): ResponseBuilder
+    """
+    Reset the builder to a fresh state, only use the returned builder for further actions.
+    """
 
 class iso _FullResponseBuilder
   """
-  efficient HTTP response builder
+  Efficient HTTP response builder
   backed by a byte array to which we only append.
 
   Will write multiple chunks into separate arrays only if
   they exceed 65535 bytes (arbitrary choice).
-  Otherwise appends to the same array.
+  Otherwise appends to the same array, in order to not bog up
+  writev calls with tiny arrays, which makes it very much inefficient.
+
+  Keep your arrays decently sized at all times!
+
+  This instance is `iso`, so you can safely send it around amongst your actors.
   """
   let _version: HTTPVersion
   let _empty_placeholder: Array[U8] val = recover val _empty_placeholder.create(0) end
@@ -164,7 +220,26 @@ class iso _FullResponseBuilder
 
 // TODO: make internal state a ByteArrays instance and only keep track of
 // indices pointing to values
-class val BuildableHTTPResponse
+class val BuildableHTTPResponse is (HTTPResponse & ByteSeqIter)
+  """
+  Build your own HTTP Responses (minus the body) and turn them into immutable
+  things to send around.
+
+  This class can be serialized in the following ways:
+
+  * to Array[U8]: BuildableHTTPResponse.array()
+  * to ByteArrays: BuildableHTTPResponse.to_bytes()
+
+  or by using it as a ByteSeqIter.
+
+  This class exists if you want to use the verbose API of [HTTPSession](http-HTTPSession.md)
+  and brings lots of convenience, like getters and setters for all common properties.
+
+  If you are looking for a more efficient way to build responses, use a [ResponseBuilder](http-ResponseBuilder.md)
+  as it is returned from [HTTPResponses.builder()](http-HTTPResponses.md#builder), this class is not introspectable
+  and only allows adding properties the way they are put on the serialized form in the request. E.g. you must first
+  set the status and then the headers, not the other way around. But it makes for a more efficient API.
+  """
   var _version: HTTPVersion
   var _status: Status
   embed _headers: Headers = _headers.create()
@@ -256,6 +331,10 @@ class val BuildableHTTPResponse
     (acc + crlf)
 
   fun values(): Iterator[this->ByteSeq box] =>
+    """
+    Make this a very inefficient ByteSeqIter.
+    Rather use `array()` if you care about performance.
+    """
     to_bytes().arrays().values()
 
   fun tag _format_multiline(header_value: String): String =>
