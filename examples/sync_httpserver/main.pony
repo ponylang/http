@@ -129,6 +129,17 @@ actor Main
               max_concurrent_connections' = limit)
     )
 
+  fun _print_help(env: Env) =>
+    env.err.print(
+      """
+      Usage:
+
+         sync_httpserver [<PORT> = 50001] [<MAX_CONCURRENT_CONNECTIONS> = 100]
+
+      """
+    )
+
+
 class LoggingServerNotify is ServerNotify
   let _env: Env
 
