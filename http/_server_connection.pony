@@ -92,7 +92,7 @@ actor _ServerConnection is HTTPSession
     _conn.dispose()
 
   be closed() =>
-    _backend.failed(ConnectionClosed, _active_request)
+    _backend.closed()
     _conn.unmute()
 
 //// SEND RESPONSE API ////

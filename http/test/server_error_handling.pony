@@ -17,13 +17,8 @@ class val _ServerConnectionClosedHandlerFactory is HandlerFactory
     object is HTTPHandler
       fun ref apply(res: HTTPRequest val, request_id: RequestId) =>
         _h.log("received request")
-      fun ref failed(reason: HTTPFailureReason, request_id: RequestId) =>
-        match reason
-        | ConnectionClosed =>
-          _h.complete_action("server failed with ConnectionClosed")
-        else
-          _h.fail_action("server failed with ConnectionClosed")
-        end
+      fun ref closed() =>
+        _h.complete_action("server failed with ConnectionClosed")
     end
 
 class iso ServerConnectionClosedTest is UnitTest

@@ -94,14 +94,18 @@ interface HTTPHandler
 
   fun ref cancelled(request_id: RequestId) =>
     """
-    Notification that transferring the payload has been cancelled locally,
-    e.g. by disposing the client, closing the server or manually cancelling a single request.
+    Notification that sending a response has been cancelled locally,
+    e.g. by closing the server or manually cancelling a single request.
     """
 
-  fun ref failed(reason: HTTPFailureReason, request_id: RequestId) =>
+  fun ref failed(reason: RequestParseError, request_id: RequestId) =>
     """
-    Notification about failure to transfer the payload
-    (e.g. connection could not be established, authentication failed, connection was closed prematurely, ...)
+    Notification about failure parsing HTTP requests.
+    """
+
+  fun ref closed() =>
+    """
+    Notification that the underlying connection has been closed.
     """
 
   fun ref throttled() =>

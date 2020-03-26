@@ -31,13 +31,8 @@ class val _ClosedTestHandlerFactory is HandlerFactory
         )
         session.send_finished(request_id)
 
-      fun ref failed(reason: HTTPFailureReason, request_id: RequestId) =>
-        _h.log("failed called.")
-        match reason
-        | ConnectionClosed =>
-          _h.log("closed during handling of request: " + request_id.string())
-          _h.complete_action("connection-closed")
-        end
+      fun ref closed() =>
+        _h.complete_action("connection-closed")
     end
 
 
