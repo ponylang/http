@@ -29,7 +29,7 @@ interface tag HTTPSession
   ////////////////////////
   // API THAT CALLS YOU //
   ////////////////////////
-  be _receive_start(request: HTTPRequest val, request_id: RequestID)
+  be _receive_start(request: HTTPRequest val, request_id: RequestID) =>
     """
     Start receiving a request.
 
@@ -43,19 +43,22 @@ interface tag HTTPSession
     helps us to get the responses back into the right order, no matter how they
     are received from the application.
     """
+    None
 
-  be _receive_chunk(data: Array[U8] val, request_id: RequestID)
+  be _receive_chunk(data: Array[U8] val, request_id: RequestID) =>
     """
     Receive a chunk of body data for the request identified by `request_id`.
 
     The body is split up into arbitrarily sized data chunks, whose size is determined by the
     underlying protocol mechanisms, not the actual body size.
     """
+    None
 
-  be _receive_finished(request_id: RequestID)
+  be _receive_finished(request_id: RequestID) =>
     """
     Indicate that the current inbound request, including the body, has been fully received.
     """
+    None
 
   be _receive_failed(parse_error: RequestParseError, request_id: RequestID) =>
     """
@@ -71,7 +74,7 @@ interface tag HTTPSession
 
 
   // verbose api
-  be send_start(respone: HTTPResponse val, request_id: RequestID)
+  be send_start(respone: HTTPResponse val, request_id: RequestID) =>
     """
     ### Verbose API
 
@@ -83,8 +86,9 @@ interface tag HTTPSession
     * HTTPSession.send_chunk    - 0 or more times - submit body
     * HTTPSession.send_finished - exactly once    - clean up resources
     """
+    None
 
-  be send_chunk(data: ByteSeq val, request_id: RequestID)
+  be send_chunk(data: ByteSeq val, request_id: RequestID) =>
     """
     ### Verbose API
 
@@ -93,8 +97,9 @@ interface tag HTTPSession
 
     Notify the HTTPSession that the body has been fully sent, by calling `HTTPSession.send_finished`.
     """
+    None
 
-  be send_finished(request_id: RequestID)
+  be send_finished(request_id: RequestID) =>
     """
     ### Verbose API
 
@@ -107,16 +112,18 @@ interface tag HTTPSession
     If this behaviour isnt called, the server might misbehave, especially
     with clients doing HTTP pipelining.
     """
+    None
 
-  be send_cancel(request_id: RequestID)
+  be send_cancel(request_id: RequestID) =>
     """
     Cancel sending an in-flight response.
     As the HTTPSession will be invalid afterwards, as the response might not have been sent completely,
     it is best to close the session afterwards using `HTTPSession.dispose()`.
     """
+    None
 
   // simple api
-  be send_no_body(response: HTTPResponse val, request_id: RequestID)
+  be send_no_body(response: HTTPResponse val, request_id: RequestID) =>
     """
     ### Simple API
 
@@ -125,8 +132,9 @@ interface tag HTTPSession
     This call will do all the work of sending the response and cleaning up resources.
     No need to call `HTTPSession.send_finished()` anymore for this request.
     """
+    None
 
-  be send(response: HTTPResponse val, body: ByteArrays, request_id: RequestID)
+  be send(response: HTTPResponse val, body: ByteArrays, request_id: RequestID) =>
     """
     ### Simple API
 
@@ -150,9 +158,10 @@ interface tag HTTPSession
     This call will do all the work of sending the response and cleaning up resources.
     No need to call `HTTPSession.send_finished()` anymore for this request.
     """
+    None
 
   // optimized raw api
-  be send_raw(raw: ByteSeqIter, request_id: RequestID)
+  be send_raw(raw: ByteSeqIter, request_id: RequestID) =>
     """
     ### Optimized raw API
 
@@ -205,22 +214,26 @@ interface tag HTTPSession
         _session.send_finished(request_id)
     ```
     """
+    None
 
-  be dispose()
+  be dispose() =>
     """
     Close the connection from this end.
     """
+    None
 
-  be _mute()
+  be _mute() =>
     """
     Stop delivering *incoming* data to the handler. This may not
     be effective instantly.
     """
+    None
 
-  be _unmute()
+  be _unmute() =>
     """
     Resume delivering incoming data to the handler.
     """
+    None
 
 
 
