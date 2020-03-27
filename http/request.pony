@@ -1,5 +1,8 @@
 
-primitive HTTP11 is (Equatable[HTTPVersion] & Stringable)
+interface val _HTTPVersion is (Equatable[HTTPVersion] & Stringable)
+  fun to_bytes(): Array[U8] val
+
+primitive HTTP11 is _HTTPVersion
   """
   HTTP/1.1
   """
@@ -7,7 +10,7 @@ primitive HTTP11 is (Equatable[HTTPVersion] & Stringable)
   fun to_bytes(): Array[U8] val => [as U8: 'H'; 'T'; 'T'; 'P'; '/'; '1'; '.'; '1']
   fun eq(o: HTTPVersion): Bool => o is this
 
-primitive HTTP10 is (Equatable[HTTPVersion] & Stringable)
+primitive HTTP10 is _HTTPVersion
   """
   HTTP/1.0
   """
@@ -15,7 +18,7 @@ primitive HTTP10 is (Equatable[HTTPVersion] & Stringable)
   fun to_bytes(): Array[U8] val => [as U8: 'H'; 'T'; 'T'; 'P'; '/'; '1'; '.'; '0']
   fun eq(o: HTTPVersion): Bool => o is this
 
-primitive HTTP09 is (Equatable[HTTPVersion] & Stringable)
+primitive HTTP09 is _HTTPVersion
   """
   HTTP/0.9
   """
@@ -23,7 +26,7 @@ primitive HTTP09 is (Equatable[HTTPVersion] & Stringable)
   fun to_bytes(): Array[U8] val => [as U8: 'H'; 'T'; 'T'; 'P'; '/'; '0'; '.'; '9']
   fun eq(o: HTTPVersion): Bool => o is this
 
-type HTTPVersion is (HTTP09 | HTTP10 | HTTP11)
+type HTTPVersion is ((HTTP09 | HTTP10 | HTTP11) & _HTTPVersion)
   """
   union of supported HTTP Versions
 

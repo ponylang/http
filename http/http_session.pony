@@ -29,7 +29,7 @@ interface tag HTTPSession
   ////////////////////////
   // API THAT CALLS YOU //
   ////////////////////////
-  be _receive_start(request: HTTPRequest val, request_id: RequestId)
+  be _receive_start(request: HTTPRequest val, request_id: RequestID)
     """
     Start receiving a request.
 
@@ -37,14 +37,14 @@ interface tag HTTPSession
     [HTTPRequest](http-HTTPRequest.md) contains all information extracted from
     these parts.
 
-    The [RequestId](http-RequestId.md) is passed in order for the HTTPSession
+    The [RequestID](http-RequestID.md) is passed in order for the HTTPSession
     implementation to maintain the correct request order in case of HTTP pipelining.
-    Response handling can happen asynchronously at arbitrary times, so the RequestId
+    Response handling can happen asynchronously at arbitrary times, so the RequestID
     helps us to get the responses back into the right order, no matter how they
     are received from the application.
     """
 
-  be _receive_chunk(data: Array[U8] val, request_id: RequestId)
+  be _receive_chunk(data: Array[U8] val, request_id: RequestID)
     """
     Receive a chunk of body data for the request identified by `request_id`.
 
@@ -52,12 +52,12 @@ interface tag HTTPSession
     underlying protocol mechanisms, not the actual body size.
     """
 
-  be _receive_finished(request_id: RequestId)
+  be _receive_finished(request_id: RequestID)
     """
     Indicate that the current inbound request, including the body, has been fully received.
     """
 
-  be _receive_failed(parse_error: RequestParseError, request_id: RequestId) =>
+  be _receive_failed(parse_error: RequestParseError, request_id: RequestID) =>
     """
     Nofitcation if the request parser failed to parse incoming data as HTTPRequest.
 
@@ -71,7 +71,7 @@ interface tag HTTPSession
 
 
   // verbose api
-  be send_start(respone: HTTPResponse val, request_id: RequestId)
+  be send_start(respone: HTTPResponse val, request_id: RequestID)
     """
     ### Verbose API
 
@@ -84,7 +84,7 @@ interface tag HTTPSession
     * HTTPSession.send_finished - exactly once    - clean up resources
     """
 
-  be send_chunk(data: ByteSeq val, request_id: RequestId)
+  be send_chunk(data: ByteSeq val, request_id: RequestID)
     """
     ### Verbose API
 
@@ -94,7 +94,7 @@ interface tag HTTPSession
     Notify the HTTPSession that the body has been fully sent, by calling `HTTPSession.send_finished`.
     """
 
-  be send_finished(request_id: RequestId)
+  be send_finished(request_id: RequestID)
     """
     ### Verbose API
 
@@ -108,7 +108,7 @@ interface tag HTTPSession
     with clients doing HTTP pipelining.
     """
 
-  be send_cancel(request_id: RequestId)
+  be send_cancel(request_id: RequestID)
     """
     Cancel sending an in-flight response.
     As the HTTPSession will be invalid afterwards, as the response might not have been sent completely,
@@ -116,7 +116,7 @@ interface tag HTTPSession
     """
 
   // simple api
-  be send_no_body(response: HTTPResponse val, request_id: RequestId)
+  be send_no_body(response: HTTPResponse val, request_id: RequestID)
     """
     ### Simple API
 
@@ -126,7 +126,7 @@ interface tag HTTPSession
     No need to call `HTTPSession.send_finished()` anymore for this request.
     """
 
-  be send(response: HTTPResponse val, body: ByteArrays, request_id: RequestId)
+  be send(response: HTTPResponse val, body: ByteArrays, request_id: RequestID)
     """
     ### Simple API
 
@@ -152,7 +152,7 @@ interface tag HTTPSession
     """
 
   // optimized raw api
-  be send_raw(raw: ByteSeqIter, request_id: RequestId)
+  be send_raw(raw: ByteSeqIter, request_id: RequestID)
     """
     ### Optimized raw API
 
@@ -180,7 +180,7 @@ interface tag HTTPSession
       new create(session: HTTPSession) =>
         _session = session
 
-      fun ref apply(request: HTTPRequest val, request_id: RequestId): Any =>
+      fun ref apply(request: HTTPRequest val, request_id: RequestID): Any =>
         let body =
           match request.content_length()
           | let cl: USize =>

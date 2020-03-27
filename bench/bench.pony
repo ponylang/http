@@ -20,13 +20,13 @@ actor _TestHTTPSession is HTTPSession
   be set_continue(c: AsyncBenchContinue) =>
     _c = c
 
-  be _receive_start(request: HTTPRequest val, request_id: RequestId) =>
+  be _receive_start(request: HTTPRequest val, request_id: RequestID) =>
     Debug("_receive_start")
 
-  be _receive_chunk(data: Array[U8] val, request_id: RequestId) =>
+  be _receive_chunk(data: Array[U8] val, request_id: RequestID) =>
     Debug("_receive_chunk")
 
-  be _receive_finished(request_id: RequestId) =>
+  be _receive_finished(request_id: RequestID) =>
     Debug("finish")
     try
       (_c as AsyncBenchContinue).complete()
@@ -35,10 +35,10 @@ actor _TestHTTPSession is HTTPSession
   be dispose() =>
     Debug("dispose")
 
-  be send_start(response: HTTPResponse val, request_id: RequestId) => None
-  be send_chunk(data: ByteSeq val, request_id: RequestId) => None
-  be send_cancel(request_id: RequestId) => None
-  be send_finished(request_id: RequestId) => None
+  be send_start(response: HTTPResponse val, request_id: RequestID) => None
+  be send_chunk(data: ByteSeq val, request_id: RequestID) => None
+  be send_cancel(request_id: RequestID) => None
+  be send_finished(request_id: RequestID) => None
 
   be _mute() => None
 

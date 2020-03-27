@@ -15,7 +15,7 @@ class val _ServerConnectionClosedHandlerFactory is HandlerFactory
 
   fun apply(session: HTTPSession): HTTPHandler ref^ =>
     object is HTTPHandler
-      fun ref apply(res: HTTPRequest val, request_id: RequestId) =>
+      fun ref apply(res: HTTPRequest val, request_id: RequestID) =>
         _h.log("received request")
       fun ref closed() =>
         _h.complete_action("server failed with ConnectionClosed")

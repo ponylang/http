@@ -17,7 +17,7 @@ class val _ClosedTestHandlerFactory is HandlerFactory
 
   fun apply(session: HTTPSession): HTTPHandler ref^ =>
     object ref is HTTPHandler
-      fun ref apply(request: HTTPRequest val, request_id: RequestId) =>
+      fun ref apply(request: HTTPRequest val, request_id: RequestID) =>
         _h.complete_action("request-received")
 
         // send response

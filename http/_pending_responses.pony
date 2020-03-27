@@ -25,7 +25,7 @@ class val _ByteSeqsWrapper is ByteSeqIter
         })
 
 type _ByteSeqs is (ByteSeq | ByteSeqIter)
-type _PendingResponse is (RequestId, Vec[_ByteSeqs])
+type _PendingResponse is (RequestID, Vec[_ByteSeqs])
 
 class ref _PendingResponses
   // TODO: find out what is the most efficient way to
@@ -35,7 +35,7 @@ class ref _PendingResponses
 
   new ref create() => None // forcing ref refcap
 
-  fun ref add_pending(request_id: RequestId, response_data: Array[U8] val) =>
+  fun ref add_pending(request_id: RequestID, response_data: Array[U8] val) =>
     // - insort by request_id, descending, so that when we pop, we don't need to
     //   move the other entries, only when we receive entries with higher request-id
     try
@@ -65,7 +65,7 @@ class ref _PendingResponses
       )?
     end
 
-  fun ref add_pending_arrays(request_id: RequestId, data: ByteSeqIter) =>
+  fun ref add_pending_arrays(request_id: RequestID, data: ByteSeqIter) =>
     try
       var i = USize(0)
       var l = USize(0)
@@ -87,7 +87,7 @@ class ref _PendingResponses
       _pending.insert(l, (request_id, Vec[_ByteSeqs].push(data)))?
     end
 
-  fun ref append_data(request_id: RequestId, data: ByteSeq val) =>
+  fun ref append_data(request_id: RequestID, data: ByteSeq val) =>
     try
       var i = USize(0)
       var l = USize(0)
@@ -108,7 +108,7 @@ class ref _PendingResponses
     end
 
 
-  fun ref pop(request_id: RequestId): ((RequestId, ByteSeqIter) | None) =>
+  fun ref pop(request_id: RequestID): ((RequestID, ByteSeqIter) | None) =>
     try
       let last_i = _pending.size() - 1
       let entry = _pending(last_i)?

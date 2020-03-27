@@ -12,7 +12,7 @@ interface SyncHTTPHandler
 class SyncHTTPHandlerWrapper is HTTPHandler
   let _session: HTTPSession
   let _handler: SyncHTTPHandler
-  var _request_id: (RequestId | None) = None
+  var _request_id: (RequestID | None) = None
   var _request: HTTPRequest = BuildableHTTPRequest.create()
   var _body_buffer: ByteArrays = ByteArrays
 
@@ -22,7 +22,7 @@ class SyncHTTPHandlerWrapper is HTTPHandler
     _handler = handler
     _session = session
 
-  fun ref apply(request: HTTPRequest val, request_id: RequestId) =>
+  fun ref apply(request: HTTPRequest val, request_id: RequestID) =>
     _request_id = request_id
     _request = request
     _sent = false
@@ -54,10 +54,10 @@ class SyncHTTPHandlerWrapper is HTTPHandler
       end
     end
 
-  fun ref chunk(data: ByteSeq val, request_id: RequestId) =>
+  fun ref chunk(data: ByteSeq val, request_id: RequestID) =>
     _body_buffer = _body_buffer + data
 
-  fun ref finished(request_id: RequestId) =>
+  fun ref finished(request_id: RequestID) =>
     if not _sent then
       // resetting _body_buffer
       let res = _run_handler(_request, _body_buffer = ByteArrays)

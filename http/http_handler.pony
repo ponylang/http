@@ -15,19 +15,19 @@ interface HTTPHandler
 
   When an [HTTPRequest](http-HTTPRequest.md) is received on an [HTTPSession](http-HTTPSession.md) actor,
   the corresponding [HTTPHandler.apply](http-HTTPHandler.md#apply) method is called
-  with the request and a [RequestId](http-RequestId). The [HTTPRequest](http-HTTPRequest.md)
+  with the request and a [RequestID](http-RequestID). The [HTTPRequest](http-HTTPRequest.md)
   contains the information extracted from HTTP Headers and the Request Line, but it does not
   contain any body data. It is sent to [HTTPHandler.apply](http-HTTPHandler.md#apply) before the body
   is fully received.
 
   If the request has a body, its raw data is sent to the [HTTPHandler.chunk](http-HTTPHandler.md#chunk) method
-  together with the [RequestId](http-RequestId.md) of the request it belongs to.
+  together with the [RequestID](http-RequestID.md) of the request it belongs to.
 
   Once all body data is received, [HTTPHandler.finished](http-HTTPHandler.md#finished) is called with the
-  [RequestId](http-RequestId.md) of the request it belongs to. Now is the time to act on the full body data,
+  [RequestID](http-RequestID.md) of the request it belongs to. Now is the time to act on the full body data,
   if it hasn't been processed yet.
 
-  The [RequestId](http-Requestid.md) must be kept around for sending the response for this request.
+  The [RequestID](http-Requestid.md) must be kept around for sending the response for this request.
   This way the session can ensure, all responses are sent in the same order as they have been received,
   which is required for HTTP pipelining. This way processing responses can be passed to other actors and
   processing can take arbitrary times. The [HTTPSession](http-HTTPSession.md) will take care of sending
@@ -40,7 +40,7 @@ interface HTTPHandler
   - exactly once:       `finished(requestid_n)`
 
   And so on for `requestid_(n + 1)`. Only after `finished` has been called for a
-  `RequestId`, the next request will be received by the HTTPHandler instance, there will
+  `RequestID`, the next request will be received by the HTTPHandler instance, there will
   be no interleaving. So it is save to keep state for the given request in a Handler between calls to `apply`
   and `finished`.
 
@@ -75,13 +75,13 @@ interface HTTPHandler
     new create(session: HTTPSession) =>
       _session = session
 
-    fun ref apply(request: HTTPRequest val, request_id: RequestId): Any =>
+    fun ref apply(request: HTTPRequest val, request_id: RequestID): Any =>
       _path = request.uri().path
 
-    fun ref chunk(data: ByteSeq val, request_id: RequestId) =>
+    fun ref chunk(data: ByteSeq val, request_id: RequestID) =>
       _body = _body + data
 
-    fun ref finished(request_id: RequestId) =>
+    fun ref finished(request_id: RequestID) =>
       _session.send_raw(
         HTTPResponses.builder()
           .set_status(StatusOk)
@@ -99,7 +99,7 @@ interface HTTPHandler
   ```
 
   """
-  fun ref apply(request: HTTPRequest val, request_id: RequestId): Any =>
+  fun ref apply(request: HTTPRequest val, request_id: RequestID): Any =>
     """
     Notification of an incoming message.
 
@@ -107,25 +107,25 @@ interface HTTPHandler
     with a call to this method.
     """
 
-  fun ref chunk(data: ByteSeq val, request_id: RequestId) =>
+  fun ref chunk(data: ByteSeq val, request_id: RequestID) =>
     """
     Notification of incoming body data. The body belongs to the most
     recent `HTTPRequest` delivered by an `apply` notification.
     """
 
-  fun ref finished(request_id: RequestId) =>
+  fun ref finished(request_id: RequestID) =>
     """
     Notification that no more body chunks are coming. Delivery of this HTTP
     message is complete.
     """
 
-  fun ref cancelled(request_id: RequestId) =>
+  fun ref cancelled(request_id: RequestID) =>
     """
     Notification that sending a response has been cancelled locally,
     e.g. by closing the server or manually cancelling a single request.
     """
 
-  fun ref failed(reason: RequestParseError, request_id: RequestId) =>
+  fun ref failed(reason: RequestParseError, request_id: RequestID) =>
     """
     Notification about failure parsing HTTP requests.
     """

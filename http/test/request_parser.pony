@@ -216,16 +216,16 @@ primitive _R
     )
 
 actor _MockRequestHandler is HTTP11RequestHandler
-  be _receive_start(request: HTTPRequest val, request_id: RequestId) =>
+  be _receive_start(request: HTTPRequest val, request_id: RequestID) =>
     Debug("_receive_start: " + request_id.string())
 
-  be _receive_chunk(data: Array[U8] val, request_id: RequestId) =>
+  be _receive_chunk(data: Array[U8] val, request_id: RequestID) =>
     Debug("_receive_chunk: " + request_id.string())
 
-  be _receive_finished(request_id: RequestId) =>
+  be _receive_finished(request_id: RequestID) =>
     Debug("_receive_finished: " + request_id.string())
 
-  be _receive_failed(parse_error: RequestParseError, request_id: RequestId) =>
+  be _receive_failed(parse_error: RequestParseError, request_id: RequestID) =>
     Debug("_receive_failed: " + request_id.string())
 
 primitive ParserTestBuilder
@@ -245,15 +245,15 @@ primitive ParserTestBuilder
           object is HTTP11RequestHandler
             var req: (HTTPRequest | None) = None
             var chunks: ByteArrays = ByteArrays
-            be _receive_start(request: HTTPRequest val, request_id: RequestId) =>
+            be _receive_start(request: HTTPRequest val, request_id: RequestID) =>
               h.log("received request")
               req = request
 
-            be _receive_chunk(data: Array[U8] val, request_id: RequestId) =>
+            be _receive_chunk(data: Array[U8] val, request_id: RequestID) =>
               h.log("received chunk")
               chunks = chunks + data
 
-            be _receive_finished(request_id: RequestId) =>
+            be _receive_finished(request_id: RequestID) =>
               h.log("received finished")
               try
                 cb(h, req as HTTPRequest, chunks)?
@@ -265,7 +265,7 @@ primitive ParserTestBuilder
               chunks = ByteArrays
               req = None
 
-            be _receive_failed(parse_error: RequestParseError, request_id: RequestId) =>
+            be _receive_failed(parse_error: RequestParseError, request_id: RequestID) =>
               h.complete(false)
               h.fail("FAILED WITH " + parse_error.string() + " FOR REQUEST:\n\n" + req_str)
           end
@@ -281,17 +281,17 @@ primitive ParserTestBuilder
       fun apply(h: TestHelper) =>
         let parser = HTTP11RequestParser(
           object is HTTP11RequestHandler
-            be _receive_start(request: HTTPRequest val, request_id: RequestId) =>
+            be _receive_start(request: HTTPRequest val, request_id: RequestID) =>
               h.log("receive_start")
-            be _receive_chunk(data: Array[U8] val, request_id: RequestId) =>
+            be _receive_chunk(data: Array[U8] val, request_id: RequestID) =>
               h.log("received chunk of size: " + data.size().string())
 
-            be _receive_finished(request_id: RequestId) =>
+            be _receive_finished(request_id: RequestID) =>
               if not ok_to_finish' then
                 h.fail("didnt expect this request to finish:\n\n" + req_str)
               end
 
-            be _receive_failed(parse_error: RequestParseError, request_id: RequestId) =>
+            be _receive_failed(parse_error: RequestParseError, request_id: RequestID) =>
               h.fail("FAILED WITH " + parse_error.string() + " FOR REQUEST:\n\n" + req_str)
           end
         )
@@ -303,13 +303,13 @@ class iso NoDataTest is UnitTest
   fun apply(h: TestHelper) =>
     let parser = HTTP11RequestParser(
       object is HTTP11RequestHandler
-        be _receive_start(request: HTTPRequest val, request_id: RequestId) =>
+        be _receive_start(request: HTTPRequest val, request_id: RequestID) =>
           h.fail("request delivered from no data.")
-        be _receive_chunk(data: Array[U8] val, request_id: RequestId) =>
+        be _receive_chunk(data: Array[U8] val, request_id: RequestID) =>
           h.fail("chunk delivered from no data.")
-        be _receive_finished(request_id: RequestId) =>
+        be _receive_finished(request_id: RequestID) =>
           h.fail("finished called from no data.")
-        be _receive_failed(parse_error: RequestParseError, request_id: RequestId) =>
+        be _receive_failed(parse_error: RequestParseError, request_id: RequestID) =>
           h.fail("failed called from no data.")
       end
     )
@@ -320,13 +320,13 @@ class iso UnknownMethodTest is UnitTest
   fun apply(h: TestHelper) =>
     let parser = HTTP11RequestParser(
       object is HTTP11RequestHandler
-        be _receive_start(request: HTTPRequest val, request_id: RequestId) =>
+        be _receive_start(request: HTTPRequest val, request_id: RequestID) =>
           h.fail("request delivered from no data.")
-        be _receive_chunk(data: Array[U8] val, request_id: RequestId) =>
+        be _receive_chunk(data: Array[U8] val, request_id: RequestID) =>
           h.fail("chunk delivered from no data.")
-        be _receive_finished(request_id: RequestId) =>
+        be _receive_finished(request_id: RequestID) =>
           h.fail("finished called from no data.")
-        be _receive_failed(parse_error: RequestParseError, request_id: RequestId) =>
+        be _receive_failed(parse_error: RequestParseError, request_id: RequestID) =>
           h.assert_is[RequestParseError](UnknownMethod, parse_error)
       end
     )

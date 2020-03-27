@@ -1,21 +1,25 @@
-primitive RequestIds
+
+
+type RequestID is USize
+
+primitive RequestIDs
   """
-  Utilities for dealing with type RequestId
+  Utilities for dealing with type RequestID
   in order to not assume anything about its actual implementation.
   """
-  fun max_value(): RequestId =>
+  fun max_value(): RequestID =>
     USize.max_value()
 
-  fun min(id1: RequestId, id2: RequestId): RequestId =>
+  fun min(id1: RequestID, id2: RequestID): RequestID =>
     id1.min(id2)
-  fun max(id1: RequestId, id2: RequestId): RequestId =>
+  fun max(id1: RequestID, id2: RequestID): RequestID =>
     id1.max(id2)
 
-  fun next(id: RequestId): RequestId =>
+  fun next(id: RequestID): RequestID =>
     id + 1
 
-  fun gt(id1: RequestId, id2: RequestId): Bool =>
+  fun gt(id1: RequestID, id2: RequestID): Bool =>
     id1 > id2
 
-  fun gte(id1: RequestId, id2: RequestId): Bool =>
+  fun gte(id1: RequestID, id2: RequestID): Bool =>
     id1 >= id2

@@ -24,7 +24,7 @@ class val _PipeliningOrderHandlerFactory is HandlerFactory
     object ref is HTTPHandler
       let _session: HTTPSession = session
 
-      fun ref finished(request_id: RequestId) =>
+      fun ref finished(request_id: RequestID) =>
         let rid = request_id.string()
         let res = HTTPResponses.builder()
           .set_status(StatusOK)

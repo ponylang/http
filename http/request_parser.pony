@@ -46,7 +46,6 @@ type _ParserState is (
   _ExpectChunk |
   _ExpectChunkEnd)
 
-type RequestId is USize
 
 primitive Chunked
 
@@ -56,15 +55,15 @@ interface tag HTTP11RequestHandler
   be it a valid `HTTPRequest` containing method, URL, headers and other metadata,
   or a specific `RequestParseError`.
   """
-  be _receive_start(request: HTTPRequest val, request_id: RequestId)
+  be _receive_start(request: HTTPRequest val, request_id: RequestID)
     """
     Receive parsed HTTPRequest
     """
 
-  be _receive_chunk(data: Array[U8] val, request_id: RequestId)
-  be _receive_finished(request_id: RequestId)
+  be _receive_chunk(data: Array[U8] val, request_id: RequestID)
+  be _receive_finished(request_id: RequestID)
 
-  be _receive_failed(parse_error: RequestParseError, request_id: RequestId)
+  be _receive_failed(parse_error: RequestParseError, request_id: RequestID)
 
 class HTTP11RequestParser
   let _max_request_line_size: USize = 8192 // TODO make configurable
@@ -75,7 +74,7 @@ class HTTP11RequestParser
 
   var _state: _ParserState = _ExpectRequestLine
   var _buffer: ByteArrays = ByteArrays.create()
-  var _request_counter: RequestId = 0
+  var _request_counter: RequestID = 0
   var _current_request: BuildableHTTPRequest trn = BuildableHTTPRequest.create()
 
   var _expected_body_length: USize = 0
