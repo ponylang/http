@@ -1,29 +1,31 @@
 use "valbytes"
 use "debug"
 
-primitive TooLarge is Stringable
+primitive TooLarge is _RequestParseError
   fun string(): String iso^ => "TooLarge".clone()
 
-primitive UnknownMethod is Stringable
+primitive UnknownMethod is _RequestParseError
   fun string(): String iso^ => "UnknownMethod".clone()
 
-primitive InvalidURI is Stringable
+primitive InvalidURI is _RequestParseError
   fun string(): String iso^ =>
     "InvalidURI".clone()
-primitive InvalidVersion is Stringable
+primitive InvalidVersion is _RequestParseError
   fun string(): String iso^ =>
     "InvalidVersion".clone()
-primitive InvalidContentLength is Stringable
+primitive InvalidContentLength is _RequestParseError
   fun string(): String iso^ =>
     "InvalidContentLength".clone()
-primitive InvalidTransferCoding is Stringable
+primitive InvalidTransferCoding is _RequestParseError
   fun string(): String iso^ =>
     "InvalidTransferCoding".clone()
-primitive InvalidChunk is Stringable
+primitive InvalidChunk is _RequestParseError
   fun string(): String iso^ =>
     "InvalidChunk".clone()
 
-type RequestParseError is ( TooLarge | UnknownMethod | InvalidURI | InvalidVersion | InvalidContentLength | InvalidTransferCoding | InvalidChunk )
+interface val _RequestParseError is Stringable
+
+type RequestParseError is (( TooLarge | UnknownMethod | InvalidURI | InvalidVersion | InvalidContentLength | InvalidTransferCoding | InvalidChunk ) & _RequestParseError)
 
 primitive NeedMore is Stringable
   fun string(): String iso^ => "NeedMore".clone()

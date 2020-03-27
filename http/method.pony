@@ -1,4 +1,4 @@
-trait val HTTPMethod is (Equatable[HTTPMethod] & Stringable)
+interface val HTTPMethod is (Equatable[HTTPMethod] & Stringable)
   """
   HTTP method
 
