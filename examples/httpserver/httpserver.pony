@@ -121,7 +121,7 @@ class BackendHandler is HTTPHandler
     _session = session
     _response_builder = HTTPResponses.builder()
 
-  fun ref apply(request: HTTPRequest val, request_id: RequestId) =>
+  fun ref apply(request: HTTPRequest val, request_id: RequestID) =>
     """
     Start processing a request.
 
@@ -188,7 +188,7 @@ class BackendHandler is HTTPHandler
       end
     end
 
-  fun ref chunk(data: ByteSeq val, request_id: RequestId) =>
+  fun ref chunk(data: ByteSeq val, request_id: RequestID) =>
     """
     Process the next chunk of data received.
 
@@ -205,7 +205,7 @@ class BackendHandler is HTTPHandler
       )
     end
 
-  fun ref finished(request_id: RequestId) =>
+  fun ref finished(request_id: RequestID) =>
     """
     Called when the last chunk has been handled and the full request has been received.
 

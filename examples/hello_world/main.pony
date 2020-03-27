@@ -106,9 +106,9 @@ class BackendHandler is HTTPHandler
     _session = session
     _response = response
 
-  fun ref apply(request: HTTPRequest val, request_id: RequestId) =>
+  fun ref apply(request: HTTPRequest val, request_id: RequestID) =>
     _session.send_raw(_response, request_id)
     _session.send_finished(request_id)
 
-  fun ref finished(request_id: RequestId) => None
+  fun ref finished(request_id: RequestID) => None
 
