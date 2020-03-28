@@ -19,14 +19,14 @@ class val _PipeliningOrderHandlerFactory is HandlerFactory
     _h = h
     _timers = Timers
 
-  fun apply(session: HTTPSession): HTTPHandler ref^ =>
+  fun apply(session: Session): Handler ref^ =>
     let random = Rand(Time.seconds().u64())
-    object ref is HTTPHandler
-      let _session: HTTPSession = session
+    object ref is Handler
+      let _session: Session = session
 
       fun ref finished(request_id: RequestID) =>
         let rid = request_id.string()
-        let res = HTTPResponses.builder()
+        let res = Responses.builder()
           .set_status(StatusOK)
           .add_header("Content-Length", rid.size().string())
           .finish_headers()
@@ -62,11 +62,11 @@ class iso PipeliningOrderTest is UnitTest
     h.long_test(Nanos.from_seconds(5))
     h.expect_action("all received")
     h.dispose_when_done(
-      HTTPServer(
+      Server(
         h.env.root as AmbientAuth,
         object iso is ServerNotify
           let reqs: Array[String] val = requests
-          fun ref listening(server: HTTPServer ref) =>
+          fun ref listening(server: Server ref) =>
             try
               (let host, let port) = server.local_address().name()?
               h.log("listening on " + host + ":" + port)
@@ -125,11 +125,11 @@ class iso PipeliningOrderTest is UnitTest
                 port
               )
             end
-          fun ref closed(server: HTTPServer ref) =>
+          fun ref closed(server: Server ref) =>
             h.fail("closed")
         end,
         _PipeliningOrderHandlerFactory(h),
-        HTTPServerConfig()
+        ServerConfig()
       )
     )
 
@@ -146,10 +146,10 @@ class iso PipeliningCloseTest is UnitTest
     h.expect_action("connected")
     h.expect_action("all received")
     h.dispose_when_done(
-      HTTPServer(
+      Server(
         h.env.root as AmbientAuth,
         object iso is ServerNotify
-          fun ref listening(server: HTTPServer ref) =>
+          fun ref listening(server: Server ref) =>
             try
               (let host, let port) = server.local_address().name()?
               h.log("listening on " + host + ":" + port)
@@ -213,11 +213,11 @@ class iso PipeliningCloseTest is UnitTest
                 port
               )
             end
-          fun ref closed(server: HTTPServer ref) =>
+          fun ref closed(server: Server ref) =>
             h.fail("closed")
         end,
         _PipeliningOrderHandlerFactory(h),
-        HTTPServerConfig()
+        ServerConfig()
       )
     )
 

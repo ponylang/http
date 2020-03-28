@@ -27,11 +27,11 @@ actor Main
     end
 
     // Start the top server control actor.
-    let server = HTTPServer(
+    let server = Server(
       auth,
       LoggingServerNotify(env),  // notify for server lifecycle events
       BackendMaker // factory for session-based application backend
-      where config = HTTPServerConfig( // configuration of HTTPServer
+      where config = ServerConfig( // configuration of Server
         where host' = host,
               port' = port,
               max_concurrent_connections' = limit)
@@ -51,16 +51,16 @@ actor Main
 class LoggingServerNotify is ServerNotify
   """
   Notification class that is notified about
-  important lifecycle events for the HTTPServer
+  important lifecycle events for the Server
   """
   let _env: Env
 
   new iso create(env: Env) =>
     _env = env
 
-  fun ref listening(server: HTTPServer ref) =>
+  fun ref listening(server: Server ref) =>
     """
-    Called when the HTTPServer starts listening on its host:port pair via TCP.
+    Called when the Server starts listening on its host:port pair via TCP.
     """
     try
       (let host, let service) = server.local_address().name()?
@@ -71,23 +71,23 @@ class LoggingServerNotify is ServerNotify
       server.dispose()
     end
 
-  fun ref not_listening(server: HTTPServer ref) =>
+  fun ref not_listening(server: Server ref) =>
     """
-    Called when the HTTPServer was not able to start listening on its host:port pair via TCP.
+    Called when the Server was not able to start listening on its host:port pair via TCP.
     """
     _env.err.print("Failed to listen.")
     _env.exitcode(1)
 
-  fun ref closed(server: HTTPServer ref) =>
+  fun ref closed(server: Server ref) =>
     """
-    Called when the HTTPServer is closed.
+    Called when the Server is closed.
     """
     _env.err.print("Shutdown.")
 
 class val BackendMaker
 
   let _msg: String = "hello world"
-  let _response: ByteSeqIter = HTTPResponses.builder()
+  let _response: ByteSeqIter = Responses.builder()
     .set_status(StatusOK)
     .add_header("Content-Type", "text/plain")
     .add_header("Content-Length", _msg.size().string())
@@ -95,18 +95,18 @@ class val BackendMaker
     .add_chunk(_msg.array())
     .build()
 
-  fun apply(session: HTTPSession): HTTPHandler ref^ =>
+  fun apply(session: Session): Handler ref^ =>
     BackendHandler(session, _response)
 
-class BackendHandler is HTTPHandler
-  let _session: HTTPSession
+class BackendHandler is Handler
+  let _session: Session
   let _response: ByteSeqIter
 
-  new ref create(session: HTTPSession, response: ByteSeqIter) =>
+  new ref create(session: Session, response: ByteSeqIter) =>
     _session = session
     _response = response
 
-  fun ref apply(request: HTTPRequest val, request_id: RequestID) =>
+  fun ref apply(request: Request val, request_id: RequestID) =>
     _session.send_raw(_response, request_id)
     _session.send_finished(request_id)
 

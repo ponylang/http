@@ -1,28 +1,28 @@
 use "valbytes"
 use "debug"
 
-interface SyncHTTPHandler
+interface SyncHandler
   """
   Use this handler, when you want to handle your requests without accessing other actors.
   """
-  fun ref apply(request: HTTPRequest val, body: (ByteArrays | None)): ByteSeqIter ?
+  fun ref apply(request: Request val, body: (ByteArrays | None)): ByteSeqIter ?
 
-  fun error_response(request: HTTPRequest): (ByteSeqIter | None) => None
+  fun error_response(request: Request): (ByteSeqIter | None) => None
 
-class SyncHTTPHandlerWrapper is HTTPHandler
-  let _session: HTTPSession
-  let _handler: SyncHTTPHandler
+class SyncHandlerWrapper is Handler
+  let _session: Session
+  let _handler: SyncHandler
   var _request_id: (RequestID | None) = None
-  var _request: HTTPRequest = BuildableHTTPRequest.create()
+  var _request: Request = BuildableRequest.create()
   var _body_buffer: ByteArrays = ByteArrays
 
   var _sent: Bool = false
 
-  new create(session: HTTPSession, handler: SyncHTTPHandler) =>
+  new create(session: Session, handler: SyncHandler) =>
     _handler = handler
     _session = session
 
-  fun ref apply(request: HTTPRequest val, request_id: RequestID) =>
+  fun ref apply(request: Request val, request_id: RequestID) =>
     _request_id = request_id
     _request = request
     _sent = false
@@ -33,7 +33,7 @@ class SyncHTTPHandlerWrapper is HTTPHandler
       _session.send_raw(res, request_id)
     end
 
-  fun ref _run_handler(request: HTTPRequest, body: (ByteArrays | None) = None): ByteSeqIter =>
+  fun ref _run_handler(request: Request, body: (ByteArrays | None) = None): ByteSeqIter =>
     try
       _handler(request, None)?
     else
@@ -43,7 +43,7 @@ class SyncHTTPHandlerWrapper is HTTPHandler
       | None =>
         // default 500 response
         let message = "Internal Server Error"
-        HTTPResponses
+        Responses
           .builder(request.version())
           .set_status(StatusInternalServerError)
           .add_header("Content-Length", message.size().string())

@@ -8,7 +8,7 @@ interface tag _SessionRegistry
   be register_session(conn: _ServerConnection)
   be unregister_session(conn: _ServerConnection)
 
-actor HTTPServer is _SessionRegistry
+actor Server is _SessionRegistry
   """
   Runs an HTTP server.
 
@@ -20,7 +20,7 @@ actor HTTPServer is _SessionRegistry
 
   2. `_ServerConnHandler` is the notification class for new connections. It creates
   a `_ServerConnection` actor and receives all the raw data from TCP. It uses
-  the `HTTP11RequestParser` to assemble complete `HTTPRequest` objects which are passed off
+  the `HTTP11RequestParser` to assemble complete `Request` objects which are passed off
   to the `_ServerConnection`.
 
   3. The `_ServerConnection` actor deals with requests and their bodies
@@ -29,7 +29,7 @@ actor HTTPServer is _SessionRegistry
   """
   let _notify: ServerNotify
   var _handler_maker: HandlerFactory val
-  let _config: HTTPServerConfig
+  let _config: ServerConfig
   let _sslctx: (SSLContext | None)
   let _listen: TCPListener
   var _address: NetAddress
@@ -41,7 +41,7 @@ actor HTTPServer is _SessionRegistry
     auth: TCPListenerAuth,
     notify: ServerNotify iso,
     handler: HandlerFactory val,
-    config: HTTPServerConfig,
+    config: ServerConfig,
     sslctx: (SSLContext | None) = None)
   =>
     """
@@ -68,7 +68,7 @@ actor HTTPServer is _SessionRegistry
     if _config.has_timeout() then
       match _timer
       | None =>
-        let that: HTTPServer tag = this
+        let that: Server tag = this
         let timeout_interval = _config.timeout_heartbeat_interval
         let t = Timer(
           object iso is TimerNotify

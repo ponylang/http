@@ -6,14 +6,14 @@ class _ServerListener is TCPListenNotify
   Manages the listening socket for an HTTP server. Incoming requests
   are assembled and dispatched.
   """
-  let _server: HTTPServer
-  let _config: HTTPServerConfig
+  let _server: Server
+  let _config: ServerConfig
   let _sslctx: (SSLContext | None)
   let _handlermaker: HandlerFactory val
 
   new iso create(
-    server: HTTPServer,
-    config: HTTPServerConfig,
+    server: Server,
+    config: ServerConfig,
     sslctx: (SSLContext | None),
     handler: HandlerFactory val)  // Makes a unique session handler
   =>

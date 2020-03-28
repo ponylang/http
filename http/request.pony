@@ -1,32 +1,32 @@
 
-interface val _HTTPVersion is (Equatable[HTTPVersion] & Stringable)
+interface val _Version is (Equatable[Version] & Stringable)
   fun to_bytes(): Array[U8] val
 
-primitive HTTP11 is _HTTPVersion
+primitive HTTP11 is _Version
   """
   HTTP/1.1
   """
   fun string(): String iso^ => recover iso String(8).>append("HTTP/1.1") end
   fun to_bytes(): Array[U8] val => [as U8: 'H'; 'T'; 'T'; 'P'; '/'; '1'; '.'; '1']
-  fun eq(o: HTTPVersion): Bool => o is this
+  fun eq(o: Version): Bool => o is this
 
-primitive HTTP10 is _HTTPVersion
+primitive HTTP10 is _Version
   """
   HTTP/1.0
   """
   fun string(): String iso^ => recover iso String(8).>append("HTTP/1.0") end
   fun to_bytes(): Array[U8] val => [as U8: 'H'; 'T'; 'T'; 'P'; '/'; '1'; '.'; '0']
-  fun eq(o: HTTPVersion): Bool => o is this
+  fun eq(o: Version): Bool => o is this
 
-primitive HTTP09 is _HTTPVersion
+primitive HTTP09 is _Version
   """
   HTTP/0.9
   """
   fun string(): String iso^ => recover iso String(8).>append("HTTP/0.9") end
   fun to_bytes(): Array[U8] val => [as U8: 'H'; 'T'; 'T'; 'P'; '/'; '0'; '.'; '9']
-  fun eq(o: HTTPVersion): Bool => o is this
+  fun eq(o: Version): Bool => o is this
 
-type HTTPVersion is ((HTTP09 | HTTP10 | HTTP11) & _HTTPVersion)
+type Version is ((HTTP09 | HTTP10 | HTTP11) & _Version)
   """
   union of supported HTTP Versions
 
@@ -34,7 +34,7 @@ type HTTPVersion is ((HTTP09 | HTTP10 | HTTP11) & _HTTPVersion)
   """
 
 
-interface val HTTPRequest
+interface val Request
   """
   HTTP Request
 
@@ -47,32 +47,32 @@ interface val HTTPRequest
 
   Without body.
   """
-  fun method(): HTTPMethod
+  fun method(): Method
   fun uri(): URL
-  fun version(): HTTPVersion
+  fun version(): Version
   fun header(name: String): (String | None)
   fun headers(): Iterator[Header]
   fun transfer_coding(): (Chunked | None)
   fun content_length(): (USize | None)
   fun has_body(): Bool
 
-class val BuildableHTTPRequest is HTTPRequest
+class val BuildableRequest is Request
   """
   A HTTP Request that is created with `trn` refcap
   in order to be mutable, and then, when done, be consumed into
   a `val` reference. This is the way, the `HTTP11RequestParser` is handling this class and so should you.
   """
-  var _method: HTTPMethod
+  var _method: Method
   var _uri: URL
-  var _version: HTTPVersion
+  var _version: Version
   embed _headers: Headers = _headers.create()
   var _transfer_coding: (Chunked | None)
   var _content_length: (USize | None)
 
   new trn create(
-    method': HTTPMethod = GET,
+    method': Method = GET,
     uri': URL = URL,
-    version': HTTPVersion = HTTP11,
+    version': Version = HTTP11,
     transfer_coding': (Chunked | None) = None,
     content_length': (USize | None) = None) =>
     _method = method'
@@ -81,7 +81,7 @@ class val BuildableHTTPRequest is HTTPRequest
     _transfer_coding = transfer_coding'
     _content_length = content_length'
 
-  fun method(): HTTPMethod =>
+  fun method(): Method =>
     """
     The Request Method.
 
@@ -89,7 +89,7 @@ class val BuildableHTTPRequest is HTTPRequest
     """
     _method
 
-  fun ref set_method(method': HTTPMethod): BuildableHTTPRequest ref =>
+  fun ref set_method(method': Method): BuildableRequest ref =>
     _method = method'
     this
 
@@ -101,11 +101,11 @@ class val BuildableHTTPRequest is HTTPRequest
     """
     _uri
 
-  fun ref set_uri(uri': URL): BuildableHTTPRequest ref =>
+  fun ref set_uri(uri': URL): BuildableRequest ref =>
     _uri = uri'
     this
 
-  fun version(): HTTPVersion =>
+  fun version(): Version =>
     """
     The HTTP version as given on the Request Line.
 
@@ -113,7 +113,7 @@ class val BuildableHTTPRequest is HTTPRequest
     """
     _version
 
-  fun ref set_version(v: HTTPVersion): BuildableHTTPRequest ref =>
+  fun ref set_version(v: Version): BuildableRequest ref =>
     _version = v
     this
 
@@ -126,7 +126,7 @@ class val BuildableHTTPRequest is HTTPRequest
 
   fun headers(): Iterator[Header] => _headers.values()
 
-  fun ref add_header(name: String, value: String): BuildableHTTPRequest ref =>
+  fun ref add_header(name: String, value: String): BuildableRequest ref =>
     """
     Add a header with name and value to this request.
     If a header with this name already exists, the given value will be appended to it,
@@ -136,7 +136,7 @@ class val BuildableHTTPRequest is HTTPRequest
     _headers.add(name, value)
     this
 
-  fun ref set_header(name: String, value: String): BuildableHTTPRequest ref =>
+  fun ref set_header(name: String, value: String): BuildableRequest ref =>
     """
     Set a header in this request to the given value.
 
@@ -145,7 +145,7 @@ class val BuildableHTTPRequest is HTTPRequest
     _headers.set(name, value)
     this
 
-  fun ref clear_headers(): BuildableHTTPRequest ref =>
+  fun ref clear_headers(): BuildableRequest ref =>
     """
     Remove all previously set headers from this request.
     """
@@ -163,7 +163,7 @@ class val BuildableHTTPRequest is HTTPRequest
     """
     _transfer_coding
 
-  fun ref set_transfer_coding(te: (Chunked | None)): BuildableHTTPRequest ref =>
+  fun ref set_transfer_coding(te: (Chunked | None)): BuildableRequest ref =>
     _transfer_coding = te
     this
 
@@ -176,7 +176,7 @@ class val BuildableHTTPRequest is HTTPRequest
     """
     _content_length
 
-  fun ref set_content_length(cl: USize): BuildableHTTPRequest ref =>
+  fun ref set_content_length(cl: USize): BuildableRequest ref =>
     _content_length = cl
     this
 

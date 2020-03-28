@@ -1,11 +1,11 @@
 use "valbytes"
 use "format"
 
-interface val HTTPResponse is ByteSeqIter
+interface val Response is ByteSeqIter
   """
   Representing a HTTP response minus the body.
   """
-  fun version(): HTTPVersion
+  fun version(): Version
   fun status(): Status
   fun header(name: String): (String | None)
   fun headers(): Iterator[Header]
@@ -14,11 +14,11 @@ interface val HTTPResponse is ByteSeqIter
   fun to_bytes(): ByteArrays
   fun array(): Array[U8] iso^
 
-primitive HTTPResponses // TODO: better naming
+primitive Responses // TODO: better naming
   """
-  The entry-point into building HTTPResponses.
+  The entry-point into building Responses.
   """
-  fun builder(version: HTTPVersion = HTTP11): ResponseBuilder =>
+  fun builder(version: Version = HTTP11): ResponseBuilder =>
     """
     Official way to get a reusable [ResponseBuilder](http-ResponseBuilder.md)
     to build your responses efficiently.
@@ -40,12 +40,12 @@ interface ResponseBuilder
 
   Use [ResponseBuilderBody.build()](http-ResponseBuilderBody.md#build) to finally build the
   response into a [ByteSeqIter](builtin-ByteSeqIter.md),
-  taylored for use with [HTTPSession.send_raw()](http-HTTPSession.md#send_raw).
+  taylored for use with [Session.send_raw()](http-Session.md#send_raw).
 
   Example usage:
 
   ```pony
-  let builder: ResponseBuilder = HTTPResponses.builder()
+  let builder: ResponseBuilder = Responses.builder()
   builder.set_status(StatusOK)
          .add_header("Content-Length", "4")
          .add_header("Content-Type", "text/plain; charset=UTF-8")
@@ -96,7 +96,7 @@ class iso _FullResponseBuilder
 
   This instance is `iso`, so you can safely send it around amongst your actors.
   """
-  let _version: HTTPVersion
+  let _version: Version
   let _empty_placeholder: Array[U8] val = recover val _empty_placeholder.create(0) end
   let _crlf: Array[U8] val = [as U8: '\r'; '\n']
   let _header_sep: Array[U8] val = [as U8: ':'; ' ']
@@ -106,7 +106,7 @@ class iso _FullResponseBuilder
   var _transfer_coding: (Chunked | None)
   var _needs_reset: Bool = false
 
-  new iso _create(version: HTTPVersion = HTTP11) =>
+  new iso _create(version: Version = HTTP11) =>
     _version = version
     _array = (recover iso Array[U8].create(128) end)
       .>append(_version.to_bytes())
@@ -220,27 +220,27 @@ class iso _FullResponseBuilder
 
 // TODO: make internal state a ByteArrays instance and only keep track of
 // indices pointing to values
-class val BuildableHTTPResponse is (HTTPResponse & ByteSeqIter)
+class val BuildableResponse is (Response & ByteSeqIter)
   """
   Build your own HTTP Responses (minus the body) and turn them into immutable
   things to send around.
 
   This class can be serialized in the following ways:
 
-  * to Array[U8]: BuildableHTTPResponse.array()
-  * to ByteArrays: BuildableHTTPResponse.to_bytes()
+  * to Array[U8]: BuildableResponse.array()
+  * to ByteArrays: BuildableResponse.to_bytes()
 
   or by using it as a ByteSeqIter.
 
-  This class exists if you want to use the verbose API of [HTTPSession](http-HTTPSession.md)
+  This class exists if you want to use the verbose API of [Session](http-Session.md)
   and brings lots of convenience, like getters and setters for all common properties.
 
   If you are looking for a more efficient way to build responses, use a [ResponseBuilder](http-ResponseBuilder.md)
-  as it is returned from [HTTPResponses.builder()](http-HTTPResponses.md#builder), this class is not introspectable
+  as it is returned from [Responses.builder()](http-Responses.md#builder), this class is not introspectable
   and only allows adding properties the way they are put on the serialized form in the request. E.g. you must first
   set the status and then the headers, not the other way around. But it makes for a more efficient API.
   """
-  var _version: HTTPVersion
+  var _version: Version
   var _status: Status
   embed _headers: Headers = _headers.create()
   var _transfer_coding: (Chunked | None)
@@ -248,7 +248,7 @@ class val BuildableHTTPResponse is (HTTPResponse & ByteSeqIter)
 
   new trn create(
     status': Status = StatusOK,
-    version': HTTPVersion = HTTP11,
+    version': Version = HTTP11,
     transfer_coding': (Chunked | None) = None,
     content_length': (USize | None) = None) =>
     _status = status'
@@ -256,35 +256,35 @@ class val BuildableHTTPResponse is (HTTPResponse & ByteSeqIter)
     _transfer_coding = transfer_coding'
     _content_length = content_length'
 
-  fun version(): HTTPVersion => _version
-  fun ref set_version(v: HTTPVersion): BuildableHTTPResponse ref =>
+  fun version(): Version => _version
+  fun ref set_version(v: Version): BuildableResponse ref =>
     _version = v
     this
 
   fun status(): Status => _status
-  fun ref set_status(s: Status): BuildableHTTPResponse ref =>
+  fun ref set_status(s: Status): BuildableResponse ref =>
     _status = s
     this
 
   fun header(name: String): (String | None) => _headers.get(name)
   fun headers(): Iterator[Header] => _headers.values()
-  fun ref add_header(name: String, value: String): BuildableHTTPResponse ref =>
+  fun ref add_header(name: String, value: String): BuildableResponse ref =>
     _headers.add(name, value)
     this
-  fun ref set_header(name: String, value: String): BuildableHTTPResponse ref =>
+  fun ref set_header(name: String, value: String): BuildableResponse ref =>
     _headers.set(name, value)
     this
-  fun ref clear_headers(): BuildableHTTPResponse ref =>
+  fun ref clear_headers(): BuildableResponse ref =>
     _headers.clear()
     this
 
   fun transfer_coding(): (Chunked | None) => _transfer_coding
-  fun ref set_transfer_coding(c: (Chunked | None)): BuildableHTTPResponse ref =>
+  fun ref set_transfer_coding(c: (Chunked | None)): BuildableResponse ref =>
     _transfer_coding = c
     this
 
   fun content_length(): (USize | None) => _content_length
-  fun ref set_content_length(cl: (USize | None)): BuildableHTTPResponse ref =>
+  fun ref set_content_length(cl: (USize | None)): BuildableResponse ref =>
     _content_length = cl
     match cl
     | let clu: USize =>

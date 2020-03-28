@@ -54,12 +54,12 @@ primitive Chunked
 interface tag HTTP11RequestHandler
   """
   Downstream actor that is notified of parse results,
-  be it a valid `HTTPRequest` containing method, URL, headers and other metadata,
+  be it a valid `Request` containing method, URL, headers and other metadata,
   or a specific `RequestParseError`.
   """
-  be _receive_start(request: HTTPRequest val, request_id: RequestID)
+  be _receive_start(request: Request val, request_id: RequestID)
     """
-    Receive parsed HTTPRequest
+    Receive parsed Request
     """
 
   be _receive_chunk(data: Array[U8] val, request_id: RequestID)
@@ -77,7 +77,7 @@ class HTTP11RequestParser
   var _state: _ParserState = _ExpectRequestLine
   var _buffer: ByteArrays = ByteArrays.create()
   var _request_counter: RequestID = 0
-  var _current_request: BuildableHTTPRequest trn = BuildableHTTPRequest.create()
+  var _current_request: BuildableRequest trn = BuildableRequest.create()
 
   var _expected_body_length: USize = 0
   var _persistent_connection: Bool = true
@@ -154,10 +154,10 @@ class HTTP11RequestParser
     match _buffer.find(" ", start)
     | (true, let method_end_idx: USize) =>
       let raw_method = _buffer.string(start, method_end_idx)
-      let method = HTTPMethods.parse(raw_method)
+      let method = Methods.parse(raw_method)
       match method
       | None => return UnknownMethod
-      | let m: HTTPMethod =>
+      | let m: Method =>
         _current_request.set_method(m)
       end
 
@@ -258,7 +258,7 @@ class HTTP11RequestParser
     // send it down to the handler
     _handler._receive_start(
       // resetting the request here already, to pass down a trn
-      _current_request = BuildableHTTPRequest.create(),
+      _current_request = BuildableRequest.create(),
       _request_counter
     )
 
@@ -470,7 +470,7 @@ class HTTP11RequestParser
     reset_request: Bool = false)
   =>
     if reset_request then
-      _current_request = BuildableHTTPRequest.create()
+      _current_request = BuildableRequest.create()
     end
     _request_counter = _request_counter + 1
     _state = _ExpectRequestLine

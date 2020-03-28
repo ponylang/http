@@ -28,30 +28,30 @@ actor Main
     end
 
     // Start the top server control actor.
-    let server = HTTPServer(
+    let server = Server(
       auth,
       LoggingServerNotify(env),
-      // HandlerFactory - used to instantiate the session-scoped HTTPHandler
+      // HandlerFactory - used to instantiate the session-scoped Handler
       {(session) =>
-        SyncHTTPHandlerWrapper(
+        SyncHandlerWrapper(
           session,
-          object ref is SyncHTTPHandler
+          object ref is SyncHandler
 
 
-            var builder: (ResponseBuilder | None) = HTTPResponses.builder()
+            var builder: (ResponseBuilder | None) = Responses.builder()
               """
               response builder - reused within a session
               """
 
-            fun ref apply(request: HTTPRequest val, body: (ByteArrays | None)): ByteSeqIter ? =>
+            fun ref apply(request: Request val, body: (ByteArrays | None)): ByteSeqIter ? =>
               """
               Handle a new full HTTP Request including body.
-              Return a ByteSeqIter representing the HTTPResponse.
+              Return a ByteSeqIter representing the Response.
 
               This is made easy using the ResponseBuilder returned from
 
               ```pony
-              HTTPResponses.builder()
+              Responses.builder()
               ```
 
               This handler allows for failing, but must return a result synchronously.
@@ -59,22 +59,22 @@ actor Main
               but the response ust be constructed when this function returns.
               In return the API is much simpler that the threefold cascade of receiving requests:
 
-                * HTTPHandler.apply(request, request_id)
-                * HTTPHandler.chunk(data, request_id)
-                * HTTPHandler.finished(request_id)
+                * Handler.apply(request, request_id)
+                * Handler.chunk(data, request_id)
+                * Handler.finished(request_id)
 
               And the (at maximum) threefold API to send responses:
 
-                * HTTPSession.send_start(response, request_id)
-                * HTTPSession.send_chunk(data, request_id)
-                * HTTPSession.send_finished(request_id)
+                * Session.send_start(response, request_id)
+                * Session.send_chunk(data, request_id)
+                * Session.send_finished(request_id)
 
               The API is much simpler, but the request body is aggregated into a `ByteArrays` instance,
               which is suboptimal for big requests and might not perform as well as the more verbose API listed above,
               especially for streaming contexts.
               """
 
-              // serialize HTTPRequest for sending it back
+              // serialize Request for sending it back
               // TODO: have a good api for that on the request class itself
               let array: Array[U8] trn = recover trn Array[U8](128) end
               array.>append(request.method().repr())
@@ -123,7 +123,7 @@ actor Main
           end
         )
       }
-      where config = HTTPServerConfig(
+      where config = ServerConfig(
         where host' = host,
               port' = port,
               max_concurrent_connections' = limit)
@@ -146,7 +146,7 @@ class LoggingServerNotify is ServerNotify
   new iso create(env: Env) =>
     _env = env
 
-  fun ref listening(server: HTTPServer ref) =>
+  fun ref listening(server: Server ref) =>
     try
       (let host, let service) = server.local_address().name()?
       _env.err.print("connected: " + host + ":" + service)
@@ -156,10 +156,10 @@ class LoggingServerNotify is ServerNotify
       _env.exitcode(1)
     end
 
-  fun ref not_listening(server: HTTPServer ref) =>
+  fun ref not_listening(server: Server ref) =>
     _env.err.print("Failed to listen.")
     _env.exitcode(1)
 
-  fun ref closed(server: HTTPServer ref) =>
+  fun ref closed(server: Server ref) =>
     _env.err.print("Shutdown.")
 

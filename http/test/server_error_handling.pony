@@ -13,9 +13,9 @@ class val _ServerConnectionClosedHandlerFactory is HandlerFactory
   new val create(h: TestHelper) =>
     _h = h
 
-  fun apply(session: HTTPSession): HTTPHandler ref^ =>
-    object is HTTPHandler
-      fun ref apply(res: HTTPRequest val, request_id: RequestID) =>
+  fun apply(session: Session): Handler ref^ =>
+    object is Handler
+      fun ref apply(res: Request val, request_id: RequestID) =>
         _h.log("received request")
       fun ref closed() =>
         _h.complete_action("server failed with ConnectionClosed")
@@ -29,11 +29,11 @@ class iso ServerConnectionClosedTest is UnitTest
     h.expect_action("client connected")
     h.expect_action("server failed with ConnectionClosed")
 
-    let server = HTTPServer(
+    let server = Server(
       h.env.root as AmbientAuth,
       object iso is ServerNotify
         let _h: TestHelper = h
-        fun ref listening(server: HTTPServer ref) =>
+        fun ref listening(server: Server ref) =>
           _h.complete_action("server listening")
 
           try
@@ -65,13 +65,13 @@ class iso ServerConnectionClosedTest is UnitTest
             _h.fail("error starting client")
           end
 
-        fun ref not_listening(server: HTTPServer ref) =>
+        fun ref not_listening(server: Server ref) =>
           _h.fail_action("server listening")
 
-        fun ref closed(server: HTTPServer ref) =>
+        fun ref closed(server: Server ref) =>
           _h.log("server stopped listening")
       end,
       _ServerConnectionClosedHandlerFactory(h)
-      where config = HTTPServerConfig(where host'="127.0.0.1")
+      where config = ServerConfig(where host'="127.0.0.1")
     )
     h.dispose_when_done(server)

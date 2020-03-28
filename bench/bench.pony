@@ -14,13 +14,13 @@ actor Main is BenchmarkList
     bench(_MultipartFileUploadBenchmark)
     bench(_ChunkedRequestBenchmark)
 
-actor _TestHTTPSession is HTTPSession
+actor _TestSession is Session
   var _c: (AsyncBenchContinue | None) = None
 
   be set_continue(c: AsyncBenchContinue) =>
     _c = c
 
-  be _receive_start(request: HTTPRequest val, request_id: RequestID) =>
+  be _receive_start(request: Request val, request_id: RequestID) =>
     Debug("_receive_start")
 
   be _receive_chunk(data: Array[U8] val, request_id: RequestID) =>
@@ -35,7 +35,7 @@ actor _TestHTTPSession is HTTPSession
   be dispose() =>
     Debug("dispose")
 
-  be send_start(response: HTTPResponse val, request_id: RequestID) => None
+  be send_start(response: Response val, request_id: RequestID) => None
   be send_chunk(data: ByteSeq val, request_id: RequestID) => None
   be send_cancel(request_id: RequestID) => None
   be send_finished(request_id: RequestID) => None
@@ -46,7 +46,7 @@ actor _TestHTTPSession is HTTPSession
 
 class _ParseRequestBenchmark
   let _data: Array[String]
-  let _session: _TestHTTPSession = _TestHTTPSession.create()
+  let _session: _TestSession = _TestSession.create()
   let _parser: HTTP11RequestParser = HTTP11RequestParser.create(_session)
 
   new create(data: Array[String]) =>

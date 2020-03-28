@@ -1,6 +1,6 @@
 use "valbytes"
 
-interface tag HTTPSession
+interface tag Session
   """
   An HTTP Session is the external API to the communication link
   between client and server.
@@ -9,18 +9,18 @@ interface tag HTTPSession
   An HTTP Session lives as long as the underlying TCP connection and receives
   request data from it and writes response data to it.
 
-  Receiving data and parsing this data into [HTTPRequest](http-HTTPRequest.md)s is happening on
-  the TCPConnection actor. The [HTTPSession](http-HTTPSession.md) actor is started when a new TCPConnection
+  Receiving data and parsing this data into [Request](http-Request.md)s is happening on
+  the TCPConnection actor. The [Session](http-Session.md) actor is started when a new TCPConnection
   is accepted, and shut down, when the connection is closed.
 
   ### Receiving a Request
 
   As part of the Request-Response handling internal to this HTTP library,
-  a HTTPSession is instantiated that forwards requests to a [HTTPHandler](http-HTTPHandler.md),
-  to actual application code, which in turn sends Responses back to the HTTPSession instance
-  it was instantiated with (See [HTTPHandlerFactory](http-HTTPHandlerFactory.md).
+  a Session is instantiated that forwards requests to a [Handler](http-Handler.md),
+  to actual application code, which in turn sends Responses back to the Session instance
+  it was instantiated with (See [HandlerFactory](http-HandlerFactory.md).
 
-  See [HTTPHandler](http-HTTPHandler.md) on how requests are received by application code.
+  See [Handler](http-Handler.md) on how requests are received by application code.
 
   ### Sending a Response
 
@@ -29,15 +29,15 @@ interface tag HTTPSession
   ////////////////////////
   // API THAT CALLS YOU //
   ////////////////////////
-  be _receive_start(request: HTTPRequest val, request_id: RequestID) =>
+  be _receive_start(request: Request val, request_id: RequestID) =>
     """
     Start receiving a request.
 
     This will be called when all headers of an incoming request have been parsed.
-    [HTTPRequest](http-HTTPRequest.md) contains all information extracted from
+    [Request](http-Request.md) contains all information extracted from
     these parts.
 
-    The [RequestID](http-RequestID.md) is passed in order for the HTTPSession
+    The [RequestID](http-RequestID.md) is passed in order for the Session
     implementation to maintain the correct request order in case of HTTP pipelining.
     Response handling can happen asynchronously at arbitrary times, so the RequestID
     helps us to get the responses back into the right order, no matter how they
@@ -62,7 +62,7 @@ interface tag HTTPSession
 
   be _receive_failed(parse_error: RequestParseError, request_id: RequestID) =>
     """
-    Nofitcation if the request parser failed to parse incoming data as HTTPRequest.
+    Nofitcation if the request parser failed to parse incoming data as Request.
 
     Ignored by default.
     """
@@ -74,7 +74,7 @@ interface tag HTTPSession
 
 
   // verbose api
-  be send_start(respone: HTTPResponse val, request_id: RequestID) =>
+  be send_start(respone: Response val, request_id: RequestID) =>
     """
     ### Verbose API
 
@@ -82,9 +82,9 @@ interface tag HTTPSession
 
     Sending a response via the verbose API needs to be done in 2 or more steps:
 
-    * HTTPSession.send_start    - exactly once    - submit status and headers
-    * HTTPSession.send_chunk    - 0 or more times - submit body
-    * HTTPSession.send_finished - exactly once    - clean up resources
+    * Session.send_start    - exactly once    - submit status and headers
+    * Session.send_chunk    - 0 or more times - submit body
+    * Session.send_finished - exactly once    - clean up resources
     """
     None
 
@@ -95,7 +95,7 @@ interface tag HTTPSession
     Send a piece of body data of the request identified by `request_id`.
     This might be the whole body or just a piece of it.
 
-    Notify the HTTPSession that the body has been fully sent, by calling `HTTPSession.send_finished`.
+    Notify the Session that the body has been fully sent, by calling `Session.send_finished`.
     """
     None
 
@@ -117,28 +117,28 @@ interface tag HTTPSession
   be send_cancel(request_id: RequestID) =>
     """
     Cancel sending an in-flight response.
-    As the HTTPSession will be invalid afterwards, as the response might not have been sent completely,
-    it is best to close the session afterwards using `HTTPSession.dispose()`.
+    As the Session will be invalid afterwards, as the response might not have been sent completely,
+    it is best to close the session afterwards using `Session.dispose()`.
     """
     None
 
   // simple api
-  be send_no_body(response: HTTPResponse val, request_id: RequestID) =>
+  be send_no_body(response: Response val, request_id: RequestID) =>
     """
     ### Simple API
 
-    Send a bodyless HTTPResponse in one call.
+    Send a bodyless Response in one call.
 
     This call will do all the work of sending the response and cleaning up resources.
-    No need to call `HTTPSession.send_finished()` anymore for this request.
+    No need to call `Session.send_finished()` anymore for this request.
     """
     None
 
-  be send(response: HTTPResponse val, body: ByteArrays, request_id: RequestID) =>
+  be send(response: Response val, body: ByteArrays, request_id: RequestID) =>
     """
     ### Simple API
 
-    Send an HTTPResponse with a body in one call.
+    Send an Response with a body in one call.
 
     The body must be a [ByteArrays](valbytes-ByteArrays.md) instance.
 
@@ -156,7 +156,7 @@ interface tag HTTPSession
     ```
 
     This call will do all the work of sending the response and cleaning up resources.
-    No need to call `HTTPSession.send_finished()` anymore for this request.
+    No need to call `Session.send_finished()` anymore for this request.
     """
     None
 
@@ -165,12 +165,12 @@ interface tag HTTPSession
     """
     ### Optimized raw API
 
-    Send raw bytes to the HTTPSession in form of a [ByteSeqIter](builtin-ByteSeqIter.md).
+    Send raw bytes to the Session in form of a [ByteSeqIter](builtin-ByteSeqIter.md).
 
     These bytes may or may not include the response body.
-    You can use `HTTPSession.send_chunk()` to send the response body piece by piece.
+    You can use `Session.send_chunk()` to send the response body piece by piece.
 
-    To finish sending the response, it is required to call `HTTPSession.send_finished()`
+    To finish sending the response, it is required to call `Session.send_finished()`
     to wrap things up, otherwise the server might misbehave.
 
     This API uses the [TCPConnection.writev](net-TCPConnection.md#writev) method to
@@ -183,13 +183,13 @@ interface tag HTTPSession
     Example:
 
     ```pony
-    class MyHTTPHandler is HTTPHandler
-      let _session: HTTPSession
+    class MyHandler is Handler
+      let _session: Session
 
-      new create(session: HTTPSession) =>
+      new create(session: Session) =>
         _session = session
 
-      fun ref apply(request: HTTPRequest val, request_id: RequestID): Any =>
+      fun ref apply(request: Request val, request_id: RequestID): Any =>
         let body =
           match request.content_length()
           | let cl: USize =>
@@ -201,7 +201,7 @@ interface tag HTTPSession
           end
 
         _session.send_raw(
-          HTTPResponses.builder()
+          Responses.builder()
             .set_status(StatusOK)
             .add_header("Content-Type", "text/plain; charset=UTF-8")
             .add_header("Content-Length", body.size().string())

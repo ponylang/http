@@ -19,9 +19,9 @@ primitive RequestParserTests is TestList
 
           XX"""),
         {
-          (h: TestHelper, request: HTTPRequest, chunks: ByteArrays)? =>
-            h.assert_eq[HTTPMethod](GET, request.method())
-            h.assert_eq[HTTPVersion](HTTP11, request.version())
+          (h: TestHelper, request: Request, chunks: ByteArrays)? =>
+            h.assert_eq[Method](GET, request.method())
+            h.assert_eq[Version](HTTP11, request.version())
             h.assert_eq[String]("/url", request.uri().string())
             h.assert_eq[String]("Close", request.header("Connection") as String)
             h.assert_eq[USize](2, request.content_length() as USize)
@@ -41,9 +41,9 @@ primitive RequestParserTests is TestList
           """
         ),
         {
-          (h: TestHelper, request: HTTPRequest, chunks: ByteArrays) =>
-            h.assert_eq[HTTPMethod](GET, request.method())
-            h.assert_eq[HTTPVersion](HTTP11, request.version())
+          (h: TestHelper, request: Request, chunks: ByteArrays) =>
+            h.assert_eq[Method](GET, request.method())
+            h.assert_eq[Version](HTTP11, request.version())
             h.assert_eq[String]("/", request.uri().string())
             h.assert_false(request.headers().has_next())
             h.assert_false(request.has_body())
@@ -63,9 +63,9 @@ primitive RequestParserTests is TestList
           """
         ),
         {
-          (h: TestHelper, request: HTTPRequest, chunks: ByteArrays)? =>
-            h.assert_eq[HTTPMethod](HEAD, request.method())
-            h.assert_eq[HTTPVersion](HTTP11, request.version())
+          (h: TestHelper, request: Request, chunks: ByteArrays)? =>
+            h.assert_eq[Method](HEAD, request.method())
+            h.assert_eq[Version](HTTP11, request.version())
             h.assert_eq[String]("/upload?param=value", request.uri().string())
             h.assert_eq[String]("upload.org", request.header("Host") as String)
             h.assert_eq[String]("ponytest/0.33.1", request.header("user-agent") as String)
@@ -216,7 +216,7 @@ primitive _R
     )
 
 actor _MockRequestHandler is HTTP11RequestHandler
-  be _receive_start(request: HTTPRequest val, request_id: RequestID) =>
+  be _receive_start(request: Request val, request_id: RequestID) =>
     Debug("_receive_start: " + request_id.string())
 
   be _receive_chunk(data: Array[U8] val, request_id: RequestID) =>
@@ -232,20 +232,20 @@ primitive ParserTestBuilder
   fun parse_success(
     name': String,
     request': String,
-    callback: {(TestHelper, HTTPRequest val, ByteArrays)? } val)
+    callback: {(TestHelper, Request val, ByteArrays)? } val)
     : UnitTest iso^
   =>
     object iso is UnitTest
-      let cb: {(TestHelper, HTTPRequest val, ByteArrays)? } val = callback
+      let cb: {(TestHelper, Request val, ByteArrays)? } val = callback
       let req_str: String = request'
       fun name(): String => "request_parser/success/" + name'
       fun apply(h: TestHelper) =>
         h.long_test(1_000_000_000)
         let parser = HTTP11RequestParser(
           object is HTTP11RequestHandler
-            var req: (HTTPRequest | None) = None
+            var req: (Request | None) = None
             var chunks: ByteArrays = ByteArrays
-            be _receive_start(request: HTTPRequest val, request_id: RequestID) =>
+            be _receive_start(request: Request val, request_id: RequestID) =>
               h.log("received request")
               req = request
 
@@ -256,7 +256,7 @@ primitive ParserTestBuilder
             be _receive_finished(request_id: RequestID) =>
               h.log("received finished")
               try
-                cb(h, req as HTTPRequest, chunks)?
+                cb(h, req as Request, chunks)?
                 h.complete(true)
               else
                 h.complete(false)
@@ -281,7 +281,7 @@ primitive ParserTestBuilder
       fun apply(h: TestHelper) =>
         let parser = HTTP11RequestParser(
           object is HTTP11RequestHandler
-            be _receive_start(request: HTTPRequest val, request_id: RequestID) =>
+            be _receive_start(request: Request val, request_id: RequestID) =>
               h.log("receive_start")
             be _receive_chunk(data: Array[U8] val, request_id: RequestID) =>
               h.log("received chunk of size: " + data.size().string())
@@ -303,7 +303,7 @@ class iso NoDataTest is UnitTest
   fun apply(h: TestHelper) =>
     let parser = HTTP11RequestParser(
       object is HTTP11RequestHandler
-        be _receive_start(request: HTTPRequest val, request_id: RequestID) =>
+        be _receive_start(request: Request val, request_id: RequestID) =>
           h.fail("request delivered from no data.")
         be _receive_chunk(data: Array[U8] val, request_id: RequestID) =>
           h.fail("chunk delivered from no data.")
@@ -320,7 +320,7 @@ class iso UnknownMethodTest is UnitTest
   fun apply(h: TestHelper) =>
     let parser = HTTP11RequestParser(
       object is HTTP11RequestHandler
-        be _receive_start(request: HTTPRequest val, request_id: RequestID) =>
+        be _receive_start(request: Request val, request_id: RequestID) =>
           h.fail("request delivered from no data.")
         be _receive_chunk(data: Array[U8] val, request_id: RequestID) =>
           h.fail("chunk delivered from no data.")

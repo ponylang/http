@@ -10,7 +10,7 @@ class _ServerConnHandler is TCPConnectionNotify
   """
   let _handlermaker: HandlerFactory val
   let _registry: _SessionRegistry tag
-  let _config: HTTPServerConfig
+  let _config: ServerConfig
 
   var _parser: (HTTP11RequestParser | None) = None
   var _session: (_ServerConnection | None) = None
@@ -18,7 +18,7 @@ class _ServerConnHandler is TCPConnectionNotify
   new iso create(
     handlermaker: HandlerFactory val,
     registry: _SessionRegistry,
-    config: HTTPServerConfig)
+    config: ServerConfig)
     =>
     """
     Initialize the context for parsing incoming HTTP requests.
@@ -45,8 +45,8 @@ class _ServerConnHandler is TCPConnectionNotify
     : Bool
   =>
     """
-    Pass chunks of data to the `HTTPParser` for this session. It will
-    then pass completed information on the the `HTTPSession`.
+    Pass chunks of data to the `HTTP11RequestParser` for this session. It will
+    then pass completed information on the `Session`.
     """
     // TODO: inactivity timer
     // add a "reset" API to Timers

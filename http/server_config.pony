@@ -1,7 +1,7 @@
 use "time"
 use "json"
 
-class val HTTPServerConfig
+class val ServerConfig
 
   let host: String
     """

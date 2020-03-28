@@ -27,11 +27,11 @@ actor Main
     end
 
     // Start the top server control actor.
-    let server = HTTPServer(
+    let server = Server(
       auth,
       LoggingServerNotify(env),  // notify for server lifecycle events
       BackendMaker.create(env)   // factory for session-based application backend
-      where config = HTTPServerConfig( // configuration of HTTPServer
+      where config = ServerConfig( // configuration of Server
         where host' = host,
               port' = port,
               max_concurrent_connections' = limit)
@@ -55,16 +55,16 @@ actor Main
 class LoggingServerNotify is ServerNotify
   """
   Notification class that is notified about
-  important lifecycle events for the HTTPServer
+  important lifecycle events for the Server
   """
   let _env: Env
 
   new iso create(env: Env) =>
     _env = env
 
-  fun ref listening(server: HTTPServer ref) =>
+  fun ref listening(server: Server ref) =>
     """
-    Called when the HTTPServer starts listening on its host:port pair via TCP.
+    Called when the Server starts listening on its host:port pair via TCP.
     """
     try
       (let host, let service) = server.local_address().name()?
@@ -75,16 +75,16 @@ class LoggingServerNotify is ServerNotify
       server.dispose()
     end
 
-  fun ref not_listening(server: HTTPServer ref) =>
+  fun ref not_listening(server: Server ref) =>
     """
-    Called when the HTTPServer was not able to start listening on its host:port pair via TCP.
+    Called when the Server was not able to start listening on its host:port pair via TCP.
     """
     _env.err.print("Failed to listen.")
     _env.exitcode(1)
 
-  fun ref closed(server: HTTPServer ref) =>
+  fun ref closed(server: Server ref) =>
     """
-    Called when the HTTPServer is closed.
+    Called when the Server is closed.
     """
     _env.err.print("Shutdown.")
 
@@ -97,10 +97,10 @@ class BackendMaker is HandlerFactory
   new val create(env: Env) =>
     _env = env
 
-  fun apply(session: HTTPSession): HTTPHandler^ =>
+  fun apply(session: Session): Handler^ =>
     BackendHandler.create(_env, session)
 
-class BackendHandler is HTTPHandler
+class BackendHandler is Handler
   """
   Backend application instance for a single HTTP session.
 
@@ -109,19 +109,19 @@ class BackendHandler is HTTPHandler
   (to be exact it is 2 as the TCPConnection is also an actor).
   """
   let _env: Env
-  let _session: HTTPSession
+  let _session: Session
 
   var _response_builder: ResponseBuilder
   var _body_builder: (ResponseBuilderBody | None) = None
   var _sent: Bool = false
   var _chunked: (Chunked | None) = None
 
-  new ref create(env: Env, session: HTTPSession) =>
+  new ref create(env: Env, session: Session) =>
     _env = env
     _session = session
-    _response_builder = HTTPResponses.builder()
+    _response_builder = Responses.builder()
 
-  fun ref apply(request: HTTPRequest val, request_id: RequestID) =>
+  fun ref apply(request: Request val, request_id: RequestID) =>
     """
     Start processing a request.
 
@@ -180,7 +180,7 @@ class BackendHandler is HTTPHandler
       match (_body_builder = None)
       | let builder: ResponseBuilderBody =>
         // already send the response if request has no body
-        // use optimized HTTPSession API to send out all available chunks at
+        // use optimized Session API to send out all available chunks at
         // once using writev on the socket
         _session.send_raw(builder.build(), request_id)
         _response_builder = builder.reset() // reset the builder for later reuse within this session
@@ -210,7 +210,7 @@ class BackendHandler is HTTPHandler
     Called when the last chunk has been handled and the full request has been received.
 
     Here we send out the full response, if the request had a body we needed to process first (see `fun chunk` above).
-    We call `HTTPSession.send_finished(request_id)` to let the HTTP machinery finish sending and clena up resources
+    We call `Session.send_finished(request_id)` to let the HTTP machinery finish sending and clena up resources
     connected to this request.
     """
     match (_body_builder = None)

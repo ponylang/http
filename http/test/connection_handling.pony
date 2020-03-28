@@ -15,14 +15,14 @@ class val _ClosedTestHandlerFactory is HandlerFactory
   new val create(h: TestHelper) =>
     _h = h
 
-  fun apply(session: HTTPSession): HTTPHandler ref^ =>
-    object ref is HTTPHandler
-      fun ref apply(request: HTTPRequest val, request_id: RequestID) =>
+  fun apply(session: Session): Handler ref^ =>
+    object ref is Handler
+      fun ref apply(request: Request val, request_id: RequestID) =>
         _h.complete_action("request-received")
 
         // send response
         session.send_raw(
-          HTTPResponses.builder()
+          Responses.builder()
             .set_status(StatusOK)
             .add_header("Content-Length", "0")
             .finish_headers()
@@ -47,10 +47,10 @@ class iso ConnectionTimeoutTest is UnitTest
     h.expect_action("request-received")
     h.expect_action("connection-closed")
     h.dispose_when_done(
-      HTTPServer(
+      Server(
         h.env.root as TCPListenerAuth,
         object iso is ServerNotify
-          fun ref listening(server: HTTPServer ref) =>
+          fun ref listening(server: Server ref) =>
             try
               (let host, let port) = server.local_address().name()?
               h.log("listening on " + host + ":" + port)
@@ -66,11 +66,11 @@ class iso ConnectionTimeoutTest is UnitTest
                 port
               )
             end
-          fun ref closed(server: HTTPServer ref) =>
+          fun ref closed(server: Server ref) =>
             h.fail("closed")
         end,
         _ClosedTestHandlerFactory(h),
-        HTTPServerConfig(
+        ServerConfig(
           where connection_timeout' = 1,
                 timeout_heartbeat_interval' = 500
         )
@@ -90,10 +90,10 @@ class iso ConnectionCloseHeaderTest is UnitTest
     h.expect_action("request-received")
     h.expect_action("connection-closed")
     h.dispose_when_done(
-      HTTPServer(
+      Server(
         h.env.root as TCPListenerAuth,
         object iso is ServerNotify
-          fun ref listening(server: HTTPServer ref) =>
+          fun ref listening(server: Server ref) =>
             try
               (let host, let port) = server.local_address().name()?
               h.log("listening on " + host + ":" + port)
@@ -109,11 +109,11 @@ class iso ConnectionCloseHeaderTest is UnitTest
                 port
               )
             end
-          fun ref closed(server: HTTPServer ref) =>
+          fun ref closed(server: Server ref) =>
             h.fail("closed")
         end,
         _ClosedTestHandlerFactory(h),
-        HTTPServerConfig()
+        ServerConfig()
       )
     )
 
@@ -129,10 +129,10 @@ class iso ConnectionHTTP10Test is UnitTest
     h.expect_action("request-received")
     h.expect_action("connection-closed")
     h.dispose_when_done(
-      HTTPServer(
+      Server(
         h.env.root as TCPListenerAuth,
         object iso is ServerNotify
-          fun ref listening(server: HTTPServer ref) =>
+          fun ref listening(server: Server ref) =>
             try
               (let host, let port) = server.local_address().name()?
               h.log("listening on " + host + ":" + port)
@@ -148,11 +148,11 @@ class iso ConnectionHTTP10Test is UnitTest
                 port
               )
             end
-          fun ref closed(server: HTTPServer ref) =>
+          fun ref closed(server: Server ref) =>
             h.fail("closed")
         end,
         _ClosedTestHandlerFactory(h),
-        HTTPServerConfig()
+        ServerConfig()
       )
     )
 

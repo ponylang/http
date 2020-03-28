@@ -1,36 +1,36 @@
-interface HTTPHandler
+interface Handler
   """
   This is the interface through which HTTP requests are delivered *to*
   application code and through which HTTP responses are sent to the underlying connection.
 
-  Instances of a HTTPHandler are executed in the context of the `HTTPSession` actor so most of them should be
+  Instances of a Handler are executed in the context of the `Session` actor so most of them should be
   passing data on to a processing actor.
 
-  Each `HTTPSession` must have a unique instance of the handler. The
-  application code does not necessarily know when an `HTTPSession` is created,
+  Each `Session` must have a unique instance of the handler. The
+  application code does not necessarily know when an `Session` is created,
   so the application must provide an instance of `HandlerFactory` that
   will be called at the appropriate time.
 
   ### Receiving Requests
 
-  When an [HTTPRequest](http-HTTPRequest.md) is received on an [HTTPSession](http-HTTPSession.md) actor,
-  the corresponding [HTTPHandler.apply](http-HTTPHandler.md#apply) method is called
-  with the request and a [RequestID](http-RequestID). The [HTTPRequest](http-HTTPRequest.md)
+  When an [Request](http-Request.md) is received on an [Session](http-Session.md) actor,
+  the corresponding [Handler.apply](http-Handler.md#apply) method is called
+  with the request and a [RequestID](http-RequestID). The [Request](http-Request.md)
   contains the information extracted from HTTP Headers and the Request Line, but it does not
-  contain any body data. It is sent to [HTTPHandler.apply](http-HTTPHandler.md#apply) before the body
+  contain any body data. It is sent to [Handler.apply](http-Handler.md#apply) before the body
   is fully received.
 
-  If the request has a body, its raw data is sent to the [HTTPHandler.chunk](http-HTTPHandler.md#chunk) method
+  If the request has a body, its raw data is sent to the [Handler.chunk](http-Handler.md#chunk) method
   together with the [RequestID](http-RequestID.md) of the request it belongs to.
 
-  Once all body data is received, [HTTPHandler.finished](http-HTTPHandler.md#finished) is called with the
+  Once all body data is received, [Handler.finished](http-Handler.md#finished) is called with the
   [RequestID](http-RequestID.md) of the request it belongs to. Now is the time to act on the full body data,
   if it hasn't been processed yet.
 
   The [RequestID](http-Requestid.md) must be kept around for sending the response for this request.
   This way the session can ensure, all responses are sent in the same order as they have been received,
   which is required for HTTP pipelining. This way processing responses can be passed to other actors and
-  processing can take arbitrary times. The [HTTPSession](http-HTTPSession.md) will take care of sending
+  processing can take arbitrary times. The [Session](http-Session.md) will take care of sending
   the responses in the correct order.
 
   It is guaranteed that the call sequence is always:
@@ -40,25 +40,25 @@ interface HTTPHandler
   - exactly once:       `finished(requestid_n)`
 
   And so on for `requestid_(n + 1)`. Only after `finished` has been called for a
-  `RequestID`, the next request will be received by the HTTPHandler instance, there will
+  `RequestID`, the next request will be received by the Handler instance, there will
   be no interleaving. So it is save to keep state for the given request in a Handler between calls to `apply`
   and `finished`.
 
   #### Failures and Cancelling
 
-  If a [HTTPSession](http-HTTPSession.md) experienced faulty requests, the [HTTPHandler](http-HTTPHandler.md)
-  is notified via [HTTPHandler.failed](http-HTTPHandler.md#failed).
+  If a [Session](http-Session.md) experienced faulty requests, the [Handler](http-Handler.md)
+  is notified via [Handler.failed](http-Handler.md#failed).
 
-  If the underlying connection to a [HTTPSession](http-HTTPSession.md) has been closed,
-  the [HTTPHandler](http-HTTPHandler.md) is notified via [HTTPHandler.closed](http-HTTPHandler.md#closed).
+  If the underlying connection to a [Session](http-Session.md) has been closed,
+  the [Handler](http-Handler.md) is notified via [Handler.closed](http-Handler.md#closed).
 
   ### Sending Responses
 
   A handler is instantiated using a [HandlerFactory](http-HandlerFactory.md), which passes an instance of
-  [HTTPSession](http-HTTPSession.md) to be used in constructing a handler.
+  [Session](http-Session.md) to be used in constructing a handler.
 
-  A HTTPSession is required to be able to send responses.
-  See the docs for [HTTPSession](http-HTTPSession.md) for ways to send responses.
+  A Session is required to be able to send responses.
+  See the docs for [Session](http-Session.md) for ways to send responses.
 
   Example Handler:
 
@@ -66,16 +66,16 @@ interface HTTPHandler
   use "http"
   use "valbytes"
 
-  class MyHTTPHandler is HTTPHandler
-    let _session: HTTPSession
+  class MyHandler is Handler
+    let _session: Session
 
     var _path: String = ""
     var _body: ByteArrays = ByteArrays
 
-    new create(session: HTTPSession) =>
+    new create(session: Session) =>
       _session = session
 
-    fun ref apply(request: HTTPRequest val, request_id: RequestID): Any =>
+    fun ref apply(request: Request val, request_id: RequestID): Any =>
       _path = request.uri().path
 
     fun ref chunk(data: ByteSeq val, request_id: RequestID) =>
@@ -83,7 +83,7 @@ interface HTTPHandler
 
     fun ref finished(request_id: RequestID) =>
       _session.send_raw(
-        HTTPResponses.builder()
+        Responses.builder()
           .set_status(StatusOk)
           .add_header("Content-Length", (_body.size() + _path.size() + 13).string())
           .add_header("Content-Type", "text/plain")
@@ -99,7 +99,7 @@ interface HTTPHandler
   ```
 
   """
-  fun ref apply(request: HTTPRequest val, request_id: RequestID): Any =>
+  fun ref apply(request: Request val, request_id: RequestID): Any =>
     """
     Notification of an incoming message.
 
@@ -110,7 +110,7 @@ interface HTTPHandler
   fun ref chunk(data: ByteSeq val, request_id: RequestID) =>
     """
     Notification of incoming body data. The body belongs to the most
-    recent `HTTPRequest` delivered by an `apply` notification.
+    recent `Request` delivered by an `apply` notification.
     """
 
   fun ref finished(request_id: RequestID) =>
@@ -156,39 +156,39 @@ interface HandlerFactory
   this interface.
 
   The `HandlerFactory.apply` method will be called when a new
-  `HTTPSession` is created, giving the application a chance to create
-  an instance of its own `HTTPHandler`. This happens on both
+  `Session` is created, giving the application a chance to create
+  an instance of its own `Handler`. This happens on both
   client and server ends.
   """
 
-  fun apply(session: HTTPSession): HTTPHandler ref^
+  fun apply(session: Session): Handler ref^
     """
-    Called by the [HTTPSession](http-HTTPSession.md) when it needs a new instance of the
-    application's [HTTPHandler](http-HTTPHandler.md). It is suggested that the
+    Called by the [Session](http-Session.md) when it needs a new instance of the
+    application's [Handler](http-Handler.md). It is suggested that the
     `session` value be passed to the constructor for the new
-    [HTTPHandler](http-HTTPHandler.md), you will need it for sending stuff back.
+    [Handler](http-Handler.md), you will need it for sending stuff back.
 
     This part must be implemented, as there might be more paramaters
-    that need to be passed for creating a HTTPHandler.
+    that need to be passed for creating a Handler.
     """
 
-interface HTTPHandlerWithoutContext is HTTPHandler
+interface HandlerWithoutContext is Handler
   """
-  Simple [HTTPHandler](http-HTTPHandler.md) that can be constructed
-  with only a HTTPSession.
+  Simple [Handler](http-Handler.md) that can be constructed
+  with only a Session.
   """
-  new create(session: HTTPSession)
+  new create(session: Session)
 
 
-primitive SimpleHandlerFactory[T: HTTPHandlerWithoutContext]
+primitive SimpleHandlerFactory[T: HandlerWithoutContext]
   """
-  HandlerFactory for a HTTPHandlerWithoutContext.
+  HandlerFactory for a HandlerWithoutContext.
 
   Just create it like:
 
   ```pony
   let server =
-    HTTPServer(
+    Server(
       ...,
       SimpleHandlerFactory[MySimpleHandler],
       ...
@@ -196,5 +196,5 @@ primitive SimpleHandlerFactory[T: HTTPHandlerWithoutContext]
   ```
 
   """
-  fun apply(session: HTTPSession): HTTPHandler ref^ =>
+  fun apply(session: Session): Handler ref^ =>
     T.create(session)

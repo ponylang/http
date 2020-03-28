@@ -4,7 +4,7 @@ use "valbytes"
 use "debug"
 use "time"
 
-actor _ServerConnection is HTTPSession
+actor _ServerConnection is Session
   """
   Manages a stream of requests coming into a server from a single client,
   dispatches those request to a back-end, and returns the responses back
@@ -12,8 +12,8 @@ actor _ServerConnection is HTTPSession
 
   TODO: how to handle 101 Upgrade - set new notify for the connection
   """
-  let _backend: HTTPHandler
-  let _config: HTTPServerConfig
+  let _backend: Handler
+  let _config: ServerConfig
   let _conn: TCPConnection
   var _close_after: (RequestID | None) = None
 
@@ -33,7 +33,7 @@ actor _ServerConnection is HTTPSession
 
   new create(
     handlermaker: HandlerFactory val,
-    config: HTTPServerConfig,
+    config: ServerConfig,
     conn: TCPConnection)
   =>
     """
@@ -49,7 +49,7 @@ actor _ServerConnection is HTTPSession
   fun ref _reset_timeout() =>
     _last_activity_ts = Time.seconds()
 
-  be _receive_start(request: HTTPRequest val, request_id: RequestID) =>
+  be _receive_start(request: Request val, request_id: RequestID) =>
     _reset_timeout()
     _active_request = request_id
     // detemine if we need to close the connection after this request
@@ -98,7 +98,7 @@ actor _ServerConnection is HTTPSession
 //// SEND RESPONSE API ////
 //// STANDARD API
 
-  be send_start(response: HTTPResponse val, request_id: RequestID) =>
+  be send_start(response: Response val, request_id: RequestID) =>
     """
     Initiate transmission of the HTTP Response message for the current
     Request.
@@ -106,7 +106,7 @@ actor _ServerConnection is HTTPSession
     _send_start(response, request_id)
 
 
-  fun ref _send_start(response: HTTPResponse val, request_id: RequestID) =>
+  fun ref _send_start(response: Response val, request_id: RequestID) =>
     _conn.unmute()
     let expected_id = RequestIDs.next(_sent_response)
     if request_id == expected_id then
@@ -122,7 +122,7 @@ actor _ServerConnection is HTTPSession
       None
     end
 
-  fun ref _send(response: HTTPResponse val) =>
+  fun ref _send(response: Response val) =>
     """
     Send a single response to the underlying TCPConnection.
     """
@@ -191,7 +191,7 @@ actor _ServerConnection is HTTPSession
 
 //// CONVENIENCE API
 
-  be send_no_body(response: HTTPResponse val, request_id: RequestID) =>
+  be send_no_body(response: Response val, request_id: RequestID) =>
     """
     Start and finish sending a response without a body.
 
@@ -200,7 +200,7 @@ actor _ServerConnection is HTTPSession
     _send_start(response, request_id)
     _send_finished(request_id)
 
-  be send(response: HTTPResponse val, body: ByteArrays, request_id: RequestID) =>
+  be send(response: Response val, body: ByteArrays, request_id: RequestID) =>
     """
     Start and finish sending a response with body.
     """
@@ -224,7 +224,7 @@ actor _ServerConnection is HTTPSession
   be send_raw(raw: ByteSeqIter, request_id: RequestID) =>
     """
     If you have your response already in bytes, and don't want to build an expensive
-    [HTTPResponse](http-HTTPResponse) object, use this method to send your [ByteSeqIter](builtin-ByteSeqIter).
+    [Response](http-Response) object, use this method to send your [ByteSeqIter](builtin-ByteSeqIter).
     This `raw` argument can contain only the response without body,
     in which case you can send the body chunks later on using `send_chunk`,
     or, to further optimize your writes to the network, it might already contain
