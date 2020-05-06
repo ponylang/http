@@ -10,7 +10,7 @@
 # - git
 # - make
 # - ponyc
-# - stable
+# - corral
 
 set -o errexit
 

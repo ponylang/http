@@ -10,23 +10,20 @@ Ponylang package to build client and server applications for the HTTP protocol.
 
 ## Installation
 
-* Add `http` (and its transitive dependencies) to your build dependencies using [pony-stable](https://github.com/ponylang/pony-stable):
+* Add `http` (and its transitive dependencies) to your build dependencies using [corral](https://github.com/ponylang/corral):
 
 ```bash
-stable add github ponylang/http
-
-# transitive dependencies
-stable add github ponylang/net-ssl
+corral add github.com/ponylang/http.git
 
 # for testing only
-stable add github ponylang/regex
+corral add github.com/ponylang/regex.git
 ```
 
-* Execute `stable fetch` to fetch your dependencies.
+* Execute `corral fetch` to fetch your dependencies.
 * Include this package by adding `use "http"` to your Pony sources.
-* Execute `stable env ponyc` to compile your application
+* Execute `corral run -- ponyc` to compile your application
 
-Note: `net-ssl` requires a C SSL library to be installed. Please see the [net-ssl installation instructions](https://github.com/ponylang/net-ssl#installation) for more information.
+Note: The `net-ssl` transitive dependency requires a C SSL library to be installed. Please see the [net-ssl installation instructions](https://github.com/ponylang/net-ssl#installation) for more information.
 
 ## History
 
@@ -34,7 +31,7 @@ This is the Pony HTTP/1 library from the standard library, formerly known as `ne
 
 `http` was removed from the stdlib with [0.24.0](https://github.com/ponylang/ponyc/releases/tag/0.24.0) as a result of [RFC 55](https://github.com/ponylang/rfcs/blob/master/text/0055-remove-http-server-from-stdlib.md). See also [the announcement blog post](https://www.ponylang.io/blog/2018/06/0.24.0-released/).
 
-The Pony Team decided to remove it from the stdlib as is did not meet their quality standards. Given the familiarity of most people with HTTP and thus the attention this library gets, it was considered wiser to remove it from the stdlib and give it a new home as a separate package, where it will not be subject to RFCs in order to rework its innarts.
+The Pony Team decided to remove it from the stdlib as is did not meet their quality standards. Given the familiarity of most people with HTTP and thus the attention this library gets, it was considered wiser to remove it from the stdlib and give it a new home as a separate package, where it will not be subject to RFCs in order to rework its innards.
 
 ### Help us improve
 

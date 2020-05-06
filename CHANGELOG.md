@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Changed
 
+- Switch dependency management from pony-stable to corral
 
 ## [0.2.4] - 2019-09-04
 

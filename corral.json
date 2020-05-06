@@ -1,0 +1,12 @@
+{
+  "deps": [
+    {
+      "locator": "github.com/ponylang/net-ssl.git",
+      "version": "1.0.0"
+    },
+    {
+      "locator": "github.com/ponylang/regex.git",
+      "version": "1.0.0"
+    }
+  ]
+}

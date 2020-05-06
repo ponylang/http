@@ -1,7 +1,7 @@
 config ?= release
 
 PACKAGE := http
-COMPILE_WITH := stable env ponyc
+COMPILE_WITH := corral run -- ponyc
 
 BUILD_DIR ?= build/$(config)
 SRC_DIR ?= $(PACKAGE)
@@ -11,7 +11,7 @@ BENCH_DIR := bench
 tests_binary := $(BUILD_DIR)/test
 bench_binary := $(BUILD_DIR)/bench
 docs_dir := build/$(PACKAGE)-docs
-deps_dir := .deps
+deps_dirs := _corral _repos
 
 ifdef config
 	ifeq (,$(filter $(config),debug release))
@@ -41,33 +41,30 @@ SOURCE_FILES := $(shell find $(SRC_DIR) -name \*.pony)
 EXAMPLE_SOURCE_FILES := $(shell find $(EXAMPLES_DIR) -name \*.pony)
 BENCH_SOURCE_FILES := $(shell find $(BENCH_DIR) -name \*.pony)
 
-$(deps_dir):
-	stable fetch
-
 test: unit-tests build-examples
 
 unit-tests: $(tests_binary)
 	$^ --exclude=integration --sequential
 
-$(tests_binary): $(SOURCE_FILES) | $(BUILD_DIR) $(deps_dir)
+$(tests_binary): $(SOURCE_FILES) | $(BUILD_DIR) $(deps_dirs)
 	${PONYC} -o ${BUILD_DIR} $(TEST_DIR)
 
-build-examples: $(SOURCE_FILES) $(EXAMPLE_SOURCE FILES)| $(BUILD_DIR) $(deps_dir)
+build-examples: $(SOURCE_FILES) $(EXAMPLE_SOURCE FILES)| $(BUILD_DIR) $(deps_dirs)
 	find examples/*/* -name '*.pony' -print | xargs -n 1 dirname  | sort -u | grep -v ffi- | xargs -n 1 -I {} ${PONYC} -s --checktree -o ${BUILD_DIR} {}
 
 clean:
 	rm -rf $(BUILD_DIR)
 
 realclean:
-	rm -rf build $(deps_dir)
+	rm -rf build $(deps_dirs)
 
-$(docs_dir): $(SOURCE_FILES) $(deps_dir)
+$(docs_dir): $(SOURCE_FILES) $(deps_dirs)
 	rm -rf $(docs_dir)
 	${PONYC} --docs-public --pass=docs --output build $(SRC_DIR)
 
 docs: $(docs_dir)
 
-$(bench_binary): $(SOURCE_FILES) $(BENCH_SOURCE_FILES) | $(BUILD_DIR) $(deps_dir)
+$(bench_binary): $(SOURCE_FILES) $(BENCH_SOURCE_FILES) | $(BUILD_DIR) $(deps_dirs)
 	$(PONYC) $(BENCH_DIR) -o $(BUILD_DIR)
 
 bench: $(bench_binary)
@@ -83,6 +80,9 @@ TAGS:
 	ctags --recurse=yes $(SRC_DIR)
 
 all: test
+
+$(deps_dirs):
+	corral fetch
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
