@@ -1,6 +1,8 @@
 config ?= release
 
 PACKAGE := http
+GET_DEPENDENCIES_WIITH := corral fetch
+CLEAN_DEPENDENCIES_WIITH := corral clean
 COMPILE_WITH := corral run -- ponyc
 
 BUILD_DIR ?= build/$(config)
@@ -11,7 +13,6 @@ BENCH_DIR := bench
 tests_binary := $(BUILD_DIR)/test
 bench_binary := $(BUILD_DIR)/bench
 docs_dir := build/$(PACKAGE)-docs
-deps_dirs := _corral _repos
 
 ifdef config
 	ifeq (,$(filter $(config),debug release))
@@ -46,25 +47,27 @@ test: unit-tests build-examples
 unit-tests: $(tests_binary)
 	$^ --exclude=integration --sequential
 
-$(tests_binary): $(SOURCE_FILES) | $(BUILD_DIR) $(deps_dirs)
+$(tests_binary): $(SOURCE_FILES) | $(BUILD_DIR)
+	${GET_DEPENDENCIES_WIITH}
 	${PONYC} -o ${BUILD_DIR} $(TEST_DIR)
 
-build-examples: $(SOURCE_FILES) $(EXAMPLE_SOURCE FILES)| $(BUILD_DIR) $(deps_dirs)
+build-examples: $(SOURCE_FILES) $(EXAMPLE_SOURCE FILES)| $(BUILD_DIR)
+	${GET_DEPENDENCIES_WIITH}
 	find examples/*/* -name '*.pony' -print | xargs -n 1 dirname  | sort -u | grep -v ffi- | xargs -n 1 -I {} ${PONYC} -s --checktree -o ${BUILD_DIR} {}
 
 clean:
+	${CLEAN_DEPENDENCIES_WIITH}
 	rm -rf $(BUILD_DIR)
 
-realclean:
-	rm -rf build $(deps_dirs)
-
-$(docs_dir): $(SOURCE_FILES) $(deps_dirs)
+$(docs_dir): $(SOURCE_FILES)
 	rm -rf $(docs_dir)
+	${GET_DEPENDENCIES_WIITH}
 	${PONYC} --docs-public --pass=docs --output build $(SRC_DIR)
 
 docs: $(docs_dir)
 
-$(bench_binary): $(SOURCE_FILES) $(BENCH_SOURCE_FILES) | $(BUILD_DIR) $(deps_dirs)
+$(bench_binary): $(SOURCE_FILES) $(BENCH_SOURCE_FILES) | $(BUILD_DIR)
+	${GET_DEPENDENCIES_WIITH}
 	$(PONYC) $(BENCH_DIR) -o $(BUILD_DIR)
 
 bench: $(bench_binary)
@@ -81,10 +84,7 @@ TAGS:
 
 all: test
 
-$(deps_dirs):
-	corral fetch
-
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-.PHONY: all clean realclean TAGS test
+.PHONY: all clean TAGS test
