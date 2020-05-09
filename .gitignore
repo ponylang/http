@@ -3,3 +3,6 @@ TAGS
 tags
 /.deps/*
 /.coverage/
+/_corral/
+/_repos/
+/lock.json

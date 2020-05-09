@@ -1,12 +1,17 @@
 {
   "deps": [
     {
-      "locator": "github.com/ponylang/net-ssl.git",
-      "version": "1.0.0"
+      "locator": "github.com/mfelsche/ponycheck.git",
+      "version": "0.5.4"
     },
     {
-      "locator": "github.com/ponylang/regex.git",
+      "locator": "github.com/ponylang/valbytes.git",
+      "version": "0.5.0"
+    },
+    {
+      "locator": "github.com/ponylang/net-ssl.git",
       "version": "1.0.0"
     }
-  ]
+  ],
+  "info": {}
 }
