@@ -51,7 +51,7 @@ $(tests_binary): $(SOURCE_FILES) | $(BUILD_DIR)
 	${GET_DEPENDENCIES_WIITH}
 	${PONYC} -o ${BUILD_DIR} $(TEST_DIR)
 
-build-examples: $(SOURCE_FILES) $(EXAMPLES_SOURCE FILES)| $(BUILD_DIR)
+build-examples: $(SOURCE_FILES) $(EXAMPLES_SOURCE_FILES)| $(BUILD_DIR)
 	${GET_DEPENDENCIES_WIITH}
 	find examples/*/* -name '*.pony' -print | xargs -n 1 dirname  | sort -u | grep -v ffi- | xargs -n 1 -I {} ${PONYC} -s --checktree -o ${BUILD_DIR} {}
 
