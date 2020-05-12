@@ -1,5 +1,6 @@
-build/*
+/build
+/_corral
+/_repos
 TAGS
 tags
-.deps/*
 .coverage/
