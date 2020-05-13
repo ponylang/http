@@ -8,6 +8,10 @@ Ponylang package to build client and server applications for the HTTP protocol.
 
 `http` is beta quality software that will change frequently. Expect breaking changes. That said, you should feel comfortable using it in your projects.
 
+### Deprecation
+
+The Server code contained in this repository is considered deprecated. The new official ponylang HTTP Server is hosted at [http_server](https://github.com/ponylang/http_server).
+
 ## Installation
 
 * Add `http` (and its transitive dependencies) to your build dependencies using [corral](https://github.com/ponylang/corral):
