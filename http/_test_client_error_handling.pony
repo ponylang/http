@@ -10,7 +10,9 @@ actor _ClientErrorHandlingTests is TestList
 
   fun tag tests(test: PonyTest) =>
     test(_ConnectionClosedTest)
-    test(_ConnectFailedTest)
+    ifdef not windows then
+      test(_ConnectFailedTest)
+    end
     test(_SSLAuthFailedTest)
 
 class val _ConnectionClosedHandlerFactory is HandlerFactory
@@ -33,7 +35,7 @@ class iso _ConnectionClosedTest is UnitTest
   fun name(): String => "client/error-handling/connection-closed"
 
   fun apply(h: TestHelper) ? =>
-    h.long_test(10_000_000_000)
+    h.long_test(2_000_000_000)
 
     h.expect_action("server listening")
     h.expect_action("server listen connected")
@@ -41,142 +43,177 @@ class iso _ConnectionClosedTest is UnitTest
     h.expect_action("server connection closed")
     h.expect_action("client failed with ConnectionClosed")
 
-    let listener = TCPListener.ip4(
-        h.env.root as AmbientAuth,
-        object iso is TCPListenNotify
-          let _h: TestHelper = h
-          fun ref listening(listen: TCPListener ref) =>
-            _h.complete_action("server listening")
-            _h.log("listening")
+    let notify = object iso is TCPListenNotify
+      let _h: TestHelper = h
+      fun ref listening(listen: TCPListener ref) =>
+        _h.complete_action("server listening")
+        _h.log("listening")
 
-            try
-              let client = HTTPClient(
-                _h.env.root as AmbientAuth,
-                None
-                where keepalive_timeout_secs = U32(2)
-              )
-              (let host, let port) = listen.local_address().name()?
-              let req = Payload.request("GET", URL.build("http://" + host + ":" + port  + "/bla")?)
-              req.add_chunk("CHUNK")
-              client(
-                consume req,
-                _ConnectionClosedHandlerFactory(_h)
-              )?
-            else
-              _h.fail("request building failed")
-            end
+        try
+          let client = HTTPClient(
+            _h.env.root as AmbientAuth,
+            None
+            where keepalive_timeout_secs = U32(2)
+          )
+          (let host, let port) = listen.local_address().name()?
+          let req = Payload.request("GET",
+            URL.build("http://" + host + ":" + port  + "/bla")?)
+          req.add_chunk("CHUNK")
+          client(
+            consume req,
+            _ConnectionClosedHandlerFactory(_h)
+          )?
+        else
+          _h.fail("request building failed")
+        end
 
-          fun ref not_listening(listen: TCPListener ref) =>
-            _h.fail_action("server listening")
-            _h.log("not_listening")
+      fun ref not_listening(listen: TCPListener ref) =>
+        _h.fail_action("server listening")
+        _h.log("not_listening")
 
-          fun ref closed(listen: TCPListener ref) =>
-            _h.log("TCP listener closed")
+      fun ref closed(listen: TCPListener ref) =>
+        _h.log("TCP listener closed")
 
-          fun ref connected(listen: TCPListener ref): TCPConnectionNotify iso^ =>
-            _h.complete_action("server listen connected")
-            // server code
-            object iso is TCPConnectionNotify
-              fun ref received(conn: TCPConnection ref, data: Array[U8] iso, times: USize): Bool =>
-                conn.close() // trigger the error condition
-                true
+      fun ref connected(listen: TCPListener ref): TCPConnectionNotify iso^ =>
+        _h.complete_action("server listen connected")
+        // server code
+        object iso is TCPConnectionNotify
+          fun ref received(conn: TCPConnection ref, data: Array[U8] iso,
+            times: USize): Bool
+          =>
+            conn.close() // trigger the error condition
+            true
 
-              fun ref accepted(conn: TCPConnection ref) =>
-                _h.complete_action("server connection accepted")
-                _h.dispose_when_done(conn)
+          fun ref accepted(conn: TCPConnection ref) =>
+            _h.complete_action("server connection accepted")
+            _h.dispose_when_done(conn)
 
-              fun ref connect_failed(conn: TCPConnection ref) =>
-                _h.fail("connection failed")
+          fun ref connect_failed(conn: TCPConnection ref) =>
+            _h.fail("connection failed")
 
-              fun ref closed(conn: TCPConnection ref) =>
-                _h.complete_action("server connection closed")
-            end
-        end,
-        "127.0.0.1",
-        "0")
+          fun ref closed(conn: TCPConnection ref) =>
+            _h.complete_action("server connection closed")
+        end
+    end
+
+    let host = "127.0.0.1"
+    let service = "0"
+
+    let listener = TCPListener.ip4(h.env.root as AmbientAuth, consume notify,
+      host, service)
     h.dispose_when_done(listener)
+
+actor _ConnectAttempter
+  let _h: TestHelper
+
+  new create(h: TestHelper) =>
+    _h = h
+
+  be connect(host: String, port: String) =>
+    let port' =
+      ifdef windows then
+        port
+      else
+        port
+      end
+
+    _h.log("connecting to " + host + ":" + port')
+    _h.complete_action("client trying to connect")
+    try
+      let client = HTTPClient(
+        _h.env.root as AmbientAuth,
+        None
+        where keepalive_timeout_secs = U32(2)
+      )
+      let req = Payload.request("GET",
+        URL.build("http://" + host + ":" + port' + "/bla")?)
+      req.add_chunk("CHUNK")
+      client(
+        consume req,
+        _ConnectFailedHandlerFactory(_h)
+      )?
+    else
+      _h.fail("request building failed")
+    end
 
 class val _ConnectFailedHandlerFactory is HandlerFactory
   let _h: TestHelper
+
   new val create(h: TestHelper) =>
     _h = h
 
   fun apply(session: HTTPSession): HTTPHandler ref^ =>
     object is HTTPHandler
+      fun ref finished() =>
+        _h.fail("failed by finishing")
+        _h.complete(false)
       fun ref failed(reason: HTTPFailureReason) =>
         match reason
+        | AuthFailed =>
+          _h.fail("failed with AuthFailed")
+          _h.complete(false)
+        | ConnectionClosed =>
+          _h.fail("failed with ConnectionClosed")
+          _h.complete(false)
         | ConnectFailed =>
           _h.complete_action("client failed with ConnectFailed")
-        else
-          _h.fail_action("failed with sth else")
         end
     end
-
 
 class iso _ConnectFailedTest is UnitTest
   fun name(): String => "client/error-handling/connect-failed"
 
   fun apply(h: TestHelper) ? =>
-    h.long_test(10_000_000_000)
+    h.long_test(20_000_000_000)
 
     h.expect_action("server listening")
     h.expect_action("server closed")
+    h.expect_action("client trying to connect")
     h.expect_action("client failed with ConnectFailed")
 
-    let listener = TCPListener.ip4(
-        h.env.root as AmbientAuth,
-        object iso is TCPListenNotify
-          let _h: TestHelper = h
-          var host: String = ""
-          var port: String = ""
+    let notify = object iso is TCPListenNotify
+      let _h: TestHelper = h
+      var host: String = ""
+      var port: String = ""
 
-          fun ref listening(listen: TCPListener ref) =>
-            _h.complete_action("server listening")
-            _h.log("listening")
-            try
-              (host, port) = listen.local_address().name()?
-            else
-              _h.fail("unable to get port")
-            end
-            listen.close()
+      fun ref listening(listen: TCPListener ref) =>
+        _h.complete_action("server listening")
+        _h.log("listening")
+        try
+          (host, port) = listen.local_address().name()?
+        else
+          _h.fail("unable to get port")
+        end
+        listen.close()
 
-          fun ref not_listening(listen: TCPListener ref) =>
-            _h.fail_action("server listening")
-            _h.log("not_listening")
+      fun ref not_listening(listen: TCPListener ref) =>
+        _h.fail_action("server listening")
+        _h.log("not_listening")
 
-          fun ref closed(listen: TCPListener ref) =>
-            _h.complete_action("server closed")
-            _h.log("TCP listener closed")
-            try
-              let client = HTTPClient(
-                _h.env.root as AmbientAuth,
-                None
-                where keepalive_timeout_secs = U32(2)
-              )
-              let req = Payload.request(
-                "GET",
-                URL.build("http://" + host + ":" + port  + "/bla")?)
-              req.add_chunk("CHUNK")
-              client(
-                consume req,
-                _ConnectFailedHandlerFactory(_h)
-              )?
-            else
-              _h.fail("request building failed")
-            end
+      fun ref closed(listen: TCPListener ref) =>
+        _h.complete_action("server closed")
+        _h.log("TCP listener closed")
+        _h.fail("not attempting connect")
+        _h.complete(false)
+        // let attempt = _ConnectAttempter(_h)
+        // attempt.connect(host, port)
 
-          fun ref connected(listen: TCPListener ref): TCPConnectionNotify iso^ =>
-            _h.log("server listen connected.")
-            object iso is TCPConnectionNotify
-              fun ref received(conn: TCPConnection ref, data: Array[U8] iso, times: USize): Bool =>
-                true
-              fun ref accepted(conn: TCPConnection ref) => None
-              fun ref connect_failed(conn: TCPConnection ref) => None
-              fun ref closed(conn: TCPConnection ref) => None
-            end
-        end,
-        "127.0.0.1",
-        "0")
+      fun ref connected(listen: TCPListener ref): TCPConnectionNotify iso^ =>
+        _h.log("server listen connected.")
+        object iso is TCPConnectionNotify
+          fun ref received(conn: TCPConnection ref, data: Array[U8] iso,
+            times: USize): Bool => true
+          fun ref accepted(conn: TCPConnection ref) => None
+          fun ref connect_failed(conn: TCPConnection ref) => None
+          fun ref closed(conn: TCPConnection ref) => None
+        end
+    end
+
+    let host = "127.0.0.1"
+    let service = "0"
+
+    let listener = TCPListener.ip4(h.env.root as AmbientAuth, consume notify,
+      host, service)
     h.dispose_when_done(listener)
 
 
@@ -238,11 +275,13 @@ class iso _SSLAuthFailedTest is UnitTest
       h.log("key path: " + (key_path as FilePath).path + " does not exist!")
       error
     end
-    ca_path = FilePath(h.env.root as AmbientAuth,
-        "/usr/share/ca-certificates/mozilla")?
-    if not (ca_path as FilePath).exists() then
-      h.log("ca path: " + (ca_path as FilePath).path + " does not exist!")
-      error
+    ifdef not windows then
+      ca_path = FilePath(h.env.root as AmbientAuth,
+          "/usr/share/ca-certificates/mozilla")?
+      if not (ca_path as FilePath).exists() then
+        h.log("ca path: " + (ca_path as FilePath).path + " does not exist!")
+        error
+      end
     end
 
   fun apply(h: TestHelper) ? =>
@@ -251,73 +290,81 @@ class iso _SSLAuthFailedTest is UnitTest
     h.expect_action("server listening")
     h.expect_action("client failed with AuthFailed")
 
-    let listener = TCPListener.ip4(
-        h.env.root as AmbientAuth,
-        object iso is TCPListenNotify
-          let _h: TestHelper = h
-          var host: String = ""
-          var port: String = ""
+    let notify = object iso is TCPListenNotify
+      let _h: TestHelper = h
+      var host: String = ""
+      var port: String = ""
 
-          fun ref listening(listen: TCPListener ref) =>
-            _h.complete_action("server listening")
-            _h.log("listening")
-            try
-              (host, port) = listen.local_address().name()?
-              try
-                let ssl_ctx: SSLContext val = recover
-                  SSLContext.>set_authority(
-                    None
-                    where path = ca_path as FilePath)?
-                end
-                let client = HTTPClient(
-                  _h.env.root as AmbientAuth,
-                  ssl_ctx
-                  where keepalive_timeout_secs = U32(2)
-                )
-                let req = Payload.request(
-                  "GET",
-                  URL.build("https://" + host + ":" + port  + "/bla")?)
-                req.add_chunk("CHUNK")
-                client(
-                  consume req,
-                  _SSLAuthFailedHandlerFactory(_h)
-                )?
+      fun ref listening(listen: TCPListener ref) =>
+        _h.complete_action("server listening")
+        _h.log("listening")
+        try
+          (host, port) = listen.local_address().name()?
+          try
+            let ssl_ctx: SSLContext val = recover
+              ifdef windows then
+                SSLContext.>set_authority(None, None)?
               else
-                _h.fail("request building failed")
+                SSLContext.>set_authority(
+                  None
+                  where path = ca_path as FilePath)?
               end
-            else
-              _h.fail("unable to get port")
             end
+            let client = HTTPClient(
+              _h.env.root as AmbientAuth,
+              ssl_ctx
+              where keepalive_timeout_secs = U32(2)
+            )
+            let req = Payload.request(
+              "GET",
+              URL.build("https://" + host + ":" + port  + "/bla")?)
+            req.add_chunk("CHUNK")
+            client(
+              consume req,
+              _SSLAuthFailedHandlerFactory(_h)
+            )?
+          else
+            _h.fail("request building failed")
+          end
+        else
+          _h.fail("unable to get port")
+        end
 
-          fun ref not_listening(listen: TCPListener ref) =>
-            _h.fail_action("server listening")
-            _h.log("not_listening")
+      fun ref not_listening(listen: TCPListener ref) =>
+        _h.fail_action("server listening")
+        _h.log("not_listening")
 
-          fun ref closed(listen: TCPListener ref) =>
-            _h.log("TCP listener closed")
+      fun ref closed(listen: TCPListener ref) =>
+        _h.log("TCP listener closed")
 
-          fun ref connected(listen: TCPListener ref): TCPConnectionNotify iso^ ? =>
-            _h.log("server listen connected.")
-            let tcp_notify =
-              object iso is TCPConnectionNotify
-                fun ref received(conn: TCPConnection ref, data: Array[U8] iso, times: USize): Bool =>
-                  _h.log("received on server")
-                  conn.write(consume data)
-                  true
-                fun ref accepted(conn: TCPConnection ref) =>
-                  _h.log("accepted on server")
-                fun ref connect_failed(conn: TCPConnection ref) =>
-                  _h.log("connect failed on server")
-                fun ref closed(conn: TCPConnection ref) =>
-                  _h.log("closed on server")
-                fun ref auth_failed(conn: TCPConnection ref) =>
-                  _h.log("auth failed on server")
-              end
-            let server_ssl_ctx = SSLContext.>set_cert(
-              cert_path as FilePath,
-              key_path as FilePath)?
-            SSLConnection(consume tcp_notify, server_ssl_ctx.server()?)
-        end,
-        "127.0.0.1",
-        "0")
+      fun ref connected(listen: TCPListener ref): TCPConnectionNotify iso^ ? =>
+        _h.log("server listen connected.")
+        let tcp_notify =
+          object iso is TCPConnectionNotify
+            fun ref received(conn: TCPConnection ref, data: Array[U8] iso,
+              times: USize): Bool
+            =>
+              _h.log("received on server")
+              conn.write(consume data)
+              true
+            fun ref accepted(conn: TCPConnection ref) =>
+              _h.log("accepted on server")
+            fun ref connect_failed(conn: TCPConnection ref) =>
+              _h.log("connect failed on server")
+            fun ref closed(conn: TCPConnection ref) =>
+              _h.log("closed on server")
+            fun ref auth_failed(conn: TCPConnection ref) =>
+              _h.log("auth failed on server")
+          end
+        let server_ssl_ctx = SSLContext.>set_cert(
+          cert_path as FilePath,
+          key_path as FilePath)?
+        SSLConnection(consume tcp_notify, server_ssl_ctx.server()?)
+    end
+
+    let host = "127.0.0.1"
+    let service = "0"
+
+    let listener = TCPListener.ip4(h.env.root as AmbientAuth, consume notify,
+      host, service)
     h.dispose_when_done(listener)
