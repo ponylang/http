@@ -20,11 +20,11 @@ First of all please [search existing issues](https://github.com/ponylang/http/is
 
 Provide the following details:
 
-  - short summary of what you were trying to achieve,
-  - a code snippet causing the bug,
-  - expected result,
-  - actual results and
-  - environment details: at least operating system version
+* short summary of what you were trying to achieve,
+* a code snippet causing the bug,
+* expected result,
+* actual results and
+* environment details: at least operating system version
 
 If possible, try to isolate the problem and provide just enough code to demonstrate it. Add any related information which might help to fix the issue.
 
@@ -49,9 +49,9 @@ Some things to note that aren't immediately obvious to folks just starting out:
 
 You can get help using GitHub via [the official documentation](https://help.github.com/). Some highlights include:
 
-- [Fork A Repo](https://help.github.com/articles/fork-a-repo/)
-- [Creating a pull request](https://help.github.com/articles/creating-a-pull-request/)
-- [Syncing a fork](https://help.github.com/articles/syncing-a-fork/)
+* [Fork A Repo](https://help.github.com/articles/fork-a-repo/)
+* [Creating a pull request](https://help.github.com/articles/creating-a-pull-request/)
+* [Syncing a fork](https://help.github.com/articles/syncing-a-fork/)
 
 ## Pull request
 
