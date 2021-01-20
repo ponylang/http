@@ -4,8 +4,6 @@ Ponylang package to build client and server applications for the HTTP protocol.
 
 ## Status
 
-[![Actions Status](https://github.com/ponylang/http/workflows/vs-ponyc-latest/badge.svg)](https://github.com/ponylang/http/actions)
-
 `http` is beta quality software that will change frequently. Expect breaking changes. That said, you should feel comfortable using it in your projects.
 
 ### Deprecation
