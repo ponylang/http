@@ -8,5 +8,16 @@
       "locator": "github.com/ponylang/regex.git",
       "version": "1.1.1"
     }
-  ]
+  ],
+  "packages": [
+    "http"
+  ],
+  "info": {
+    "description": "HTTP library",
+    "homepage": "https://github.com/ponylang/http",
+    "license": "BSD-2-Clause",
+    "documentation_url": "https://ponylang.github.io/http/",
+    "version": "0.2.5",
+    "name": "http"
+  }
 }
