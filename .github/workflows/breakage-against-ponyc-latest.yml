@@ -6,7 +6,7 @@ on:
 
 jobs:
   vs-ponyc-latest:
-    name: Test against ponyc master
+    name: Test against ponyc main
     runs-on: ubuntu-latest
     container:
       image: ponylang/http-ci-x86-64-unknown-linux-builder:latest

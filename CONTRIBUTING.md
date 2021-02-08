@@ -45,7 +45,7 @@ Some things to note that aren't immediately obvious to folks just starting out:
 
 1. Your fork doesn't automatically stay up to date with changes in the main repo.
 2. Any changes you make on your branch that you used for one PR will automatically appear in another PR so if you have more than 1 PR, be sure to always create different branches for them.
-3. Weird things happen with commit history if you don't create your PR branches off of `master` so always make sure you have the `master` branch checked out before creating a branch for a PR
+3. Weird things happen with commit history if you don't create your PR branches off of `main` so always make sure you have the `main` branch checked out before creating a branch for a PR
 
 You can get help using GitHub via [the official documentation](https://help.github.com/). Some highlights include:
 
@@ -127,8 +127,8 @@ Try to avoid doing it. A commit that changes the formatting for large chunks of 
 
 The details:
 
-All Pony sources should follow the [Pony standard library style guide](https://github.com/ponylang/ponyc/blob/master/STYLE_GUIDE.md).
+All Pony sources should follow the [Pony standard library style guide](https://github.com/ponylang/ponyc/blob/main/STYLE_GUIDE.md).
 
 ## File naming
 
-Pony code follows the [Pony standard library file naming guidelines](https://github.com/ponylang/ponyc/blob/master/STYLE_GUIDE.md#naming).
+Pony code follows the [Pony standard library file naming guidelines](https://github.com/ponylang/ponyc/blob/main/STYLE_GUIDE.md#naming).
