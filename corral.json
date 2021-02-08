@@ -13,7 +13,7 @@
     "http"
   ],
   "info": {
-    "description": "HTTP library",
+    "description": "HTTP client library",
     "homepage": "https://github.com/ponylang/http",
     "license": "BSD-2-Clause",
     "documentation_url": "https://ponylang.github.io/http/",
