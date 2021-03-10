@@ -2,17 +2,11 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
-## [unreleased] - unreleased
+## [0.2.8] - 2021-03-10
 
 ### Fixed
 
 - Use buffered write for Payload - improves perf by ~200x ([PR #55](https://github.com/ponylang/http/pull/55))
-
-### Added
-
-
-### Changed
-
 
 ## [0.2.7] - 2021-02-08
 
