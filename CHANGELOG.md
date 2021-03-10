@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Fixed
 
+- Use buffered write for Payload - improves perf by ~200x ([PR #55](https://github.com/ponylang/http/pull/55))
 
 ### Added
 
