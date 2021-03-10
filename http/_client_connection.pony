@@ -52,6 +52,7 @@ actor _ClientConnection is HTTPSession
   var _safewait: Bool = false
   var _conn: (TCPConnection | None | _ConnConnecting) = None
   var _nobackpressure: Bool = true   // TCP backpressure indicator
+  embed _wr: Writer = Writer
 
   new create(
     auth: TCPConnectionAuth,
@@ -261,9 +262,8 @@ actor _ClientConnection is HTTPSession
           let request = _unsent.shift()?
           let safereq = request.is_safe()
           // Send all of the request that is possible for now.
-          let wr = recover ref Writer end
-          request._write(where wr = wr, keepalive = true)
-          conn.writev(wr.done())
+          request._write(where wr = _wr, keepalive = true)
+          conn.writev(_wr.done())
 
           // If there is a follow-on body, tell client to send it now.
           if request.has_body() then

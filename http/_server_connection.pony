@@ -17,6 +17,7 @@ actor _ServerConnection is HTTPSession
   var _active_response: (Payload val | None) = None
   var _keepalive: Bool = true
   var _body_bytes_sent: USize = 0
+  embed _wr: Writer = Writer
 
   new create(
     handlermaker: HandlerFactory val,
@@ -135,9 +136,8 @@ actor _ServerConnection is HTTPSession
     Send a single response.
     """
     let okstatus = (response.status < 300)
-    let wr = recover ref Writer end
-    response._write(_keepalive and okstatus, wr)
-    _conn.writev(wr.done())
+    response._write(_keepalive and okstatus, _wr)
+    _conn.writev(_wr.done())
 
     if response.has_body()
     then
