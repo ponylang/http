@@ -1,6 +1,7 @@
 use "collections"
 use "net"
 use "format"
+use "buffered"
 
 primitive ChunkedTransfer
 primitive StreamTransfer
@@ -310,60 +311,78 @@ class trn Payload
     end
     */
 
-  fun val _write(keepalive: Bool = true, conn: TCPConnection tag) =>
+  fun val _write(keepalive: Bool = true, wr: Writer ref) =>
     """
-    Writes the payload to an HTTPSession. Requests and Responses differ
+    Writes the payload to a Writer. Requests and Responses differ
     only in the first line of text - everything after that is the same format.
     """
     if _response then
-      _write_response(keepalive, conn)
+      _write_response(keepalive, wr)
     else
-      _write_request(keepalive, conn)
+      _write_request(keepalive, wr)
     end
 
-    _write_common(conn)
+    _write_common(wr)
 
-  fun val _write_request(keepalive: Bool, conn: TCPConnection tag) =>
+  fun val _write_request(keepalive: Bool, wr: Writer ref) =>
     """
     Writes the 'request' parts of an HTTP message.
     """
-    conn.write(method + " " + url.path)
+    wr
+      .> write(method)
+      .> write(" ")
+      .> write(url.path)
 
     if url.query.size() > 0 then
-      conn.write("?" + url.query)
-      end
+      wr
+        .> write("?")
+        .> write(url.query)
+    end
 
     if url.fragment.size() > 0 then
-      conn.write("#" + url.fragment)
-      end
+      wr
+        .> write("#")
+        .> write(url.fragment)
+    end
 
-    conn.write(" " + proto + "\r\n")
+    wr
+      .> write(" ")
+      .> write(proto)
+      .> write("\r\n")
 
     if not keepalive then
-      conn.write("Connection: close\r\n")
+      wr.write("Connection: close\r\n")
     end
 
     if url.port == url.default_port() then
-      conn.write("Host: " + url.host + "\r\n")
+      wr
+        .> write("Host: ")
+        .> write(url.host)
+        .> write("\r\n")
     else
-      conn.write("Host: " + url.host + ":"  + url.port.string() + "\r\n")
+      wr
+        .> write("Host: ")
+        .> write(url.host)
+        .> write(":")
+        .> write(url.port.string())
+        .> write("\r\n")
     end
 
-  fun val _write_common(conn: TCPConnection tag) =>
+  fun val _write_common(wr: Writer ref) =>
     """
     Writes the parts of an HTTP message common to both requests and
     responses.
     """
-    _write_headers(conn)
+    _write_headers(wr)
 
     // In oneshot mode we send the entire stored body.
     if transfer_mode is OneshotTransfer then
       for piece in _body.values() do
-        conn.write(piece)
+        wr.write(piece)
       end
     end
 
-  fun val _write_response(keepalive: Bool, conn: TCPConnection tag) =>
+  fun val _write_response(keepalive: Bool, wr: Writer ref) =>
     """
     Write the response-specific parts of an HTTP message. This is the
     status line, consisting of the protocol name, the status value,
@@ -371,42 +390,44 @@ class trn Payload
     field). Since writing it out is an actor behavior call, we go to
     the trouble of packaging it into a single string before sending.
     """
-    let statusline =
-      recover
-        String(proto.size() + status.string().size() + method.size() + 4)
-      end
 
-    statusline
-      .> append(proto)
-      .> append(" ")
-      .> append(status.string())
-      .> append(" ")
-      .> append(method)
-      .> append("\r\n")
-    conn.write(consume statusline)
+    wr
+      .> write(proto)
+      .> write(" ")
+      .> write(status.string())
+      .> write(" ")
+      .> write(method)
+      .> write("\r\n")
 
     if keepalive then
-      conn.write("Connection: keep-alive\r\n")
+      wr.write("Connection: keep-alive\r\n")
     end
 
-  fun _write_headers(conn: TCPConnection tag) =>
+  fun _write_headers(wr: Writer ref) =>
     """
-    Write all of the HTTP headers to the comm link.
+    Write all of the HTTP headers to the Writer.
     """
     var saw_length: Bool = false
     for (k, v) in _headers.pairs() do
       if (k != "Host") then
         if k == "Content-Length" then saw_length = true end
-        conn.write(k + ": " + v + "\r\n")
+        wr
+          .> write(k)
+          .> write(": ")
+          .> write(v)
+          .> write("\r\n")
       end
     end
 
     if (not saw_length) and (transfer_mode is OneshotTransfer) then
-      conn.write("Content-Length: " + _body_length.string() + "\r\n")
+      wr
+        .> write("Content-Length: ")
+        .> write(_body_length.string())
+        .> write("\r\n")
     end
 
     // Blank line before the body.
-    conn.write("\r\n")
+    wr.write("\r\n")
 
   fun box has_body(): Bool =>
     """

@@ -1,5 +1,6 @@
 use "net"
 use "collections"
+use "buffered"
 
 actor _ServerConnection is HTTPSession
   """
@@ -134,7 +135,9 @@ actor _ServerConnection is HTTPSession
     Send a single response.
     """
     let okstatus = (response.status < 300)
-    response._write(_keepalive and okstatus, _conn)
+    let wr = recover ref Writer end
+    response._write(_keepalive and okstatus, wr)
+    _conn.writev(wr.done())
 
     if response.has_body()
     then

@@ -1,6 +1,7 @@
 use "collections"
 use "net"
 use "net_ssl"
+use "buffered"
 
 primitive _ConnConnecting
 
@@ -260,9 +261,11 @@ actor _ClientConnection is HTTPSession
           let request = _unsent.shift()?
           let safereq = request.is_safe()
           // Send all of the request that is possible for now.
-          request._write(true, conn)
+          let wr = recover ref Writer end
+          request._write(where wr = wr, keepalive = true)
+          conn.writev(wr.done())
 
-          // If there is a folow-on body, tell client to send it now.
+          // If there is a follow-on body, tell client to send it now.
           if request.has_body() then
             match request.transfer_mode
             | OneshotTransfer => finish()
