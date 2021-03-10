@@ -34,7 +34,7 @@
         <meta name="lang:search.tokenizer" content="[\s\-]+">
       
       <link rel="shortcut icon" href="../assets/images/logo.png">
-      <meta name="generator" content="mkdocs-1.1.2, mkdocs-ponylang-0.2.7">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-ponylang-0.2.8">
     
     
       
@@ -1744,7 +1744,7 @@
                 
                 
                 <h1 id="payload">Payload<a class="headerlink" href="#payload" title="Permanent link">&para;</a></h1>
-<p><span class="source-link"><a href="../src/http/payload/#L11">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/http/payload/#L12">[Source]</a></span></p>
 <p>This class represent a single HTTP message, which can be either a
 <code>request</code> or a <code>response</code>.</p>
 <h3 id="transfer-modes">Transfer Modes<a class="headerlink" href="#transfer-modes" title="Permanent link">&para;</a></h3>
@@ -1809,7 +1809,7 @@ simplified method can be used instead:</p>
 </code></pre>
 <h2 id="constructors">Constructors<a class="headerlink" href="#constructors" title="Permanent link">&para;</a></h2>
 <h3 id="request">request<a class="headerlink" href="#request" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/http/payload/#L136">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/http/payload/#L137">[Source]</a></span></p>
 <p>Create an HTTP <code>request</code> message.</p>
 <pre><code class="language-pony">new iso request(
   method': String val = &quot;GET&quot;,
@@ -1827,7 +1827,7 @@ simplified method can be used instead:</p>
 </ul>
 <hr />
 <h3 id="response">response<a class="headerlink" href="#response" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/http/payload/#L145">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/http/payload/#L146">[Source]</a></span></p>
 <p>Create an HTTP <code>response</code> message.</p>
 <pre><code class="language-pony">new iso response(
   status': Status val = reference)
@@ -1844,30 +1844,30 @@ simplified method can be used instead:</p>
 <hr />
 <h2 id="public-fields">Public fields<a class="headerlink" href="#public-fields" title="Permanent link">&para;</a></h2>
 <h3 id="var-proto-string-val">var proto: <a href="https://stdlib.ponylang.io/builtin-String/">String</a> val<a class="headerlink" href="#var-proto-string-val" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/http/payload/#L75">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/http/payload/#L76">[Source]</a></span></p>
 <p>The HTTP protocol string</p>
 <hr />
 <h3 id="var-status-u16-val">var status: <a href="https://stdlib.ponylang.io/builtin-U16/">U16</a> val<a class="headerlink" href="#var-status-u16-val" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/http/payload/#L78">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/http/payload/#L79">[Source]</a></span></p>
 <p>Internal representation of the response <a href="http-Status">Status</a>.</p>
 <p>Will be <code>0</code> for HTTP requests.</p>
 <hr />
 <h3 id="var-method-string-val">var method: <a href="https://stdlib.ponylang.io/builtin-String/">String</a> val<a class="headerlink" href="#var-method-string-val" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/http/payload/#L85">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/http/payload/#L86">[Source]</a></span></p>
 <p>The HTTP Method.</p>
 <p><code>GET</code>, <code>POST</code>, <code>DELETE</code>, <code>OPTIONS</code>, ...</p>
 <p>For HTTP responses this will be the status string,
 for a <code>200</code> status this will be <code>200 OK</code>, for <code>404</code>, <code>404 Not Found</code> etc..</p>
 <hr />
 <h3 id="var-url-url-val">var url: <a href="../http-URL/">URL</a> val<a class="headerlink" href="#var-url-url-val" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/http/payload/#L95">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/http/payload/#L96">[Source]</a></span></p>
 <p>The HTTP request <a href="http-URL">URL</a>.
 It will be used for the HTTP path and the <code>Host</code> header.
 The <code>user</code> and <code>password</code> fields are ignored.</p>
 <p>For HTTP responses this will be an empty <a href="http-URL">URL</a>.</p>
 <hr />
 <h3 id="var-transfer_mode-chunkedtransfer-val-streamtransfer-val-oneshottransfer-val">var transfer_mode: (<a href="../http-ChunkedTransfer/">ChunkedTransfer</a> val | <a href="../http-StreamTransfer/">StreamTransfer</a> val | <a href="../http-OneshotTransfer/">OneshotTransfer</a> val)<a class="headerlink" href="#var-transfer_mode-chunkedtransfer-val-streamtransfer-val-oneshottransfer-val" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/http/payload/#L104">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/http/payload/#L105">[Source]</a></span></p>
 <p>Determines the transfer mode of this message.</p>
 <p>In case of outgoing requests or responses,
 use <code>set_length</code> to control the transfer mode.</p>
@@ -1875,17 +1875,17 @@ use <code>set_length</code> to control the transfer mode.</p>
 how the request is transferred.</p>
 <hr />
 <h3 id="var-session-httpsession-tag-none-val">var session: (<a href="../http-HTTPSession/">HTTPSession</a> tag | <a href="https://stdlib.ponylang.io/builtin-None/">None</a> val)<a class="headerlink" href="#var-session-httpsession-tag-none-val" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/http/payload/#L114">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/http/payload/#L115">[Source]</a></span></p>
 <hr />
 <h3 id="var-username-string-val">var username: <a href="https://stdlib.ponylang.io/builtin-String/">String</a> val<a class="headerlink" href="#var-username-string-val" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/http/payload/#L119">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/http/payload/#L120">[Source]</a></span></p>
 <p>The username extracted from an <code>Authentication</code> header of an HTTP request
 received via <a href="http-HTTPServer">HTTPServer</a>.</p>
 <p>This is not used and not sent using <a href="http-HTTPClient">HTTPClient</a>,
 use <code>update</code> to set an <code>Authentication</code> header instead.</p>
 <hr />
 <h3 id="var-password-string-val">var password: <a href="https://stdlib.ponylang.io/builtin-String/">String</a> val<a class="headerlink" href="#var-password-string-val" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/http/payload/#L127">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/http/payload/#L128">[Source]</a></span></p>
 <p>The password extracted from an <code>Authentication</code> header of an HTTP request
 received via <a href="http-HTTPServer">HTTPServer</a>.</p>
 <p>This is not used and not sent using <a href="http-HTTPClient">HTTPClient</a>,
@@ -1893,7 +1893,7 @@ use <code>update</code> to set an <code>Authentication</code> header instead.</p
 <hr />
 <h2 id="public-functions">Public Functions<a class="headerlink" href="#public-functions" title="Permanent link">&para;</a></h2>
 <h3 id="apply">apply<a class="headerlink" href="#apply" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/http/payload/#L163">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/http/payload/#L164">[Source]</a></span></p>
 <p>Get a header.</p>
 <pre><code class="language-pony">fun box apply(
   key: String val)
@@ -1909,7 +1909,7 @@ use <code>update</code> to set an <code>Authentication</code> header instead.</p
 </ul>
 <hr />
 <h3 id="is_safe">is_safe<a class="headerlink" href="#is_safe" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/http/payload/#L169">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/http/payload/#L170">[Source]</a></span></p>
 <p>A request method is "safe" if it does not modify state in the resource.
 These methods can be guaranteed not to have any body data.
 Return true for a safe request method, false otherwise.</p>
@@ -1922,7 +1922,7 @@ Return true for a safe request method, false otherwise.</p>
 </ul>
 <hr />
 <h3 id="body">body<a class="headerlink" href="#body" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/http/payload/#L184">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/http/payload/#L185">[Source]</a></span></p>
 <p>Get the body in <code>OneshotTransfer</code> mode.
 In the other modes it raises an error.</p>
 <pre><code class="language-pony">fun box body()
@@ -1934,7 +1934,7 @@ In the other modes it raises an error.</p>
 </ul>
 <hr />
 <h3 id="set_length">set_length<a class="headerlink" href="#set_length" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/http/payload/#L194">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/http/payload/#L195">[Source]</a></span></p>
 <p>Set the body length when known in advance. This determines the
 transfer mode that will be used. A parameter of 'None' will use
 Chunked Transfer Encoding. A numeric value will use Streamed
@@ -1954,7 +1954,7 @@ use Oneshot transfer.</p>
 </ul>
 <hr />
 <h3 id="update">update<a class="headerlink" href="#update" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/http/payload/#L214">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/http/payload/#L215">[Source]</a></span></p>
 <p>Set any header. If we've already received the header, append the value as a
 comma separated list, as per RFC 2616 section 4.2.</p>
 <pre><code class="language-pony">fun ref update(
@@ -1973,7 +1973,7 @@ comma separated list, as per RFC 2616 section 4.2.</p>
 </ul>
 <hr />
 <h3 id="headers">headers<a class="headerlink" href="#headers" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/http/payload/#L225">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/http/payload/#L226">[Source]</a></span></p>
 <p>Get all the headers.</p>
 <pre><code class="language-pony">fun box headers()
 : this-&gt;HashMap[String val, String val, HashEq[String val] val] ref
@@ -1984,7 +1984,7 @@ comma separated list, as per RFC 2616 section 4.2.</p>
 </ul>
 <hr />
 <h3 id="body_size">body_size<a class="headerlink" href="#body_size" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/http/payload/#L231">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/http/payload/#L232">[Source]</a></span></p>
 <p>Get the total intended size of the body.
 <code>ServerConnection</code> accumulates actual size transferred for logging.</p>
 <pre><code class="language-pony">fun box body_size()
@@ -1996,7 +1996,7 @@ comma separated list, as per RFC 2616 section 4.2.</p>
 </ul>
 <hr />
 <h3 id="add_chunk">add_chunk<a class="headerlink" href="#add_chunk" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/http/payload/#L241">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/http/payload/#L242">[Source]</a></span></p>
 <p>This is how application code adds data to the body in
 <code>OneshotTransfer</code> mode. For large bodies, call <code>set_length</code>
 and use <code>send_chunk</code> instead.</p>
@@ -2014,7 +2014,7 @@ and use <code>send_chunk</code> instead.</p>
 </ul>
 <hr />
 <h3 id="send_chunk">send_chunk<a class="headerlink" href="#send_chunk" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/http/payload/#L252">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/http/payload/#L253">[Source]</a></span></p>
 <p>This is how application code sends body data in <code>StreamTransfer</code> and
 <code>ChunkedTransfer</code> modes. For smaller body lengths, <code>add_chunk</code> in
 <code>Oneshot</code> mode can be used instead.</p>
@@ -2032,7 +2032,7 @@ and use <code>send_chunk</code> instead.</p>
 </ul>
 <hr />
 <h3 id="finish">finish<a class="headerlink" href="#finish" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/http/payload/#L277">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/http/payload/#L278">[Source]</a></span></p>
 <p>Mark the end of body transmission. This does not do anything,
 and is unnecessary, in Oneshot mode.</p>
 <pre><code class="language-pony">fun val finish()
@@ -2044,7 +2044,7 @@ and is unnecessary, in Oneshot mode.</p>
 </ul>
 <hr />
 <h3 id="respond">respond<a class="headerlink" href="#respond" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/http/payload/#L293">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/http/payload/#L294">[Source]</a></span></p>
 <p>Start sending a response from the server to the client.</p>
 <pre><code class="language-pony">fun val respond(
   response': Payload trn)
@@ -2060,7 +2060,7 @@ and is unnecessary, in Oneshot mode.</p>
 </ul>
 <hr />
 <h3 id="has_body">has_body<a class="headerlink" href="#has_body" title="Permanent link">&para;</a></h3>
-<p><span class="source-link"><a href="../src/http/payload/#L411">[Source]</a></span></p>
+<p><span class="source-link"><a href="../src/http/payload/#L432">[Source]</a></span></p>
 <p>Determines whether a message has a body portion.</p>
 <pre><code class="language-pony">fun box has_body()
 : Bool val
