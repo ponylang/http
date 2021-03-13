@@ -8,11 +8,10 @@ Ponylang package to build clients for the HTTP protocol.
 
 ## Installation
 
-* Add `http` (and its transitive dependencies) to your build dependencies using [corral](https://github.com/ponylang/corral):
+* Add `http` to your build dependencies using [corral](https://github.com/ponylang/corral):
 
 ```bash
-corral add github.com/ponylang/http.git
-corral add github.com/ponylang/net_ssl.git
+corral add github.com/ponylang/http.git --version 0.2.8
 ```
 
 * Execute `corral fetch` to fetch your dependencies.
