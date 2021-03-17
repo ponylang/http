@@ -9,8 +9,6 @@ actor Main is TestList
   fun tag tests(test: PonyTest) =>
     PrivateTests.tests(test)
     ClientErrorHandlingTests.tests(test)
-    ServerErrorHandlingTests.tests(test)
-    test(CommonLogTest)
     ClientTests.tests(test)
 
 actor _TestStream is OutStream
@@ -52,31 +50,4 @@ actor _TestStream is OutStream
       _regex.matches(collected).has_next(),
       collected + " did not match")
     h.complete(true)
-
-class iso CommonLogTest is UnitTest
-  fun name(): String => "http/common_log"
-
-  fun apply(h: TestHelper)? =>
-    h.long_test(10_000_000)
-
-    let ip = "127.0.0.1"
-    let regex =
-      recover val
-        Regex(ip + " - - \\[\\d{2}/[a-zA-Z]{3}/\\d{4}:\\d{2}:\\d{2}:\\d{2} \\+0000\\] \"GET /path\\?query=1#fragment HTTP/1\\.1\" 200 1024 \"\" \"\"")?
-      end
-    let stream = _TestStream(regex)
-    let req: Payload val = Payload.request(
-      "GET",
-      URL.build("http://localhost:65535/path?query=1#fragment")?
-    )
-    let res: Payload val = Payload.response()
-    let log = CommonLog(stream)
-    log.apply(
-      ip,
-      USize(1024),
-      req,
-      res
-    )
-    stream.validate(h)
-
 
