@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Changed
 
+- Remove HTTP server code ([PR #57](https://github.com/ponylang/http/pull/57))
 
 ## [0.2.8] - 2021-03-10
 
