@@ -8,9 +8,8 @@ COMPILE_WITH := corral run -- ponyc
 BUILD_DIR ?= build/$(config)
 SRC_DIR ?= $(PACKAGE)
 EXAMPLES_DIR := examples
-TEST_DIR := $(SRC_DIR)/test
 BENCH_DIR := bench
-tests_binary := $(BUILD_DIR)/test
+tests_binary := $(BUILD_DIR)/$(PACKAGE)
 bench_binary := $(BUILD_DIR)/bench
 docs_dir := build/$(PACKAGE)-docs
 
@@ -51,7 +50,7 @@ unit-tests: $(tests_binary)
 
 $(tests_binary): $(SOURCE_FILES) | $(BUILD_DIR)
 	$(GET_DEPENDENCIES_WITH)
-	$(PONYC) -o $(BUILD_DIR) $(TEST_DIR)
+	$(PONYC) -o $(BUILD_DIR) $(SRC_DIR)
 
 build-examples: $(EXAMPLES_BINARIES)
 

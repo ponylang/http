@@ -1,12 +1,14 @@
-use ".."
 use "ponytest"
 use "net"
 
-primitive ClientTests is TestList
-  fun tag tests(test: PonyTest) =>
-    test(ClientStreamTransferTest)
+actor _ClientTests is TestList
+  new make() =>
+    None
 
-class val StreamTransferHandlerFactory is HandlerFactory
+  fun tag tests(test: PonyTest) =>
+    test(_ClientStreamTransferTest)
+
+class val _StreamTransferHandlerFactory is HandlerFactory
   let _h: TestHelper
   var expected_length: USize = 0
   var received_size: USize = 0
@@ -37,7 +39,7 @@ class val StreamTransferHandlerFactory is HandlerFactory
         _h.fail("failed")
     end
 
-class iso ClientStreamTransferTest is UnitTest
+class iso _ClientStreamTransferTest is UnitTest
   fun name(): String => "client/stream-transfer"
   fun apply(h: TestHelper) ? =>
     h.long_test(2_000_000_000)
@@ -66,7 +68,7 @@ class iso ClientStreamTransferTest is UnitTest
             let req = Payload.request("GET", URL.build("http://" + host + ":" + port  + "/bla")?)
             client(
               consume req,
-              StreamTransferHandlerFactory(_h)
+              _StreamTransferHandlerFactory(_h)
             )?
           else
             _h.fail("request building failed")
@@ -115,5 +117,3 @@ class iso ClientStreamTransferTest is UnitTest
       "127.0.0.1"
       "0")
     h.dispose_when_done(listener)
-
-

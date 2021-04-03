@@ -1,11 +1,18 @@
 use "ponytest"
-use "net"
-use "collections"
 use "buffered"
+use "collections"
+use "net"
+use "regex"
 use "time"
 
-primitive PrivateTests is TestList
+actor Main is TestList
+  new create(env: Env) => PonyTest(env, this)
+  new make() => None
+
   fun tag tests(test: PonyTest) =>
+    _ClientErrorHandlingTests.make().tests(test)
+    _ClientTests.make().tests(test)
+
     test(_Encode)
     test(_EncodeBad)
     test(_EncodeIPv6)
