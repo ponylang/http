@@ -1,14 +1,17 @@
 use "ponytest"
-use ".."
+
 use "net"
 use "net_ssl"
 use "files"
 
-primitive ClientErrorHandlingTests is TestList
+actor _ClientErrorHandlingTests is TestList
+  new make() =>
+    None
+
   fun tag tests(test: PonyTest) =>
-    test(ConnectionClosedTest)
-    test(ConnectFailedTest)
-    test(SSLAuthFailedTest)
+    test(_ConnectionClosedTest)
+    test(_ConnectFailedTest)
+    test(_SSLAuthFailedTest)
 
 class val _ConnectionClosedHandlerFactory is HandlerFactory
   let _h: TestHelper
@@ -26,7 +29,7 @@ class val _ConnectionClosedHandlerFactory is HandlerFactory
         end
     end
 
-class iso ConnectionClosedTest is UnitTest
+class iso _ConnectionClosedTest is UnitTest
   fun name(): String => "client/error-handling/connection-closed"
 
   fun apply(h: TestHelper) ? =>
@@ -110,7 +113,7 @@ class val _ConnectFailedHandlerFactory is HandlerFactory
     end
 
 
-class iso ConnectFailedTest is UnitTest
+class iso _ConnectFailedTest is UnitTest
   fun name(): String => "client/error-handling/connect-failed"
 
   fun apply(h: TestHelper) ? =>
@@ -199,7 +202,7 @@ class val _SSLAuthFailedHandlerFactory is HandlerFactory
         end
     end
 
-class iso SSLAuthFailedTest is UnitTest
+class iso _SSLAuthFailedTest is UnitTest
   var cert_path: (FilePath | None) = None
   var key_path: (FilePath | None) = None
   var ca_path: (FilePath | None) = None
