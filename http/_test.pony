@@ -2,7 +2,6 @@ use "ponytest"
 use "buffered"
 use "collections"
 use "net"
-use "regex"
 use "time"
 
 actor Main is TestList
