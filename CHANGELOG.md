@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Changed
 
+- Remove regex dependency ([PR #62](https://github.com/ponylang/http/pull/62))
 
 ## [0.3.1] - 2021-04-10
 
