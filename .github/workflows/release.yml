@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Generate documentation and upload
-        uses: ponylang/library-documentation-action@0.1.4
+        uses: docker://ponylang/library-documentation-action:0.1.6
         with:
           site_url: "https://ponylang.github.io/http/"
           library_name: "http"
