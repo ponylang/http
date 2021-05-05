@@ -427,7 +427,7 @@ class iso _HTTPConnTest is UnitTest
           let loops: USize = 2
           // let service: String val = "12345"
           h.log("received service: [" + service + "]")
-          let us = "http://localhost:" + service
+          let us: String = "http://localhost:" + service
           h.log("URL: " + us)
           let url = URL.build(us)?
           h.log("url.string()=" + url.string())
