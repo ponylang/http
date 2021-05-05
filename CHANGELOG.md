@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Changed
 
+- Update to match breaking API change in the pony standard library ([PR #63](https://github.com/ponylang/http/pull/63))
 
 ## [0.4.0] - 2021-04-10
 
