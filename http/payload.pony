@@ -45,7 +45,7 @@ class trn Payload
 
     The type of transfer being used by an incoming message can be determined
     from its `transfer_mode` field, which will be one of the
-    [TransferMode](http-TransferMode) types.
+    [TransferMode](/http/http-TransferMode) types.
 
   ### Sequence
 
@@ -70,8 +70,8 @@ class trn Payload
   3. Add any additional headers that may be required, such as `Content-type`.
   4. Call `add_chunk` one or more times to add body data.
   4. Submit the message for transmission by calling the either the
-  [HTTPSession](http-HTTPSession)`.apply` method (in servers) or the
-  [HTTPClient](http-HTTPClient)`.apply` method in clients.
+  [HTTPSession](/http/http-HTTPSession)`.apply` method (in servers) or the
+  [HTTPClient](/http/http-HTTPClient)`.apply` method in clients.
   """
   var proto: String = "HTTP/1.1"
     """The HTTP protocol string"""
