@@ -718,7 +718,7 @@ class iso _HTTPParserStreamedBodyTest is UnitTest
 
 class _PayloadHeadersAreCaseInsensitive is UnitTest
   fun name(): String => "http/Payload.HeadersAreCaseInsensitive"
-  fun apply(h: TestHelper) ?=>
+  fun apply(h: TestHelper) ? =>
     let url = URL.valid("https://example.com")?
     let request = Payload.request(where url' = url)
     let some_caps_header: String = recover val "Accept" end
@@ -730,4 +730,3 @@ class _PayloadHeadersAreCaseInsensitive is UnitTest
 
     h.assert_eq[String](header_value, request(all_lower_header)?)
     h.assert_eq[String](header_value, request(all_upper_header)?)
-
