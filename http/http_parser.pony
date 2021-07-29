@@ -246,14 +246,13 @@ class HTTPParser
     """
     let i = line.find(":")?
     let key = line.substring(0, i)
-    key.strip()
-    let key2: String val = consume key
+    key.>strip().lower_in_place()
     let value = line.substring(i + 1)
     value.strip()
     let value2: String val = consume value
 
     // Examine certain headers describing the encoding.
-    match key2.lower()
+    match key
     | "content-length" => // Explicit body length.
       _expected_length = value2.read_int[USize]()?._1
       // On the receiving end, there is no difference
@@ -276,7 +275,7 @@ class HTTPParser
         _state = _ExpectError
       end
 
-    | "Host" =>
+    | "host" =>
       // TODO: set url host and service
       None
 
@@ -284,7 +283,7 @@ class HTTPParser
 
     end // match certain headers
 
-    _payload(key2) = value2
+    _payload(consume key) = value2
 
   fun ref _setauth(auth: String) =>
     """

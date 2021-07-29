@@ -217,11 +217,9 @@ class trn Payload
     Set any header. If we've already received the header, append the value as a
     comma separated list, as per RFC 2616 section 4.2.
     """
-    let lk = recover val key.lower() end
-    match _headers(lk) = value
-    | let prev: String =>
-      _headers(lk) = prev + "," + value
-    end
+    _headers.upsert(key.lower(),
+      value,
+      {(current, provided) => current + "," + provided})
     this
 
   fun headers(): this->Map[String, String] =>
