@@ -37,6 +37,8 @@ actor Main is TestList
     test(_HTTPParserOneshotBodyTest)
     test(_HTTPParserStreamedBodyTest)
 
+    test(_PayloadHeadersAreCaseInsensitive)
+
 class iso _Encode is UnitTest
   fun name(): String => "http/URLEncode.encode"
 
@@ -713,3 +715,19 @@ class iso _HTTPParserStreamedBodyTest is UnitTest
     match parser.parse(reader)
     | ParseError => h.fail("parser failed to parse request.")
     end
+
+class _PayloadHeadersAreCaseInsensitive is UnitTest
+  fun name(): String => "http/Payload.HeadersAreCaseInsensitive"
+  fun apply(h: TestHelper) ?=>
+    let url = URL.valid("https://example.com")?
+    let request = Payload.request(where url' = url)
+    let some_caps_header: String = recover val "Accept" end
+    let all_lower_header: String = some_caps_header.lower()
+    let all_upper_header: String = some_caps_header.upper()
+    let header_value = "text/plain"
+
+    request(some_caps_header) = header_value
+
+    h.assert_eq[String](header_value, request(all_lower_header)?)
+    h.assert_eq[String](header_value, request(all_upper_header)?)
+

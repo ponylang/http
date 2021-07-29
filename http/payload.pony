@@ -165,7 +165,7 @@ class trn Payload
     """
     Get a header.
     """
-    _headers(key)?
+    _headers(key.lower())?
 
   fun is_safe(): Bool =>
     """
@@ -217,9 +217,10 @@ class trn Payload
     Set any header. If we've already received the header, append the value as a
     comma separated list, as per RFC 2616 section 4.2.
     """
-    match _headers(key) = value
+    let lk = recover val key.lower() end
+    match _headers(lk) = value
     | let prev: String =>
-      _headers(key) = prev + "," + value
+      _headers(lk) = prev + "," + value
     end
     this
 
