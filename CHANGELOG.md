@@ -2,17 +2,11 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
-## [unreleased] - unreleased
+## [0.4.2] - 2021-07-30
 
 ### Fixed
 
 - Make Payload headers case insensitive ([PR #65](https://github.com/ponylang/http/pull/65))
-
-### Added
-
-
-### Changed
-
 
 ## [0.4.1] - 2021-05-05
 
