@@ -193,10 +193,8 @@ class iso _ConnectFailedTest is UnitTest
       fun ref closed(listen: TCPListener ref) =>
         _h.complete_action("server closed")
         _h.log("TCP listener closed")
-        _h.fail("not attempting connect")
-        _h.complete(false)
-        // let attempt = _ConnectAttempter(_h)
-        // attempt.connect(host, port)
+        let attempt = _ConnectAttempter(_h)
+        attempt.connect(host, port)
 
       fun ref connected(listen: TCPListener ref): TCPConnectionNotify iso^ =>
         _h.log("server listen connected.")
