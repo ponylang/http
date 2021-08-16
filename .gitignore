@@ -4,5 +4,5 @@
 TAGS
 tags
 .coverage/
-.vscode
+.vscode/
 lock.json
