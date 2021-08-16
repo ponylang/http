@@ -11,6 +11,7 @@ actor _ClientErrorHandlingTests is TestList
   fun tag tests(test: PonyTest) =>
     test(_ConnectionClosedTest)
     ifdef not windows then
+      // Server sockets on Windows can be connected to long after they are dead
       test(_ConnectFailedTest)
     end
     test(_SSLAuthFailedTest)
@@ -35,7 +36,7 @@ class iso _ConnectionClosedTest is UnitTest
   fun name(): String => "client/error-handling/connection-closed"
 
   fun apply(h: TestHelper) ? =>
-    h.long_test(2_000_000_000)
+    h.long_test(5_000_000_000)
 
     h.expect_action("server listening")
     h.expect_action("server listen connected")
@@ -103,7 +104,7 @@ class iso _ConnectionClosedTest is UnitTest
       host, service)
     h.dispose_when_done(listener)
 
-actor _ConnectAttempter
+actor _Connecter
   let _h: TestHelper
 
   new create(h: TestHelper) =>
@@ -128,10 +129,7 @@ actor _ConnectAttempter
       let req = Payload.request("GET",
         URL.build("http://" + host + ":" + port' + "/bla")?)
       req.add_chunk("CHUNK")
-      client(
-        consume req,
-        _ConnectFailedHandlerFactory(_h)
-      )?
+      client(consume req, _ConnectFailedHandlerFactory(_h))?
     else
       _h.fail("request building failed")
     end
@@ -164,7 +162,7 @@ class iso _ConnectFailedTest is UnitTest
   fun name(): String => "client/error-handling/connect-failed"
 
   fun apply(h: TestHelper) ? =>
-    h.long_test(20_000_000_000)
+    h.long_test(5_000_000_000)
 
     h.expect_action("server listening")
     h.expect_action("server closed")
@@ -178,7 +176,6 @@ class iso _ConnectFailedTest is UnitTest
 
       fun ref listening(listen: TCPListener ref) =>
         _h.complete_action("server listening")
-        _h.log("listening")
         try
           (host, port) = listen.local_address().name()?
         else
@@ -188,16 +185,13 @@ class iso _ConnectFailedTest is UnitTest
 
       fun ref not_listening(listen: TCPListener ref) =>
         _h.fail_action("server listening")
-        _h.log("not_listening")
 
       fun ref closed(listen: TCPListener ref) =>
         _h.complete_action("server closed")
-        _h.log("TCP listener closed")
-        let attempt = _ConnectAttempter(_h)
-        attempt.connect(host, port)
+        let connecter = _Connecter(_h)
+        connecter.connect(host, port)
 
       fun ref connected(listen: TCPListener ref): TCPConnectionNotify iso^ =>
-        _h.log("server listen connected.")
         object iso is TCPConnectionNotify
           fun ref received(conn: TCPConnection ref, data: Array[U8] iso,
             times: USize): Bool => true
@@ -283,7 +277,7 @@ class iso _SSLAuthFailedTest is UnitTest
     end
 
   fun apply(h: TestHelper) ? =>
-    h.long_test(10_000_000_000)
+    h.long_test(5_000_000_000)
 
     h.expect_action("server listening")
     h.expect_action("client failed with AuthFailed")
