@@ -50,70 +50,71 @@ class iso _ClientStreamTransferTest is UnitTest
     h.expect_action("chunk")
     h.expect_action("finished")
 
-    let listener = TCPListener.ip4(
-      h.env.root as AmbientAuth,
-      object iso is TCPListenNotify
-        let _h: TestHelper = h
+    let notify = object iso is TCPListenNotify
+      let _h: TestHelper = h
 
-        fun ref listening(listen: TCPListener ref) =>
-          _h.complete_action("server listening")
-          try
-            let client = HTTPClient(
-              _h.env.root as AmbientAuth,
-              None
-              where keepalive_timeout_secs = U32(2)
-            )
-            (let host, let port) = listen.local_address().name()?
-            _h.log("connecting to server at " + host + ":" + port)
-            let req = Payload.request("GET", URL.build("http://" + host + ":" + port  + "/bla")?)
-            client(
-              consume req,
-              _StreamTransferHandlerFactory(_h)
-            )?
-          else
-            _h.fail("request building failed")
-          end
+      fun ref listening(listen: TCPListener ref) =>
+        _h.complete_action("server listening")
+        try
+          let client = HTTPClient(
+            _h.env.root as AmbientAuth,
+            None
+            where keepalive_timeout_secs = U32(2)
+          )
+          (let host, let port) = listen.local_address().name()?
+          _h.log("connecting to server at " + host + ":" + port)
+          let req = Payload.request("GET", URL.build("http://" + host + ":" + port  + "/bla")?)
+          client(
+            consume req,
+            _StreamTransferHandlerFactory(_h)
+          )?
+        else
+          _h.fail("request building failed")
+        end
 
-        fun ref not_listening(listen: TCPListener ref) =>
-          _h.fail_action("server listening")
-          _h.log("not_listening")
+      fun ref not_listening(listen: TCPListener ref) =>
+        _h.fail_action("server listening")
+        _h.log("not_listening")
 
-        fun ref closed(listen: TCPListener ref) =>
-          _h.log("TCP listener closed")
+      fun ref closed(listen: TCPListener ref) =>
+        _h.log("TCP listener closed")
 
-        fun ref connected(listen: TCPListener ref): TCPConnectionNotify iso^ =>
-          object iso is TCPConnectionNotify
-            var written: Bool = false
-            fun ref received(conn: TCPConnection ref, data: Array[U8] iso, times: USize): Bool =>
-              _h.log("received stuff")
-              if not written then
-                conn.write("\r\n".join([
-                  "HTTP/1.1 200 OK"
-                  "Server: Bla"
-                  "Content-Length: 10004"
-                  "Content-Type: application/octet-stream"
-                  ""
-                  ""
-                ].values()))
-                conn.write(recover val Array[U8].init('a', 2501) end)
-                conn.write(recover val Array[U8].init('b', 2501) end)
-                conn.write(recover val Array[U8].init('c', 2501) end)
-                conn.write(recover val Array[U8].init('d', 2501) end)
-                written = true
-              end
-              true
+      fun ref connected(listen: TCPListener ref): TCPConnectionNotify iso^ =>
+        object iso is TCPConnectionNotify
+          var written: Bool = false
+          fun ref received(conn: TCPConnection ref, data: Array[U8] iso, times: USize): Bool =>
+            _h.log("received stuff")
+            if not written then
+              conn.write("\r\n".join([
+                "HTTP/1.1 200 OK"
+                "Server: Bla"
+                "Content-Length: 10004"
+                "Content-Type: application/octet-stream"
+                ""
+                ""
+              ].values()))
+              conn.write(recover val Array[U8].init('a', 2501) end)
+              conn.write(recover val Array[U8].init('b', 2501) end)
+              conn.write(recover val Array[U8].init('c', 2501) end)
+              conn.write(recover val Array[U8].init('d', 2501) end)
+              written = true
+            end
+            true
 
-            fun ref accepted(conn: TCPConnection ref) =>
-              _h.complete_action("server connection accepted")
-              _h.dispose_when_done(conn)
+          fun ref accepted(conn: TCPConnection ref) =>
+            _h.complete_action("server connection accepted")
+            _h.dispose_when_done(conn)
 
-            fun ref connect_failed(conn: TCPConnection ref) =>
-              _h.fail("connection failed")
+          fun ref connect_failed(conn: TCPConnection ref) =>
+            _h.fail("connection failed")
 
-            fun ref closed(conn: TCPConnection ref) =>
-              _h.complete_action("server connection closed")
-          end
-      end,
-      "127.0.0.1"
-      "0")
+          fun ref closed(conn: TCPConnection ref) =>
+            _h.complete_action("server connection closed")
+        end
+      end
+
+    let host = "127.0.0.1"
+    let service = "0"
+
+    let listener = TCPListener.ip4(h.env.root as AmbientAuth, consume notify, host, service)
     h.dispose_when_done(listener)

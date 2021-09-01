@@ -37,3 +37,41 @@ jobs:
       - uses: actions/checkout@v1
       - name: Test
         run: make test ssl=0.9.0 config=debug
+
+  windows-vs-ponyc-release:
+    name: Test against recent ponyc release on Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Test against recent ponyc release on Windows
+        run: |
+          Invoke-WebRequest https://dl.cloudsmith.io/public/ponylang/releases/raw/versions/latest/ponyc-x86-64-pc-windows-msvc.zip -OutFile C:\ponyc.zip;
+          Expand-Archive -Force -Path C:\ponyc.zip -DestinationPath C:\ponyc;
+          Invoke-WebRequest https://dl.cloudsmith.io/public/ponylang/releases/raw/versions/latest/corral-x86-64-pc-windows-msvc.zip -OutFile C:\corral.zip;
+          Expand-Archive -Force -Path C:\corral.zip -DestinationPath C:\ponyc;
+          $env:PATH = 'C:\ponyc\bin;' + $env:PATH;
+          .\make.ps1 -Command test 2>&1;
+
+  vs-ponyc-latest:
+    name: Test against recent ponyc release
+    runs-on: ubuntu-latest
+    container:
+      image: ponylang/shared-docker-ci-x86-64-unknown-linux-builder-with-libressl-3.2.5:latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Test
+        run: make test ssl=0.9.0 config=debug
+
+  windows-vs-ponyc-latest:
+    name: Test against recent ponyc release on Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Test against recent ponyc release on Windows
+        run: |
+          Invoke-WebRequest https://dl.cloudsmith.io/public/ponylang/nightlies/raw/versions/latest/ponyc-x86-64-pc-windows-msvc.zip -OutFile C:\ponyc.zip;
+          Expand-Archive -Force -Path C:\ponyc.zip -DestinationPath C:\ponyc;
+          Invoke-WebRequest https://dl.cloudsmith.io/public/ponylang/releases/raw/versions/latest/corral-x86-64-pc-windows-msvc.zip -OutFile C:\corral.zip;
+          Expand-Archive -Force -Path C:\corral.zip -DestinationPath C:\ponyc;
+          $env:PATH = 'C:\ponyc\bin;' + $env:PATH;
+          .\make.ps1 -Command test 2>&1;
