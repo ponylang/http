@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Added
 
+- Add Windows support ([PR #67](https://github.com/ponylang/http/pull/67))
 
 ### Changed
 
