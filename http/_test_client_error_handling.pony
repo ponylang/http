@@ -250,7 +250,7 @@ class iso _SSLAuthFailedTest is UnitTest
         "http"
         "test"
         "cert.pem"])
-    )?
+    )
     if not (cert_path as FilePath).exists() then
       h.log("cert path: " + (cert_path as FilePath).path + " does not exist!")
       error
@@ -262,14 +262,14 @@ class iso _SSLAuthFailedTest is UnitTest
         "http"
         "test"
         "key.pem"])
-    )?
+    )
     if not (key_path as FilePath).exists() then
       h.log("key path: " + (key_path as FilePath).path + " does not exist!")
       error
     end
     ifdef not windows then
       ca_path = FilePath(h.env.root as AmbientAuth,
-          "/usr/share/ca-certificates/mozilla")?
+          "/usr/share/ca-certificates/mozilla")
       if not (ca_path as FilePath).exists() then
         h.log("ca path: " + (ca_path as FilePath).path + " does not exist!")
         error
