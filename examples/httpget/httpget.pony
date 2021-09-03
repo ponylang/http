@@ -81,7 +81,7 @@ actor _GetWork
       recover
         SSLContext
           .>set_client_verify(true)
-          .>set_authority(FilePath(env.root as AmbientAuth, "cacert.pem")?)?
+          .>set_authority(FilePath(env.root as AmbientAuth, "cacert.pem"))?
         end
       end
 
