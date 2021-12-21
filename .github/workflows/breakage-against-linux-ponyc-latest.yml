@@ -11,7 +11,7 @@ jobs:
     container:
       image: ponylang/shared-docker-ci-x86-64-unknown-linux-builder-with-libressl-3.4.1:latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Test
         run: make test ssl=0.9.0 config=debug
       - name: Send alert on failure
