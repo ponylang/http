@@ -77,53 +77,52 @@ actor _GetWork
     _env = env
 
     // Get certificate for HTTPS links.
+
     let sslctx = try
       recover
         SSLContext
           .>set_client_verify(true)
-          .>set_authority(FilePath(env.root as AmbientAuth, "cacert.pem"))?
-        end
-      end
-
-    try
-      // The Client manages all links.
-      let client = HTTPClient(env.root as AmbientAuth, consume sslctx where keepalive_timeout_secs = timeout.u32())
-      // The Notify Factory will create HTTPHandlers as required.  It is
-      // done this way because we do not know exactly when an HTTPSession
-      // is created - they can be re-used.
-      let dumpMaker = recover val NotifyFactory.create(this) end
-
-      try
-        // Start building a GET request.
-        let req = Payload.request("GET", url)
-        req("User-Agent") = "Pony httpget"
-
-        // Add authentication if supplied.  We use the "Basic" format,
-        // which is username:password in base64.  In a real example,
-	      // you would only use this on an https link.
-        if user.size() > 0 then
-          let keyword = "Basic "
-          let content = recover String(user.size() + pass.size() + 1) end
-          content.append(user)
-          content.append(":")
-          content.append(pass)
-          let coded = Base64.encode(consume content)
-          let auth = recover String(keyword.size() + coded.size()) end
-          auth.append(keyword)
-          auth.append(consume coded)
-          req("Authorization") = consume auth
-        end
-
-        // Submit the request
-        let sentreq = client(consume req, dumpMaker)?
-
-        // Could send body data via `sentreq`, if it was a POST
-      else
-        try env.out.print("Malformed URL: " + env.args(1)?) end
-        env.exitcode(1)
+          .>set_authority(FilePath(env.root, "cacert.pem"))?
       end
     else
-      env.out.print("unable to use network")
+      env.out.print("Unable to create cert.")
+      env.exitcode(1)
+    end
+
+    // The Client manages all links.
+    let client = HTTPClient(env.root, consume sslctx where keepalive_timeout_secs = timeout.u32())
+    // The Notify Factory will create HTTPHandlers as required.  It is
+    // done this way because we do not know exactly when an HTTPSession
+    // is created - they can be re-used.
+    let dumpMaker = recover val NotifyFactory.create(this) end
+
+    try
+      // Start building a GET request.
+      let req = Payload.request("GET", url)
+      req("User-Agent") = "Pony httpget"
+
+      // Add authentication if supplied.  We use the "Basic" format,
+      // which is username:password in base64.  In a real example,
+	    // you would only use this on an https link.
+      if user.size() > 0 then
+        let keyword = "Basic "
+        let content = recover String(user.size() + pass.size() + 1) end
+        content.append(user)
+        content.append(":")
+        content.append(pass)
+        let coded = Base64.encode(consume content)
+        let auth = recover String(keyword.size() + coded.size()) end
+        auth.append(keyword)
+        auth.append(consume coded)
+        req("Authorization") = consume auth
+      end
+
+      // Submit the request
+      let sentreq = client(consume req, dumpMaker)?
+
+      // Could send body data via `sentreq`, if it was a POST
+    else
+      try env.out.print("Malformed URL: " + env.args(1)?) end
       env.exitcode(1)
     end
 

@@ -407,7 +407,7 @@ class iso _HTTPConnTest is UnitTest
   fun name(): String => "http/_HTTPConnection._new_conn"
   fun label(): String => "conn-fix"
 
-  fun ref apply(h: TestHelper) ? =>
+  fun ref apply(h: TestHelper) =>
     // Set expectations.
     h.expect_action("client factory apply called")
     h.expect_action("client handler create called")
@@ -434,7 +434,7 @@ class iso _HTTPConnTest is UnitTest
           let url = URL.build(us)?
           h.log("url.string()=" + url.string())
           let hf = _HTTPConnTestHandlerFactory(h)
-          client = recover iso HTTPClient(h.env.root as TCPConnectionAuth) end
+          client = recover iso HTTPClient(h.env.root) end
 
           for _ in Range(0, loops) do
             let payload: Payload iso = Payload.request("GET", url)
@@ -452,7 +452,7 @@ class iso _HTTPConnTest is UnitTest
     // Start the fake server.
     h.dispose_when_done(
       TCPListener.ip4(
-        h.env.root as AmbientAuth,
+        h.env.root,
         _FixedResponseHTTPServerNotify(
           h,
           {(p: String val) =>

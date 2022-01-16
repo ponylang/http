@@ -35,7 +35,7 @@ class val _ConnectionClosedHandlerFactory is HandlerFactory
 class iso _ConnectionClosedTest is UnitTest
   fun name(): String => "client/error-handling/connection-closed"
 
-  fun apply(h: TestHelper) ? =>
+  fun apply(h: TestHelper) =>
     h.long_test(5_000_000_000)
 
     h.expect_action("server listening")
@@ -52,7 +52,7 @@ class iso _ConnectionClosedTest is UnitTest
 
         try
           let client = HTTPClient(
-            _h.env.root as AmbientAuth,
+            _h.env.root,
             None
             where keepalive_timeout_secs = U32(2)
           )
@@ -100,7 +100,7 @@ class iso _ConnectionClosedTest is UnitTest
     let host = "127.0.0.1"
     let service = "0"
 
-    let listener = TCPListener.ip4(h.env.root as AmbientAuth, consume notify,
+    let listener = TCPListener.ip4(h.env.root, consume notify,
       host, service)
     h.dispose_when_done(listener)
 
@@ -122,7 +122,7 @@ actor _Connecter
     _h.complete_action("client trying to connect")
     try
       let client = HTTPClient(
-        _h.env.root as AmbientAuth,
+        _h.env.root,
         None
         where keepalive_timeout_secs = U32(2)
       )
@@ -161,7 +161,7 @@ class val _ConnectFailedHandlerFactory is HandlerFactory
 class iso _ConnectFailedTest is UnitTest
   fun name(): String => "client/error-handling/connect-failed"
 
-  fun apply(h: TestHelper) ? =>
+  fun apply(h: TestHelper) =>
     h.long_test(5_000_000_000)
 
     h.expect_action("server listening")
@@ -204,8 +204,7 @@ class iso _ConnectFailedTest is UnitTest
     let host = "127.0.0.1"
     let service = "0"
 
-    let listener = TCPListener.ip4(h.env.root as AmbientAuth, consume notify,
-      host, service)
+    let listener = TCPListener.ip4(h.env.root, consume notify, host, service)
     h.dispose_when_done(listener)
 
 
@@ -244,7 +243,7 @@ class iso _SSLAuthFailedTest is UnitTest
     // which is not the nicest thing in the world
     let cwd = Path.cwd()
     cert_path = FilePath(
-      h.env.root as AmbientAuth,
+      h.env.root,
       _Paths.join([
         cwd
         "http"
@@ -256,7 +255,7 @@ class iso _SSLAuthFailedTest is UnitTest
       error
     end
     key_path = FilePath(
-      h.env.root as AmbientAuth,
+      h.env.root,
       _Paths.join([
         cwd
         "http"
@@ -268,7 +267,7 @@ class iso _SSLAuthFailedTest is UnitTest
       error
     end
     ifdef not windows then
-      ca_path = FilePath(h.env.root as AmbientAuth,
+      ca_path = FilePath(h.env.root,
           "/usr/share/ca-certificates/mozilla")
       if not (ca_path as FilePath).exists() then
         h.log("ca path: " + (ca_path as FilePath).path + " does not exist!")
@@ -276,7 +275,7 @@ class iso _SSLAuthFailedTest is UnitTest
       end
     end
 
-  fun apply(h: TestHelper) ? =>
+  fun apply(h: TestHelper) =>
     h.long_test(5_000_000_000)
 
     h.expect_action("server listening")
@@ -303,7 +302,7 @@ class iso _SSLAuthFailedTest is UnitTest
               end
             end
             let client = HTTPClient(
-              _h.env.root as AmbientAuth,
+              _h.env.root,
               ssl_ctx
               where keepalive_timeout_secs = U32(2)
             )
@@ -357,6 +356,5 @@ class iso _SSLAuthFailedTest is UnitTest
     let host = "127.0.0.1"
     let service = "0"
 
-    let listener = TCPListener.ip4(h.env.root as AmbientAuth, consume notify,
-      host, service)
+    let listener = TCPListener.ip4(h.env.root, consume notify, host, service)
     h.dispose_when_done(listener)
