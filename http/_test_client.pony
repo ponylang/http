@@ -41,7 +41,7 @@ class val _StreamTransferHandlerFactory is HandlerFactory
 
 class iso _ClientStreamTransferTest is UnitTest
   fun name(): String => "client/stream-transfer"
-  fun apply(h: TestHelper) ? =>
+  fun apply(h: TestHelper) =>
     h.long_test(2_000_000_000)
 
     h.expect_action("server listening")
@@ -57,7 +57,7 @@ class iso _ClientStreamTransferTest is UnitTest
         _h.complete_action("server listening")
         try
           let client = HTTPClient(
-            _h.env.root as AmbientAuth,
+            _h.env.root,
             None
             where keepalive_timeout_secs = U32(2)
           )
@@ -116,5 +116,5 @@ class iso _ClientStreamTransferTest is UnitTest
     let host = "127.0.0.1"
     let service = "0"
 
-    let listener = TCPListener.ip4(h.env.root as AmbientAuth, consume notify, host, service)
+    let listener = TCPListener.ip4(h.env.root, consume notify, host, service)
     h.dispose_when_done(listener)
