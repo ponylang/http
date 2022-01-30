@@ -1,4 +1,4 @@
-interface tag HTTPSession
+trait tag HTTPSession
   """
   An HTTP Session is the external API to the communication link
   between client and server. A session can only transfer one message
@@ -50,7 +50,7 @@ interface tag HTTPSession
     """
     The appropriate Payload Builder will call this from the `TCPConnection`
     actor to start delivery of a new *inbound* message. If the `Payload`s
-    `transfer_mode` is `OneshotTransfer`, this is the only notification 
+    `transfer_mode` is `OneshotTransfer`, this is the only notification
     that will happen for the message. Otherwise there will be one or more
     `_chunk` calls followed by a `_finish` call.
     """
