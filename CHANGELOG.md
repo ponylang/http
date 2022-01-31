@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Changed
 
+- Update interfaces with private methods work with Pony 0.47.0 ([PR #76](https://github.com/ponylang/http/pull/76))
 
 ## [0.4.5] - 2022-01-16
 
