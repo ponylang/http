@@ -4,7 +4,7 @@ use "net"
 use "net_ssl"
 use "files"
 
-actor _ClientErrorHandlingTests is TestList
+actor \nodoc\ _ClientErrorHandlingTests is TestList
   new make() =>
     None
 
@@ -16,7 +16,7 @@ actor _ClientErrorHandlingTests is TestList
     end
     test(_SSLAuthFailedTest)
 
-class val _ConnectionClosedHandlerFactory is HandlerFactory
+class \nodoc\ val _ConnectionClosedHandlerFactory is HandlerFactory
   let _h: TestHelper
   new val create(h: TestHelper) =>
     _h = h
@@ -32,7 +32,7 @@ class val _ConnectionClosedHandlerFactory is HandlerFactory
         end
     end
 
-class iso _ConnectionClosedTest is UnitTest
+class \nodoc\ iso _ConnectionClosedTest is UnitTest
   fun name(): String => "client/error-handling/connection-closed"
 
   fun apply(h: TestHelper) =>
@@ -104,7 +104,7 @@ class iso _ConnectionClosedTest is UnitTest
       host, service)
     h.dispose_when_done(listener)
 
-actor _Connecter
+actor \nodoc\ _Connecter
   let _h: TestHelper
 
   new create(h: TestHelper) =>
@@ -134,7 +134,7 @@ actor _Connecter
       _h.fail("request building failed")
     end
 
-class val _ConnectFailedHandlerFactory is HandlerFactory
+class \nodoc\ val _ConnectFailedHandlerFactory is HandlerFactory
   let _h: TestHelper
 
   new val create(h: TestHelper) =>
@@ -158,7 +158,7 @@ class val _ConnectFailedHandlerFactory is HandlerFactory
         end
     end
 
-class iso _ConnectFailedTest is UnitTest
+class \nodoc\ iso _ConnectFailedTest is UnitTest
   fun name(): String => "client/error-handling/connect-failed"
 
   fun apply(h: TestHelper) =>
@@ -208,7 +208,7 @@ class iso _ConnectFailedTest is UnitTest
     h.dispose_when_done(listener)
 
 
-primitive _Paths
+primitive \nodoc\ _Paths
   fun join(paths: Array[String] box): String =>
     var p = ""
     for path in paths.values() do
@@ -216,7 +216,7 @@ primitive _Paths
     end
     p
 
-class val _SSLAuthFailedHandlerFactory is HandlerFactory
+class \nodoc\ val _SSLAuthFailedHandlerFactory is HandlerFactory
   let _h: TestHelper
   new val create(h: TestHelper) =>
     _h = h
@@ -230,7 +230,7 @@ class val _SSLAuthFailedHandlerFactory is HandlerFactory
         end
     end
 
-class iso _SSLAuthFailedTest is UnitTest
+class \nodoc\ iso _SSLAuthFailedTest is UnitTest
   var cert_path: (FilePath | None) = None
   var key_path: (FilePath | None) = None
   var ca_path: (FilePath | None) = None
