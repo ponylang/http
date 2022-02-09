@@ -1,7 +1,7 @@
 Param(
-  [Parameter(Position=0, Mandatory=$true, HelpMessage="The action to take (build, test, install, package, clean).")]
+  [Parameter(Position=0, HelpMessage="The action to take (build, test, install, package, clean).")]
   [string]
-  $Command,
+  $Command = 'build',
 
   [Parameter(HelpMessage="The build configuration (Release, Debug).")]
   [string]
@@ -92,13 +92,13 @@ function BuildTarget
   {
     if ($binaryTimestamp -lt $file.LastWriteTimeUtc)
     {
-      Write-Host "corral.exe fetch"
-      $output = (corral.exe fetch)
+      Write-Host "corral fetch"
+      $output = (corral fetch)
       $output | ForEach-Object { Write-Host $_ }
       if ($LastExitCode -ne 0) { throw "Error" }
 
-      Write-Host "corral.exe run -- ponyc.exe $configFlag $ponyArgs --cpu `"$Arch`" --output `"$buildDir`" `"$srcDir`""
-      $output = (corral.exe run -- ponyc.exe $configFlag $ponyArgs --cpu "$Arch" --output "$buildDir" "$srcDir")
+      Write-Host "corral run -- ponyc $configFlag $ponyArgs --cpu `"$Arch`" --output `"$buildDir`" `"$srcDir`""
+      $output = (corral run -- ponyc $configFlag $ponyArgs --cpu "$Arch" --output "$buildDir" "$srcDir")
       $output | ForEach-Object { Write-Host $_ }
       if ($LastExitCode -ne 0) { throw "Error" }
       break buildFiles
@@ -125,14 +125,14 @@ function BuildTest
   {
     if ($testTimestamp -lt $file.LastWriteTimeUtc)
     {
-      Write-Host "corral.exe fetch"
-      $output = (corral.exe fetch)
+      Write-Host "corral fetch"
+      $output = (corral fetch)
       $output | ForEach-Object { Write-Host $_ }
       if ($LastExitCode -ne 0) { throw "Error" }
 
       $testDir = Join-Path -Path $srcDir -ChildPath $testPath
-      Write-Host "corral.exe run -- ponyc.exe $configFlag $ponyArgs --cpu `"$Arch`" --output `"$buildDir`" `"$testDir`""
-      $output = (corral.exe run -- ponyc.exe $configFlag $ponyArgs --cpu "$Arch" --output "$buildDir" "$testDir")
+      Write-Host "corral run -- ponyc $configFlag $ponyArgs --cpu `"$Arch`" --output `"$buildDir`" `"$testDir`""
+      $output = (corral run -- ponyc $configFlag $ponyArgs --cpu "$Arch" --output "$buildDir" "$testDir")
       $output | ForEach-Object { Write-Host $_ }
       if ($LastExitCode -ne 0) { throw "Error" }
       break testFiles
