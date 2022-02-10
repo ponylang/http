@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Added
 
+- Support for using ponyup on Windows ([PR #79](https://github.com/ponylang/http/pull/79))
 
 ### Changed
 
