@@ -1,6 +1,6 @@
 use "../http"
 use "buffered"
-use "ponybench"
+use "pony_bench"
 use "debug"
 use "format"
 
