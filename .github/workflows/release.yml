@@ -37,7 +37,7 @@ jobs:
           ref: "main"
           token: ${{ secrets.RELEASE_TOKEN }}
       - name: Generate documentation and upload
-        uses: ponylang/library-documentation-action@0.5.0
+        uses: docker://ponylang/library-documentation-action:release
         with:
           site_url: "https://ponylang.github.io/http/"
           library_name: "http"
