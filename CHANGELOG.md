@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Fixed
 
+- Update to work with Pony 0.49.0 ([PR #80](https://github.com/ponylang/http/pull/80))
 
 ### Added
 
