@@ -7,14 +7,14 @@ class HTTPClient
   Manages a group of HTTP connections on behalf of a client application.
   A client should create one instance of this class.
   """
-  let _auth: TCPConnectionAuth
+  let _auth: TCPConnectAuth
   let _sslctx: SSLContext
   let _pipeline: Bool
   let _keepalive_timeout_secs: U32
   let _sessions: Map[_HostService, _ClientConnection] = _sessions.create()
 
   new create(
-    auth: TCPConnectionAuth,
+    auth: TCPConnectAuth,
     sslctx: (SSLContext | None) = None,
     pipeline: Bool = true,
     keepalive_timeout_secs: U32 = 0)
