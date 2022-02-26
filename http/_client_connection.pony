@@ -40,7 +40,7 @@ actor _ClientConnection is HTTPSession
   actual `HTTPHandler`, customized
   for the client application's needs.
   """
-  let _auth: TCPConnectionAuth
+  let _auth: TCPConnectAuth
   let _host: String
   let _service: String
   let _sslctx: (SSLContext | None)
@@ -55,7 +55,7 @@ actor _ClientConnection is HTTPSession
   embed _wr: Writer = Writer
 
   new create(
-    auth: TCPConnectionAuth,
+    auth: TCPConnectAuth,
     host: String,
     service: String,
     sslctx: (SSLContext | None) = None,

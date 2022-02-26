@@ -1,4 +1,4 @@
-use "ponytest"
+use "pony_test"
 use "net"
 
 actor \nodoc\ _ClientTests is TestList
@@ -57,7 +57,7 @@ class \nodoc\ iso _ClientStreamTransferTest is UnitTest
         _h.complete_action("server listening")
         try
           let client = HTTPClient(
-            _h.env.root,
+            TCPConnectAuth(_h.env.root),
             None
             where keepalive_timeout_secs = U32(2)
           )
@@ -116,5 +116,5 @@ class \nodoc\ iso _ClientStreamTransferTest is UnitTest
     let host = "127.0.0.1"
     let service = "0"
 
-    let listener = TCPListener.ip4(h.env.root, consume notify, host, service)
+    let listener = TCPListener.ip4(TCPListenAuth(h.env.root), consume notify, host, service)
     h.dispose_when_done(listener)

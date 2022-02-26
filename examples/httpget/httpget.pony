@@ -5,6 +5,7 @@ use "encode/base64"
 use "files"
 use "../../http"
 use "net_ssl"
+use "net"
 
 class val Config
   let user: String
@@ -82,7 +83,7 @@ actor _GetWork
       recover
         SSLContext
           .>set_client_verify(true)
-          .>set_authority(FilePath(env.root, "cacert.pem"))?
+          .>set_authority(FilePath(FileAuth(env.root), "cacert.pem"))?
       end
     else
       env.out.print("Unable to create cert.")
@@ -90,7 +91,7 @@ actor _GetWork
     end
 
     // The Client manages all links.
-    let client = HTTPClient(env.root, consume sslctx where keepalive_timeout_secs = timeout.u32())
+    let client = HTTPClient(TCPConnectAuth(env.root), consume sslctx where keepalive_timeout_secs = timeout.u32())
     // The Notify Factory will create HTTPHandlers as required.  It is
     // done this way because we do not know exactly when an HTTPSession
     // is created - they can be re-used.

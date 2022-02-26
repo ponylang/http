@@ -1,4 +1,4 @@
-use "ponytest"
+use "pony_test"
 use "buffered"
 use "collections"
 use "net"
@@ -434,7 +434,7 @@ class \nodoc\ iso _HTTPConnTest is UnitTest
           let url = URL.build(us)?
           h.log("url.string()=" + url.string())
           let hf = _HTTPConnTestHandlerFactory(h)
-          client = recover iso HTTPClient(h.env.root) end
+          client = recover iso HTTPClient(TCPConnectAuth(h.env.root)) end
 
           for _ in Range(0, loops) do
             let payload: Payload iso = Payload.request("GET", url)
@@ -452,7 +452,7 @@ class \nodoc\ iso _HTTPConnTest is UnitTest
     // Start the fake server.
     h.dispose_when_done(
       TCPListener.ip4(
-        h.env.root,
+        TCPListenAuth(h.env.root),
         _FixedResponseHTTPServerNotify(
           h,
           {(p: String val) =>

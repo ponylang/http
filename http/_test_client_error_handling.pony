@@ -1,4 +1,4 @@
-use "ponytest"
+use "pony_test"
 
 use "net"
 use "net_ssl"
@@ -52,7 +52,7 @@ class \nodoc\ iso _ConnectionClosedTest is UnitTest
 
         try
           let client = HTTPClient(
-            _h.env.root,
+            TCPConnectAuth(_h.env.root),
             None
             where keepalive_timeout_secs = U32(2)
           )
@@ -100,7 +100,7 @@ class \nodoc\ iso _ConnectionClosedTest is UnitTest
     let host = "127.0.0.1"
     let service = "0"
 
-    let listener = TCPListener.ip4(h.env.root, consume notify,
+    let listener = TCPListener.ip4(TCPListenAuth(h.env.root), consume notify,
       host, service)
     h.dispose_when_done(listener)
 
@@ -122,7 +122,7 @@ actor \nodoc\ _Connecter
     _h.complete_action("client trying to connect")
     try
       let client = HTTPClient(
-        _h.env.root,
+        TCPConnectAuth(_h.env.root),
         None
         where keepalive_timeout_secs = U32(2)
       )
@@ -204,7 +204,7 @@ class \nodoc\ iso _ConnectFailedTest is UnitTest
     let host = "127.0.0.1"
     let service = "0"
 
-    let listener = TCPListener.ip4(h.env.root, consume notify, host, service)
+    let listener = TCPListener.ip4(TCPListenAuth(h.env.root), consume notify, host, service)
     h.dispose_when_done(listener)
 
 
@@ -243,7 +243,7 @@ class \nodoc\ iso _SSLAuthFailedTest is UnitTest
     // which is not the nicest thing in the world
     let cwd = Path.cwd()
     cert_path = FilePath(
-      h.env.root,
+      FileAuth(h.env.root),
       _Paths.join([
         cwd
         "http"
@@ -255,7 +255,7 @@ class \nodoc\ iso _SSLAuthFailedTest is UnitTest
       error
     end
     key_path = FilePath(
-      h.env.root,
+      FileAuth(h.env.root),
       _Paths.join([
         cwd
         "http"
@@ -267,7 +267,7 @@ class \nodoc\ iso _SSLAuthFailedTest is UnitTest
       error
     end
     ifdef not windows then
-      ca_path = FilePath(h.env.root,
+      ca_path = FilePath(FileAuth(h.env.root),
           "/usr/share/ca-certificates/mozilla")
       if not (ca_path as FilePath).exists() then
         h.log("ca path: " + (ca_path as FilePath).path + " does not exist!")
@@ -302,7 +302,7 @@ class \nodoc\ iso _SSLAuthFailedTest is UnitTest
               end
             end
             let client = HTTPClient(
-              _h.env.root,
+              TCPConnectAuth(_h.env.root),
               ssl_ctx
               where keepalive_timeout_secs = U32(2)
             )
@@ -356,5 +356,5 @@ class \nodoc\ iso _SSLAuthFailedTest is UnitTest
     let host = "127.0.0.1"
     let service = "0"
 
-    let listener = TCPListener.ip4(h.env.root, consume notify, host, service)
+    let listener = TCPListener.ip4(TCPListenAuth(h.env.root), consume notify, host, service)
     h.dispose_when_done(listener)
