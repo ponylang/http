@@ -26,7 +26,9 @@ else
 endif
 
 ifeq (,$(filter $(MAKECMDGOALS),clean docs realclean TAGS))
-  ifeq ($(ssl), 1.1.x)
+  ifeq ($(ssl), 3.0.x)
+	  SSL = -Dopenssl_3.0.x
+  else ifeq ($(ssl), 1.1.x)
 	  SSL = -Dopenssl_1.1.x
   else ifeq ($(ssl), 0.9.0)
 	  SSL = -Dopenssl_0.9.0
