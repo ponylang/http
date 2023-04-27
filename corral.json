@@ -13,7 +13,7 @@
     "homepage": "https://github.com/ponylang/http",
     "license": "BSD-2-Clause",
     "documentation_url": "https://ponylang.github.io/http/",
-    "version": "0.5.3",
+    "version": "0.5.4",
     "name": "http"
   }
 }
