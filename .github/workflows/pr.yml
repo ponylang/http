@@ -11,7 +11,7 @@ jobs:
     name: Lint bash, docker, markdown, and yaml
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Lint codebase
         uses: docker://github/super-linter:v3.8.3
         env:
@@ -28,7 +28,7 @@ jobs:
     container:
       image: ponylang/changelog-tool:release
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Verify CHANGELOG
         run: changelog-tool verify
 
@@ -38,7 +38,7 @@ jobs:
     container:
       image: ponylang/shared-docker-ci-x86-64-unknown-linux-builder-with-libressl-3.7.2:release
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Test
         run: make test ssl=0.9.0 config=debug
 
@@ -46,7 +46,7 @@ jobs:
     name: Test against recent ponyc release on Windows
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Test against recent ponyc release on Windows
         run: |
           Invoke-WebRequest https://dl.cloudsmith.io/public/ponylang/releases/raw/versions/latest/ponyc-x86-64-pc-windows-msvc.zip -OutFile C:\ponyc.zip;
