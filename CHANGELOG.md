@@ -2,17 +2,11 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a CHANGELOG](http://keepachangelog.com/).
 
-## [unreleased] - unreleased
+## [0.5.5] - 2024-01-14
 
 ### Fixed
 
 - Fix bug triggered by OpenSSL 3.2.0 ([PR #105](https://github.com/ponylang/http/pull/105))
-
-### Added
-
-
-### Changed
-
 
 ## [0.5.4] - 2023-04-27
 
