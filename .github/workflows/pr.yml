@@ -32,18 +32,38 @@ jobs:
       - name: Verify CHANGELOG
         run: changelog-tool verify
 
-  vs-ponyc-release:
-    name: Test against recent ponyc release
+  libressl-3-vs-ponyc-release:
+    name: LibreSSL 3.x with most recent ponyc release
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/ponylang/shared-docker-ci-x86-64-unknown-linux-builder-with-libressl-3.7.3:release
     steps:
       - uses: actions/checkout@v3
       - name: Test
-        run: make test ssl=0.9.0 config=debug
+        run: make test config=debug ssl=0.9.0
+
+  openssl-1-vs-ponyc-release:
+    name: OpenSSL 1.x with most recent ponyc release
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/ponylang/shared-docker-ci-x86-64-unknown-linux-builder-with-openssl_1.1.1w:release
+    steps:
+      - uses: actions/checkout@v3
+      - name: Test
+        run: make test config=debug ssl=1.1.x
+
+  openssl-3-vs-ponyc-release:
+    name: OpenSSL 3.x with most recent ponyc release
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/ponylang/shared-docker-ci-x86-64-unknown-linux-builder-with-openssl_3.1.3:release
+    steps:
+      - uses: actions/checkout@v3
+      - name: Test
+        run: make test config=debug ssl=3.0.x
 
   windows-vs-ponyc-release:
-    name: Test against recent ponyc release on Windows
+    name: Windows with most recent ponyc release
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v3
