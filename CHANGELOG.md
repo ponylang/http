@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Fixed
 
+- Fix bug triggered by OpenSSL 3.2.0 ([PR #105](https://github.com/ponylang/http/pull/105))
 
 ### Added
 
