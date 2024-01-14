@@ -5,8 +5,8 @@ on:
     types: [shared-docker-linux-builders-updated]
 
 jobs:
-  vs-ponyc-latest:
-    name: Test against ponyc main
+  libressl-3-vs-ponyc-latest:
+    name: LibreSSL 3.x with most recent ponyc latest
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/ponylang/shared-docker-ci-x86-64-unknown-linux-builder-with-libressl-3.7.3:latest
@@ -14,6 +14,48 @@ jobs:
       - uses: actions/checkout@v3
       - name: Test
         run: make test ssl=0.9.0 config=debug
+      - name: Send alert on failure
+        if: ${{ failure() }}
+        uses: zulip/github-actions-zulip/send-message@b62d5a0e48a4d984ea4fce5dd65ba691963d4db4
+        with:
+          api-key: ${{ secrets.ZULIP_SCHEDULED_JOB_FAILURE_API_KEY }}
+          email: ${{ secrets.ZULIP_SCHEDULED_JOB_FAILURE_EMAIL }}
+          organization-url: 'https://ponylang.zulipchat.com/'
+          to: notifications
+          type: stream
+          topic: ${{ github.repository }} scheduled job failure
+          content: ${{ github.server_url}}/${{ github.repository }}/actions/runs/${{ github.run_id }} failed.
+
+  openssl-1-vs-ponyc-release:
+    name: OpenSSL 1.x with most recent ponyc latest
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/ponylang/shared-docker-ci-x86-64-unknown-linux-builder-with-openssl_1.1.1w:latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Test
+        run: make test config=debug ssl=1.1.x
+      - name: Send alert on failure
+        if: ${{ failure() }}
+        uses: zulip/github-actions-zulip/send-message@b62d5a0e48a4d984ea4fce5dd65ba691963d4db4
+        with:
+          api-key: ${{ secrets.ZULIP_SCHEDULED_JOB_FAILURE_API_KEY }}
+          email: ${{ secrets.ZULIP_SCHEDULED_JOB_FAILURE_EMAIL }}
+          organization-url: 'https://ponylang.zulipchat.com/'
+          to: notifications
+          type: stream
+          topic: ${{ github.repository }} scheduled job failure
+          content: ${{ github.server_url}}/${{ github.repository }}/actions/runs/${{ github.run_id }} failed.
+
+  openssl-3-vs-ponyc-release:
+    name: OpenSSL 3.x with most recent ponyc latest
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/ponylang/shared-docker-ci-x86-64-unknown-linux-builder-with-openssl_3.1.3:latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Test
+        run: make test config=debug ssl=3.0.x
       - name: Send alert on failure
         if: ${{ failure() }}
         uses: zulip/github-actions-zulip/send-message@b62d5a0e48a4d984ea4fce5dd65ba691963d4db4
