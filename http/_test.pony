@@ -11,6 +11,7 @@ actor \nodoc\ Main is TestList
   fun tag tests(test: PonyTest) =>
     _ClientErrorHandlingTests.make().tests(test)
     _ClientTests.make().tests(test)
+    _NetSSL105RegressionTests.make().tests(test)
 
     test(_Encode)
     test(_EncodeBad)
