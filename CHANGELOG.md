@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Changed
 
+- Change HTTPClient handler factory creation ([PR #106](https://github.com/ponylang/http/pull/106))
 
 ## [0.5.5] - 2024-01-14
 
