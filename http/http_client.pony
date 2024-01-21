@@ -12,17 +12,24 @@ class HTTPClient
   let _pipeline: Bool
   let _keepalive_timeout_secs: U32
   let _sessions: Map[_HostService, _ClientConnection] = _sessions.create()
+  let _handlermaker: HandlerFactory val
 
   new create(
     auth: TCPConnectAuth,
+    handlermaker: HandlerFactory val,
     sslctx: (SSLContext | None) = None,
     pipeline: Bool = true,
     keepalive_timeout_secs: U32 = 0)
   =>
     """
-    Create the context in which all HTTP sessions will originate.
+    Create the context in which all HTTP sessions will originate. The `handlermaker`
+    is used to create the `HTTPHandler` that is applied with each received
+    payload after making a request. All requests made with one client are created
+    using the same handler factory, if you need different handlers for different
+    requests, you need to create different clients.
 
     Parameters:
+
     - keepalive_timeout_secs: Use TCP Keepalive and check if the other side is down
                               every `keepalive_timeout_secs` seconds.
     """
@@ -40,12 +47,9 @@ class HTTPClient
 
     _pipeline = pipeline
     _keepalive_timeout_secs = keepalive_timeout_secs
+    _handlermaker = handlermaker
 
-  fun ref apply(
-    request: Payload trn,
-    handlermaker: HandlerFactory val)
-    : Payload val ?
-  =>
+  fun ref apply(request: Payload trn) : Payload val ? =>
     """
     Schedule a request on an HTTP session. If a new connection is created,
     a new instance of the application's Receive Handler will be created
@@ -54,7 +58,7 @@ class HTTPClient
     This is useful in Stream and Chunked transfer modes, so that the
     application can follow up with calls to `Client.send_body`.
     """
-    let session = _get_session(request.url, handlermaker)?
+    let session = _get_session(request.url)?
     let mode = request.transfer_mode
     request.session = session
     let valrequest: Payload val = consume request
@@ -80,11 +84,7 @@ class HTTPClient
     end
 */
 
-  fun ref _get_session(
-    url: URL,
-    handlermaker: HandlerFactory val)
-    : _ClientConnection ?
-  =>
+  fun ref _get_session(url: URL) : _ClientConnection ? =>
     """
     Gets or creates an HTTP Session for the given URL. If a new session
     is created, a new Receive Handler instance is created too.
@@ -100,10 +100,10 @@ class HTTPClient
         match url.scheme
         | "http" =>
           _ClientConnection(_auth, hs.host, hs.service,
-            None, _pipeline, _keepalive_timeout_secs, handlermaker)
+            None, _pipeline, _keepalive_timeout_secs, _handlermaker)
         | "https" =>
           _ClientConnection(_auth, hs.host, hs.service,
-            _sslctx, _pipeline, _keepalive_timeout_secs, handlermaker)
+            _sslctx, _pipeline, _keepalive_timeout_secs, _handlermaker)
         else
           error
         end

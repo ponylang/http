@@ -53,6 +53,7 @@ class \nodoc\ iso _ConnectionClosedTest is UnitTest
         try
           let client = HTTPClient(
             TCPConnectAuth(_h.env.root),
+            _ConnectionClosedHandlerFactory(_h),
             None
             where keepalive_timeout_secs = U32(2)
           )
@@ -60,10 +61,7 @@ class \nodoc\ iso _ConnectionClosedTest is UnitTest
           let req = Payload.request("GET",
             URL.build("http://" + host + ":" + port  + "/bla")?)
           req.add_chunk("CHUNK")
-          client(
-            consume req,
-            _ConnectionClosedHandlerFactory(_h)
-          )?
+          client(consume req)?
         else
           _h.fail("request building failed")
         end
@@ -123,13 +121,14 @@ actor \nodoc\ _Connecter
     try
       let client = HTTPClient(
         TCPConnectAuth(_h.env.root),
+        _ConnectFailedHandlerFactory(_h),
         None
         where keepalive_timeout_secs = U32(2)
       )
       let req = Payload.request("GET",
         URL.build("http://" + host + ":" + port' + "/bla")?)
       req.add_chunk("CHUNK")
-      client(consume req, _ConnectFailedHandlerFactory(_h))?
+      client(consume req)?
     else
       _h.fail("request building failed")
     end
@@ -303,6 +302,7 @@ class \nodoc\ iso _SSLAuthFailedTest is UnitTest
             end
             let client = HTTPClient(
               TCPConnectAuth(_h.env.root),
+              _SSLAuthFailedHandlerFactory(_h),
               ssl_ctx
               where keepalive_timeout_secs = U32(2)
             )
@@ -310,10 +310,7 @@ class \nodoc\ iso _SSLAuthFailedTest is UnitTest
               "GET",
               URL.build("https://" + host + ":" + port  + "/bla")?)
             req.add_chunk("CHUNK")
-            client(
-              consume req,
-              _SSLAuthFailedHandlerFactory(_h)
-            )?
+            client(consume req)?
           else
             _h.fail("request building failed")
           end

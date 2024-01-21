@@ -58,16 +58,14 @@ class \nodoc\ iso _ClientStreamTransferTest is UnitTest
         try
           let client = HTTPClient(
             TCPConnectAuth(_h.env.root),
+            _StreamTransferHandlerFactory(_h),
             None
             where keepalive_timeout_secs = U32(2)
           )
           (let host, let port) = listen.local_address().name()?
           _h.log("connecting to server at " + host + ":" + port)
           let req = Payload.request("GET", URL.build("http://" + host + ":" + port  + "/bla")?)
-          client(
-            consume req,
-            _StreamTransferHandlerFactory(_h)
-          )?
+          client(consume req)?
         else
           _h.fail("request building failed")
         end

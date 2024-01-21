@@ -435,13 +435,13 @@ class \nodoc\ iso _HTTPConnTest is UnitTest
           let url = URL.build(us)?
           h.log("url.string()=" + url.string())
           let hf = _HTTPConnTestHandlerFactory(h)
-          client = recover iso HTTPClient(TCPConnectAuth(h.env.root)) end
+          client = recover iso HTTPClient(TCPConnectAuth(h.env.root), hf) end
 
           for _ in Range(0, loops) do
             let payload: Payload iso = Payload.request("GET", url)
             payload.set_length(0)
             try
-              (client as HTTPClient iso)(consume payload, hf)?
+              (client as HTTPClient iso)(consume payload)?
             end
           end
         else
