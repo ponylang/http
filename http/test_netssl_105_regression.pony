@@ -40,9 +40,9 @@ class \nodoc\ iso _NetSSL105RegressionTest is UnitTest
     try
       let url = URL.build("https://echo.sacovo.ch")?
       let auth = TCPConnectAuth(h.env.root)
-      let client = HTTPClient(auth)
+      let client = HTTPClient(auth, _NetSSL105RegressionHandlerFactory(h))
       let payload = Payload.request("GET", url)
-      client.apply(consume payload, _NetSSL105RegressionHandlerFactory(h))?
+      client.apply(consume payload)?
     else
       h.fail("Unable to setup test")
     end

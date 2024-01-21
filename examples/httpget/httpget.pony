@@ -90,12 +90,18 @@ actor _GetWork
       env.exitcode(1)
     end
 
-    // The Client manages all links.
-    let client = HTTPClient(TCPConnectAuth(env.root), consume sslctx where keepalive_timeout_secs = timeout.u32())
     // The Notify Factory will create HTTPHandlers as required.  It is
     // done this way because we do not know exactly when an HTTPSession
     // is created - they can be re-used.
     let dumpMaker = recover val NotifyFactory.create(this) end
+
+    // The Client manages all links.
+    let client = HTTPClient(
+      TCPConnectAuth(env.root),
+      dumpMaker,
+      consume sslctx
+      where keepalive_timeout_secs = timeout.u32()
+    )
 
     try
       // Start building a GET request.
@@ -119,7 +125,7 @@ actor _GetWork
       end
 
       // Submit the request
-      let sentreq = client(consume req, dumpMaker)?
+      let sentreq = client(consume req)?
 
       // Could send body data via `sentreq`, if it was a POST
     else
