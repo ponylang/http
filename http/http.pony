@@ -1,6 +1,6 @@
 """
 This package includes all the support functions necessary to build client
-and server applications for the HTTP protocol.
+applications for the HTTP protocol.
 
 The important interfaces an application needs to deal with are:
 
@@ -18,7 +18,8 @@ message, with its headers.
 If you are writing a client, you will need to deal with the
 [HTTPClient](/http/http-HTTPClient/) class.
 
-If you are writing a server, you will need to deal with the
-[HTTPServer](/http/http-HTTPServer/) class.
+If you are writing a server, you should look at the
+[Server](https://ponylang.github.io/http_server/http_server-Server/)
+class in the [http_server](https://ponylang.github.io/http_server) package.
 
 """

@@ -120,7 +120,7 @@ class trn Payload
   var username: String = ""
     """
     The username extracted from an `Authentication` header of an HTTP request
-    received via [HTTPServer](http-HTTPServer).
+    received via [HTTPServer](https://ponylang.github.io/http_server/http_server-Server/).
 
     This is not used and not sent using [HTTPClient](http-HTTPClient),
     use `update` to set an `Authentication` header instead.
@@ -128,7 +128,7 @@ class trn Payload
   var password: String = ""
     """
     The password extracted from an `Authentication` header of an HTTP request
-    received via [HTTPServer](http-HTTPServer).
+    received via [HTTPServer](https://ponylang.github.io/http_server/http_server-Server/).
 
     This is not used and not sent using [HTTPClient](http-HTTPClient),
     use `update` to set an `Authentication` header instead.
