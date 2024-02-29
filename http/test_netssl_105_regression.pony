@@ -38,7 +38,7 @@ class \nodoc\ iso _NetSSL105RegressionTest is UnitTest
     h.long_test(2_000_000_000)
 
     try
-      let url = URL.build("https://echo.sacovo.ch")?
+      let url = URL.build("https://example.com")?
       let auth = TCPConnectAuth(h.env.root)
       let client = HTTPClient(auth, _NetSSL105RegressionHandlerFactory(h))
       let payload = Payload.request("GET", url)
