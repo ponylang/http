@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Changed
 
+- Update LibreSSL version used on Windows ([PR #111](https://github.com/ponylang/http/pull/111))
 
 ## [0.6.0] - 2024-01-21
 
