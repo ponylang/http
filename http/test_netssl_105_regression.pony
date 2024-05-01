@@ -35,7 +35,7 @@ class \nodoc\ iso _NetSSL105RegressionTest is UnitTest
   fun name(): String => "regression/net_ssl-105"
 
   fun apply(h: TestHelper) =>
-    h.long_test(2_000_000_000)
+    h.long_test(20_000_000_000)
 
     try
       let url = URL.build("https://example.com")?
