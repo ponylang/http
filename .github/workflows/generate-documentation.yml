@@ -32,11 +32,11 @@ jobs:
           INPUT_LIBRARY_NAME: "http"
           INPUT_DOCS_BUILD_DIR: "build/http-docs"
       - name: Setup Pages
-        uses: actions/configure-pages@v2
+        uses: actions/configure-pages@v5
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v3
         with:
           path: 'build/http-docs/site/'
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v1
+        uses: actions/deploy-pages@v4
