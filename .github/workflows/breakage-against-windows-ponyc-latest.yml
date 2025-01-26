@@ -4,6 +4,9 @@ on:
   repository_dispatch:
     types: [ponyc-windows-nightly-released]
 
+permissions:
+  packages: read
+
 jobs:
   windows-vs-ponyc-latest:
     name: Test against recent ponyc release on Windows
