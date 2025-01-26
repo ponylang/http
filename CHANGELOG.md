@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Fixed
 
+- Fix compilation error with latest pony compiler ([PR #113](https://github.com/ponylang/http/pull/113))
 
 ### Added
 
