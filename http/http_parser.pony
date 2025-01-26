@@ -252,8 +252,7 @@ class HTTPParser
     let value2: String val = consume value
 
     // Examine certain headers describing the encoding.
-    match key
-    | "content-length" => // Explicit body length.
+    if key.eq("content-length") then
       _expected_length = value2.read_int[USize]()?._1
       // On the receiving end, there is no difference
       // between Oneshot and Stream transfers except how
@@ -265,8 +264,7 @@ class HTTPParser
           OneshotTransfer
         end
       _payload.transfer_mode = _transfer_mode
-
-    | "transfer-encoding" => // Incremental body lengths.
+    elseif key.eq("transfer-encoding") then
       try
         value2.find("chunked")?
         _transfer_mode = ChunkedTransfer
@@ -274,14 +272,12 @@ class HTTPParser
       else
         _state = _ExpectError
       end
-
-    | "host" =>
+    elseif key.eq("host") then
       // TODO: set url host and service
       None
-
-    | "authorization" => _setauth(value2)
-
-    end // match certain headers
+    elseif key.eq("authorization") then
+      _setauth(value2)
+    end
 
     _payload(consume key) = value2
 
