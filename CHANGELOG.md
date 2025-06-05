@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Added
 
+- Enable building on arm64 Windows ([PR #117](https://github.com/ponylang/http/pull/117))
 
 ### Changed
 
