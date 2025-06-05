@@ -13,7 +13,7 @@ Param(
 
   [Parameter(HelpMessage="Architecture (native, x64).")]
   [string]
-  $Arch = "x86-64",
+  $Arch = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture,
 
   [Parameter(HelpMessage="Directory to install to.")]
   [string]
@@ -28,6 +28,15 @@ $isLibrary = $true
 
 $rootDir = Split-Path $script:MyInvocation.MyCommand.Path
 $srcDir = Join-Path -Path $rootDir -ChildPath $target
+
+if ($Arch -ieq 'x64')
+{
+  $Arch = 'x86-64'
+}
+elseif ($Arch -ieq 'arm64')
+{
+  $Arch = 'arm64'
+}
 
 if ($Config -ieq "Release")
 {
@@ -97,8 +106,8 @@ function BuildTarget
       $output | ForEach-Object { Write-Host $_ }
       if ($LastExitCode -ne 0) { throw "Error" }
 
-      Write-Host "corral run -- ponyc $configFlag $ponyArgs --cpu `"$Arch`" --output `"$buildDir`" `"$srcDir`""
-      $output = (corral run -- ponyc $configFlag $ponyArgs --cpu "$Arch" --output "$buildDir" "$srcDir")
+      Write-Host "corral run -- ponyc $configFlag $ponyArgs --output `"$buildDir`" `"$srcDir`""
+      $output = (corral run -- ponyc $configFlag $ponyArgs --output "$buildDir" "$srcDir")
       $output | ForEach-Object { Write-Host $_ }
       if ($LastExitCode -ne 0) { throw "Error" }
       break buildFiles
@@ -218,7 +227,7 @@ switch ($Command.ToLower())
     if (-not $isLibrary)
     {
       $binDir = Join-Path -Path $Destdir -ChildPath "bin"
-      $package = "$target-x86-64-pc-windows-msvc.zip"
+      $package = "$target-$Arch-pc-windows-msvc.zip"
       Write-Host "Creating $package..."
 
       Compress-Archive -Path $binDir -DestinationPath "$buildDir\..\$package" -Force
