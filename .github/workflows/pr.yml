@@ -28,12 +28,12 @@ jobs:
   verify-changelog:
     name: Verify CHANGELOG is valid
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/ponylang/changelog-tool:release
     steps:
       - uses: actions/checkout@v4.1.1
       - name: Verify CHANGELOG
-        run: changelog-tool verify
+        uses: docker://ghcr.io/ponylang/changelog-tool:release
+        with:
+          args: changelog-tool verify
 
   libressl-3-vs-ponyc-release:
     name: LibreSSL 3.x with most recent ponyc release
