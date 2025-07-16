@@ -18,7 +18,7 @@ corral add github.com/ponylang/http.git --version 0.6.3
 * Include this package by adding `use "http"` to your Pony sources.
 * Execute `corral run -- ponyc` to compile your application
 
-Note: The `net-ssl` transitive dependency requires a C SSL library to be installed. Please see the [net-ssl installation instructions](https://github.com/ponylang/net-ssl#installation) for more information.
+Note: The `ssl` transitive dependency requires a C SSL library to be installed. Please see the [ssl installation instructions](https://github.com/ponylang/ssl#installation) for more information.
 
 ## API Documentation
 

@@ -1,6 +1,6 @@
 use "collections"
 use "net"
-use "net_ssl"
+use "ssl/net"
 use "buffered"
 
 primitive _ConnConnecting
