@@ -1,7 +1,7 @@
 use "pony_test"
 
 use "net"
-use "net_ssl"
+use "ssl/net"
 use "files"
 
 actor \nodoc\ _ClientErrorHandlingTests is TestList

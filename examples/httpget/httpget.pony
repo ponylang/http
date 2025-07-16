@@ -4,7 +4,7 @@ use "collections"
 use "encode/base64"
 use "files"
 use "../../http"
-use "net_ssl"
+use "ssl/net"
 use "net"
 
 class val Config
