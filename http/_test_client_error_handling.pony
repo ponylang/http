@@ -266,8 +266,13 @@ class \nodoc\ iso _SSLAuthFailedTest is UnitTest
       error
     end
     ifdef not windows then
-      ca_path = FilePath(FileAuth(h.env.root),
-          "/usr/share/ca-certificates/mozilla")
+      ca_path = FilePath(
+        FileAuth(h.env.root),
+        _Paths.join([
+          cwd
+          "http"
+          "test"
+          "cacert.pem"]))
       if not (ca_path as FilePath).exists() then
         h.log("ca path: " + (ca_path as FilePath).path + " does not exist!")
         error
