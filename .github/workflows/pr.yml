@@ -49,7 +49,7 @@ jobs:
     name: LibreSSL 4.x with most recent ponyc release
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/ponylang/shared-docker-ci-x86-64-unknown-linux-builder-with-libressl-4.0.0:release
+      image: ghcr.io/ponylang/shared-docker-ci-standard-builder-with-libressl-4.2.0:release
     steps:
       - uses: actions/checkout@v4.1.1
       - name: Test
