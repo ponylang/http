@@ -3,7 +3,6 @@ name: Linux ponyc update breakage test
 on:
   repository_dispatch:
     types:
-      - shared-docker-linux-builders-updated
       - shared-docker-builders-updated
 
 permissions:
