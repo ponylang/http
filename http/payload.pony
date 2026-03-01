@@ -23,7 +23,7 @@ class trn Payload
     length is known in advance, including most transfers of files. It is
     selected by calling `Payload.set_length` with an integer bytecount.
     Appication buffer sizes determine how much data is fed to the TCP
-    connection at once, but the total amount must match \exhaustive\ this size.
+    connection at once, but the total amount must match this size.
 
   3. **ChunkedTransfer**. This is used when the payload length can not be
     known in advance, but can be large. It is selected by calling
