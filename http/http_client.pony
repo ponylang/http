@@ -79,7 +79,7 @@ class HTTPClient
     """
     Cancel a request.
     """
-    match request.session
+    match \exhaustive\ request.session
     | let s _ClientConnection tag => s.cancel(request)
     end
 */
