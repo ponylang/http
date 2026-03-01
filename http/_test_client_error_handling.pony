@@ -24,7 +24,7 @@ class \nodoc\ val _ConnectionClosedHandlerFactory is HandlerFactory
   fun apply(session: HTTPSession): HTTPHandler ref^ =>
     object is HTTPHandler
       fun ref failed(reason: HTTPFailureReason) =>
-        match reason
+        match \exhaustive\ reason
         | ConnectionClosed =>
           _h.complete_action("client failed with ConnectionClosed")
         else
@@ -145,7 +145,7 @@ class \nodoc\ val _ConnectFailedHandlerFactory is HandlerFactory
         _h.fail("failed by finishing")
         _h.complete(false)
       fun ref failed(reason: HTTPFailureReason) =>
-        match reason
+        match \exhaustive\ reason
         | AuthFailed =>
           _h.fail("failed with AuthFailed")
           _h.complete(false)

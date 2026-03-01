@@ -28,7 +28,7 @@ class val Config
       ArgSpec.string("url", "Url to query." where default' = None)
     ])?.>add_help()?
     let cmd =
-      match CommandParser(cs).parse(env.args, env.vars)
+      match \exhaustive\ CommandParser(cs).parse(env.args, env.vars)
       | let c: Command => c
       | let ch: CommandHelp =>
         ch.print_help(env.out)
@@ -140,7 +140,7 @@ actor _GetWork
     _env.out.print("-- response cancelled --")
 
   be failed(reason: HTTPFailureReason) =>
-    match reason
+    match \exhaustive\ reason
     | AuthFailed =>
       _env.err.print("-- auth failed --")
     | ConnectFailed =>

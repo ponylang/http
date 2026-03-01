@@ -79,7 +79,7 @@ class _ParseRequestBenchmark
     while data_iter.has_next() do
       let chunk = data_iter.next()?
       _reader.append(chunk)
-      match _parser.parse(_reader)
+      match \exhaustive\ _parser.parse(_reader)
       | ParseError =>
         Debug("parsing failed.")
         if not data_iter.has_next() then

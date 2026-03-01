@@ -440,7 +440,7 @@ class HTTPParser
 
 /* Saved for debugging.
   fun ref _say() =>
-    match _state
+    match \exhaustive\ _state
     | _ExpectRequest => Debug.out("-Request method and URL")
     | _ExpectResponse => Debug.out("-Response status")
     | _ExpectHeaders => Debug.out("-More headers")
