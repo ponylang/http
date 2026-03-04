@@ -45,7 +45,7 @@ EXAMPLES_SOURCE_FILES := $(shell find $(EXAMPLES_DIR) -name *.pony)
 EXAMPLES_BINARIES := $(addprefix $(BUILD_DIR)/,$(EXAMPLES))
 BENCH_SOURCE_FILES := $(shell find $(BENCH_DIR) -name *.pony)
 
-test: unit-tests build-examples
+test: unit-tests examples
 
 unit-tests: $(tests_binary)
 	$^ --exclude=integration --sequential
@@ -54,7 +54,7 @@ $(tests_binary): $(SOURCE_FILES) | $(BUILD_DIR)
 	$(GET_DEPENDENCIES_WITH)
 	$(PONYC) -o $(BUILD_DIR) $(SRC_DIR)
 
-build-examples: $(EXAMPLES_BINARIES)
+examples: $(EXAMPLES_BINARIES)
 
 $(EXAMPLES_BINARIES): $(BUILD_DIR)/%: $(SOURCE_FILES) $(EXAMPLES_SOURCE_FILES) | $(BUILD_DIR)
 	$(GET_DEPENDENCIES_WITH)
@@ -92,4 +92,4 @@ all: test
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-.PHONY: all build-examples clean TAGS test
+.PHONY: all examples clean TAGS test
