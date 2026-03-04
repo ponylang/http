@@ -4,6 +4,7 @@ PACKAGE := http
 GET_DEPENDENCIES_WITH := corral fetch
 CLEAN_DEPENDENCIES_WITH := corral clean
 COMPILE_WITH := corral run -- ponyc
+BUILD_DOCS_WITH := corral run -- pony-doc
 
 BUILD_DIR ?= build/$(config)
 SRC_DIR ?= $(PACKAGE)
@@ -67,7 +68,7 @@ clean:
 $(docs_dir): $(SOURCE_FILES)
 	rm -rf $(docs_dir)
 	$(GET_DEPENDENCIES_WITH)
-	$(PONYC) --docs-public --pass=docs --output build $(SRC_DIR)
+	$(BUILD_DOCS_WITH) --output build $(SRC_DIR)
 
 docs: $(docs_dir)
 
