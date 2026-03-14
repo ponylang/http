@@ -51,6 +51,9 @@ test: unit-tests examples
 unit-tests: $(tests_binary)
 	$^ --exclude=integration --sequential
 
+test-one: $(tests_binary)
+	$^ --only="$(t)"
+
 $(tests_binary): $(SOURCE_FILES) | $(BUILD_DIR)
 	$(GET_DEPENDENCIES_WITH)
 	$(PONYC) -o $(BUILD_DIR) $(SRC_DIR)
@@ -93,4 +96,4 @@ all: test
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-.PHONY: all examples clean TAGS test
+.PHONY: all examples clean TAGS test test-one
