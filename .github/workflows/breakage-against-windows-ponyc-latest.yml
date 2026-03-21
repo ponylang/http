@@ -20,6 +20,21 @@ jobs:
           Invoke-WebRequest https://dl.cloudsmith.io/public/ponylang/releases/raw/versions/latest/corral-x86-64-pc-windows-msvc.zip -OutFile C:\corral.zip;
           Expand-Archive -Force -Path C:\corral.zip -DestinationPath C:\ponyc;
           $env:PATH = 'C:\ponyc\bin;' + $env:PATH;
+      - name: cache SSL libs
+        id: restore-libs
+        uses: actions/cache@v5.0.3
+        with:
+          path: |
+            ssl.lib
+            crypto.lib
+            tls.lib
+          key: rootlibs-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('make.ps1') }}
+      - name: build SSL libs
+        if: steps.restore-libs.outputs.cache-hit != 'true'
+        run: .\make.ps1 -Command libs  2>&1;
+      - name: Test
+        run: |
+          $env:PATH = 'C:\ponyc\bin;' + $env:PATH;
           .\make.ps1 -Command test 2>&1;
       - name: Send alert on failure
         if: ${{ failure() }}
