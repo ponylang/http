@@ -53,14 +53,14 @@ else
   throw "Invalid -Config path '$Config'; must be one of (Debug, Release)."
 }
 
-# $libsDir = Join-Path -Path $rootDir -ChildPath "build/libs"
+$libsDir = Join-Path -Path $rootDir -ChildPath "build/libs"
 
 if (($Version -eq "") -and (Test-Path -Path "$rootDir\VERSION"))
 {
   $Version = (Get-Content "$rootDir\VERSION") + "-" + (& git 'rev-parse' '--short' '--verify' 'HEAD^')
 }
 
-$ponyArgs = "--define openssl_0.9.0"
+$ponyArgs = "--define libressl  --path $rootDir"
 
 Write-Host "Configuration:    $Config"
 Write-Host "Version:          $Version"
@@ -85,6 +85,44 @@ if (($Command -ne "clean") -and (Test-Path -Path "$rootDir\VERSION"))
       Write-Host "$templateFile -> $ponyFile"
       ((Get-Content -Path $templateFile) -replace '%%VERSION%%', $Version) | Set-Content -Path $ponyFile
     }
+  }
+}
+
+function BuildLibs
+{
+  # When upgrading, change $libreSsl, $libreSslLib, and the copied libs below
+  $libreSsl = "libressl-3.9.1"
+
+  if (-not ((Test-Path "$rootDir/crypto.lib") -and (Test-Path "$rootDir/ssl.lib")))
+  {
+    $libreSslSrc = Join-Path -Path $libsDir -ChildPath $libreSsl
+
+    if (-not (Test-Path $libreSslSrc))
+    {
+      $libreSslTgz = "$libreSsl.tar.gz"
+      $libreSslTgzTgt = Join-Path -Path $libsDir -ChildPath $libreSslTgz
+      if (-not (Test-Path $libreSslTgzTgt)) { Invoke-WebRequest -TimeoutSec 300 -Uri "https://cdn.openbsd.org/pub/OpenBSD/LibreSSL/$libreSslTgz" -OutFile $libreSslTgzTgt }
+      tar -xvzf "$libreSslTgzTgt" -C "$libsDir"
+      if ($LastExitCode -ne 0) { throw "Error downloading and extracting $libreSslTgz" }
+    }
+
+    $libreSslLib = Join-Path -Path $libsDir -ChildPath "lib/ssl-53.lib"
+
+    if (-not (Test-Path $libreSslLib))
+    {
+      Push-Location $libreSslSrc
+      (Get-Content "$libreSslSrc\CMakeLists.txt").replace('add_definitions(-Dinline=__inline)', "add_definitions(-Dinline=__inline)`nadd_definitions(-DPATH_MAX=255)") | Set-Content "$libreSslSrc\CMakeLists.txt"
+      cmake.exe $libreSslSrc -Thost=x64 -A x64 -DCMAKE_INSTALL_PREFIX="$libsDir" -DCMAKE_BUILD_TYPE="Release"
+      if ($LastExitCode -ne 0) { Pop-Location; throw "Error configuring $libreSsl" }
+      cmake.exe --build . --target install --config Release
+      if ($LastExitCode -ne 0) { Pop-Location; throw "Error building $libreSsl" }
+      Pop-Location
+    }
+
+    # copy to the root dir (i.e. PONYPATH) for linking
+    Copy-Item -Force -Path "$libsDir/lib/ssl.lib" -Destination "$rootDir/ssl.lib"
+    Copy-Item -Force -Path "$libsDir/lib/crypto.lib" -Destination "$rootDir/crypto.lib"
+    Copy-Item -Force -Path "$libsDir/lib/tls.lib" -Destination "$rootDir/tls.lib"
   }
 }
 
@@ -236,6 +274,17 @@ switch ($Command.ToLower())
     {
       Write-Host "$target is a library; nothing to package."
     }
+    break
+  }
+
+  "libs"
+  {
+    if (-not (Test-Path $libsDir))
+    {
+      mkdir "$libsDir"
+    }
+
+    BuildLibs
     break
   }
 
