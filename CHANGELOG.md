@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file. This projec
 
 - Update ponylang/ssl dependency to version 1.0.1 ([PR #119](https://github.com/ponylang/http/pull/119))
 - Update ponylang/ssl to 2.0.1 ([PR #134](https://github.com/ponylang/http/pull/134))
+- Use prebuilt LibreSSL binaries on Windows ([PR #135](https://github.com/ponylang/http/pull/135))
 
 ## [0.6.4] - 2025-07-16
 
