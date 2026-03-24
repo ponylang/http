@@ -12,6 +12,8 @@ jobs:
     name: Test against recent ponyc release on Windows
     runs-on: windows-2025
     steps:
+      - name: Disable Windows Defender
+        run: Set-MpPreference -DisableRealtimeMonitoring $true
       - uses: actions/checkout@v6.0.2
       - name: Test against recent ponyc release on Windows
         run: |
