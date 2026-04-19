@@ -51,7 +51,7 @@ jobs:
     name: OpenSSL 3.x with most recent ponyc release
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/ponylang/shared-docker-ci-standard-builder-with-openssl-3.6.0:release
+      image: ghcr.io/ponylang/shared-docker-ci-standard-builder-with-openssl-3.6.2:release
     steps:
       - uses: actions/checkout@v6.0.2
       - name: Test
